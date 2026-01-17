@@ -41,12 +41,30 @@ router.post('/signup', async (req, res) => {
         return res.status(500).json({ error: 'Error logging in after signup.' });
       }
       
+      // Verify passport data is in session
+      console.log('🔍 After req.login (signup) - Session state:', {
+        sessionID: req.sessionID,
+        hasPassport: !!req.session.passport,
+        passportUser: req.session.passport?.user,
+        hasReqUser: !!req.user,
+        isAuthenticated: req.isAuthenticated()
+      });
+      
       // Explicitly save the session to ensure it's persisted
       req.session.save((saveErr) => {
         if (saveErr) {
           console.error('Session save error after signup:', saveErr);
           return res.status(500).json({ error: 'Error saving session.' });
         }
+        
+        // Verify passport data is still there after save
+        console.log('🔍 After session.save (signup) - Session state:', {
+          sessionID: req.sessionID,
+          hasPassport: !!req.session.passport,
+          passportUser: req.session.passport?.user,
+          hasReqUser: !!req.user,
+          isAuthenticated: req.isAuthenticated()
+        });
         
         console.log('✅ Session saved for new user:', user.email, 'Session ID:', req.sessionID);
         

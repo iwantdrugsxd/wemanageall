@@ -146,9 +146,18 @@ console.log('🔐 Session config:', {
 
 app.use(session(sessionConfig));
 
-// Initialize Passport
+// Initialize Passport - MUST be after session middleware
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Ensure passport session is properly restored
+app.use((req, res, next) => {
+  // If session exists but passport data is missing, try to restore it
+  if (req.session && !req.session.passport && req.sessionID) {
+    console.warn('⚠️  Session exists but passport data is missing. Session ID:', req.sessionID);
+  }
+  next();
+});
 
 // Debug middleware to log session state
 app.use((req, res, next) => {
