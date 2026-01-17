@@ -73,7 +73,32 @@ app.use(express.urlencoded({ extended: true }));
 // Session configuration with PostgreSQL store
 const PgSession = connectPgSimple(session);
 
-app.use(session({
+// Ensure session table exists
+const ensureSessionTable = async () => {
+  try {
+    await query(`
+      CREATE TABLE IF NOT EXISTS session (
+        sid VARCHAR NOT NULL COLLATE "default",
+        sess JSON NOT NULL,
+        expire TIMESTAMP(6) NOT NULL
+      )
+      WITH (OIDS=FALSE);
+      
+      ALTER TABLE session ADD CONSTRAINT session_pkey PRIMARY KEY (sid) NOT DEFERRABLE INITIALLY IMMEDIATE;
+      
+      CREATE INDEX IF NOT EXISTS IDX_session_expire ON session(expire);
+    `);
+    console.log('✅ Session table ready');
+  } catch (error) {
+    console.warn('⚠️  Session table creation warning:', error.message);
+    // Continue anyway - connect-pg-simple will try to create it
+  }
+};
+
+// Initialize session table before using it
+ensureSessionTable();
+
+const sessionConfig = {
   store: new PgSession({
     pool: pool,
     tableName: 'session',
@@ -87,10 +112,19 @@ app.use(session({
     secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
     httpOnly: true,
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    sameSite: 'lax', // Same-site requests (works for same domain)
-    // Don't set domain - let browser use default (works for exact domain match)
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 'none' needed for HTTPS cross-site
   }
-}));
+};
+
+// Log session config (without secret)
+console.log('🔐 Session config:', {
+  secure: sessionConfig.cookie.secure,
+  sameSite: sessionConfig.cookie.sameSite,
+  hasSecret: !!process.env.SESSION_SECRET,
+  tableName: 'session'
+});
+
+app.use(session(sessionConfig));
 
 // Initialize Passport
 app.use(passport.initialize());
