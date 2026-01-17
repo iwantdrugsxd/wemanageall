@@ -50,7 +50,7 @@ const CHALLENGES = [
 
 export default function Onboarding() {
   const navigate = useNavigate();
-  const { user, updateOnboarding } = useAuth();
+  const { user, updateOnboarding, checkAuth } = useAuth();
   
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -83,7 +83,7 @@ export default function Onboarding() {
         setCurrentStep(currentStep + 1);
       } else {
         // Complete onboarding
-        await updateOnboarding(5, {
+        const result = await updateOnboarding(5, {
           identity: {
             vision: data.vision,
             values: data.values,
@@ -92,8 +92,19 @@ export default function Onboarding() {
           lifePhase: data.lifePhase,
           challenges: data.challenges,
         });
-        // Complete onboarding - redirect handled by App.jsx
-        window.location.href = '/welcome';
+        
+        // Refresh auth state to get updated user with onboardingCompleted = true
+        if (result.profile?.onboardingCompleted) {
+          // Force a refresh of the auth state
+          await checkAuth();
+          // Small delay to ensure state is updated
+          setTimeout(() => {
+            navigate('/welcome', { replace: true });
+          }, 100);
+        } else {
+          // If still not completed, navigate anyway and let ProtectedRoute handle it
+          navigate('/welcome', { replace: true });
+        }
       }
     } catch (error) {
       console.error('Failed to save:', error);

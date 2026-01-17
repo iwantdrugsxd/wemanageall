@@ -82,7 +82,7 @@ router.post('/login', (req, res, next) => {
       
       // Determine redirect based on onboarding status
       const redirect = user.onboardingCompleted 
-        ? '/dashboard' 
+        ? '/welcome' 
         : '/onboarding';
       
       res.json({

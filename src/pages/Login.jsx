@@ -18,7 +18,14 @@ export default function Login() {
 
     try {
       const result = await login(formData.email, formData.password);
-      navigate(result.redirect || '/dashboard');
+      // Let AuthRoute handle the redirect based on onboarding status
+      // The backend returns the correct redirect, but AuthRoute will override if needed
+      if (result.redirect) {
+        navigate(result.redirect);
+      } else {
+        // Fallback: let AuthRoute handle it
+        navigate('/');
+      }
     } catch (err) {
       setError(err.message || 'Invalid email or password.');
     } finally {
