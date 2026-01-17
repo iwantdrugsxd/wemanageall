@@ -123,17 +123,20 @@ const sessionConfig = {
     pool: pool,
     tableName: 'session',
     createTableIfMissing: true,
+    pruneSessionInterval: false, // Disable automatic pruning, let PostgreSQL handle it
   }),
   secret: process.env.SESSION_SECRET || 'ofa-life-os-secret-key-change-in-production',
-  resave: false,
-  saveUninitialized: false,
+  resave: true, // Force save session back to store even if not modified
+  saveUninitialized: false, // Don't save uninitialized sessions
   name: 'ofa.sid', // Custom session name
   cookie: {
     secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
     httpOnly: true,
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     sameSite: 'lax', // Works for same-domain requests (wemanageall.in to wemanageall.in)
-  }
+  },
+  // Ensure session is saved even if not modified
+  rolling: false, // Don't reset expiration on every request
 };
 
 // Log session config (without secret)

@@ -108,25 +108,50 @@ router.post('/login', (req, res, next) => {
         return res.status(500).json({ error: 'Error logging in.' });
       }
       
-      // Explicitly save the session to ensure it's persisted
-      req.session.save((saveErr) => {
-        if (saveErr) {
-          console.error('Session save error:', saveErr);
-          return res.status(500).json({ error: 'Error saving session.' });
-        }
+      // Check if passport data was set
+      console.log('🔍 Immediately after req.login:', {
+        sessionID: req.sessionID,
+        hasPassport: !!req.session.passport,
+        passportUser: req.session.passport?.user,
+        fullSession: JSON.stringify(req.session).substring(0, 200)
+      });
+      
+      // Wait a tick to ensure passport data is set
+      process.nextTick(() => {
+        // Check again after next tick
+        console.log('🔍 After nextTick:', {
+          sessionID: req.sessionID,
+          hasPassport: !!req.session.passport,
+          passportUser: req.session.passport?.user
+        });
         
-        console.log('✅ Session saved for user:', user.email, 'Session ID:', req.sessionID);
-        
-        // Determine redirect based on onboarding status
-        const redirect = user.onboardingCompleted 
-          ? '/welcome' 
-          : '/onboarding';
-        
-        res.json({
-          success: true,
-          message: 'Login successful.',
-          user,
-          redirect
+        // Explicitly save the session to ensure it's persisted
+        req.session.save((saveErr) => {
+          if (saveErr) {
+            console.error('Session save error:', saveErr);
+            return res.status(500).json({ error: 'Error saving session.' });
+          }
+          
+          // Verify passport data is still there after save
+          console.log('🔍 After session.save:', {
+            sessionID: req.sessionID,
+            hasPassport: !!req.session.passport,
+            passportUser: req.session.passport?.user
+          });
+          
+          console.log('✅ Session saved for user:', user.email, 'Session ID:', req.sessionID);
+          
+          // Determine redirect based on onboarding status
+          const redirect = user.onboardingCompleted 
+            ? '/welcome' 
+            : '/onboarding';
+          
+          res.json({
+            success: true,
+            message: 'Login successful.',
+            user,
+            redirect
+          });
         });
       });
     });
