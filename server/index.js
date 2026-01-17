@@ -76,18 +76,56 @@ const PgSession = connectPgSimple(session);
 // Ensure session table exists
 const ensureSessionTable = async () => {
   try {
+    // Check if table exists
+    const tableExists = await query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_schema = 'public' 
+        AND table_name = 'session'
+      );
+    `);
+
+    if (!tableExists.rows[0].exists) {
+      // Table doesn't exist, create it
+      await query(`
+        CREATE TABLE session (
+          sid VARCHAR NOT NULL COLLATE "default",
+          sess JSON NOT NULL,
+          expire TIMESTAMP(6) NOT NULL,
+          CONSTRAINT session_pkey PRIMARY KEY (sid) NOT DEFERRABLE INITIALLY IMMEDIATE
+        )
+        WITH (OIDS=FALSE);
+      `);
+      console.log('✅ Session table created');
+    } else {
+      // Table exists, check if it has the right structure
+      const hasPrimaryKey = await query(`
+        SELECT EXISTS (
+          SELECT FROM information_schema.table_constraints 
+          WHERE table_schema = 'public' 
+          AND table_name = 'session' 
+          AND constraint_type = 'PRIMARY KEY'
+        );
+      `);
+
+      if (!hasPrimaryKey.rows[0].exists) {
+        // Table exists but no primary key - add it (only if column exists)
+        try {
+          await query(`
+            ALTER TABLE session ADD CONSTRAINT session_pkey PRIMARY KEY (sid);
+          `);
+          console.log('✅ Session table primary key added');
+        } catch (err) {
+          console.warn('⚠️  Could not add primary key (may already exist):', err.message);
+        }
+      }
+    }
+
+    // Create index if it doesn't exist
     await query(`
-      CREATE TABLE IF NOT EXISTS session (
-        sid VARCHAR NOT NULL COLLATE "default",
-        sess JSON NOT NULL,
-        expire TIMESTAMP(6) NOT NULL
-      )
-      WITH (OIDS=FALSE);
-      
-      ALTER TABLE session ADD CONSTRAINT session_pkey PRIMARY KEY (sid) NOT DEFERRABLE INITIALLY IMMEDIATE;
-      
       CREATE INDEX IF NOT EXISTS IDX_session_expire ON session(expire);
     `);
+    
     console.log('✅ Session table ready');
   } catch (error) {
     console.warn('⚠️  Session table creation warning:', error.message);
