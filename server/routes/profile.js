@@ -18,15 +18,25 @@ const requireAuth = (req, res, next) => {
     return next();
   }
   
-  // Log session info for debugging
+  // Log detailed session info for debugging
   console.warn('⚠️  Unauthenticated request:', {
     path: req.path,
     method: req.method,
     hasSession: !!req.session,
     sessionID: req.sessionID,
+    sessionPassport: req.session?.passport,
+    hasUser: !!req.user,
+    userID: req.user?.id,
     isAuthenticated: req.isAuthenticated(),
-    cookies: req.headers.cookie ? 'present' : 'missing'
+    cookies: req.headers.cookie ? 'present' : 'missing',
+    cookieHeader: req.headers.cookie?.substring(0, 50) + '...'
   });
+  
+  // Check if session has passport data but user isn't set
+  if (req.session?.passport?.user) {
+    console.warn('⚠️  Session has passport.user but req.user is not set:', req.session.passport.user);
+    console.warn('   This suggests deserialization failed or is pending');
+  }
   
   res.status(401).json({ error: 'Please log in to continue.' });
 };

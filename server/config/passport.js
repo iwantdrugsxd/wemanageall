@@ -106,14 +106,25 @@ passport.serializeUser((user, done) => {
 // Deserialize user from session (fetch full user profile)
 passport.deserializeUser(async (id, done) => {
   try {
+    console.log('🔍 Deserializing user from session, ID:', id);
+    
+    if (!id) {
+      console.warn('⚠️  No user ID in session');
+      return done(null, false);
+    }
+    
     const user = await getUserProfile(id);
+    
     if (user) {
+      console.log('✅ User deserialized successfully:', user.email);
       done(null, user);
     } else {
+      console.warn('⚠️  User not found for ID:', id);
       done(null, false);
     }
   } catch (error) {
-    console.error('Passport deserialization error:', error);
+    console.error('❌ Passport deserialization error:', error.message);
+    console.error('   Stack:', error.stack);
     done(error);
   }
 });

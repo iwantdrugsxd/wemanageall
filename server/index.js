@@ -150,6 +150,23 @@ app.use(session(sessionConfig));
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Debug middleware to log session state
+app.use((req, res, next) => {
+  // Only log for API routes to avoid spam
+  if (req.path.startsWith('/api/') && req.method === 'POST') {
+    console.log('📊 Request session state:', {
+      path: req.path,
+      hasSession: !!req.session,
+      sessionID: req.sessionID,
+      hasPassport: !!req.session?.passport,
+      passportUser: req.session?.passport?.user,
+      hasReqUser: !!req.user,
+      isAuthenticated: req.isAuthenticated()
+    });
+  }
+  next();
+});
+
 // Serve uploaded files
 app.use('/uploads', express.static(join(__dirname, '../uploads')));
 
