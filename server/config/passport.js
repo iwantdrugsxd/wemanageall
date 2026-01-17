@@ -44,11 +44,27 @@ passport.use(new LocalStrategy(
 
 // Google OAuth Strategy
 if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  // Construct callback URL
+  // In production, use full URL. In development, use relative path
+  let callbackURL = process.env.GOOGLE_CALLBACK_URL;
+  
+  if (!callbackURL) {
+    // If FRONTEND_URL is set and it's a full URL (production), use it
+    // Otherwise use relative path (development)
+    if (process.env.FRONTEND_URL && process.env.FRONTEND_URL.startsWith('http')) {
+      callbackURL = `${process.env.FRONTEND_URL}/api/auth/google/callback`;
+    } else {
+      callbackURL = '/api/auth/google/callback';
+    }
+  }
+  
+  console.log('🔐 Google OAuth callback URL:', callbackURL);
+  
   passport.use(new GoogleStrategy(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: process.env.GOOGLE_CALLBACK_URL || '/api/auth/google/callback'
+      callbackURL: callbackURL
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
