@@ -79,13 +79,28 @@ router.put('/', requireAuth, async (req, res) => {
  */
 router.post('/onboarding', requireAuth, async (req, res) => {
   try {
+    // Verify session is still valid
+    if (!req.isAuthenticated() || !req.user) {
+      console.error('❌ Session expired during onboarding request');
+      return res.status(401).json({ error: 'Session expired. Please log in again.' });
+    }
+    
     const { step, data } = req.body;
     
     if (typeof step !== 'number' || step < 0 || step > 7) {
       return res.status(400).json({ error: 'Invalid step number.' });
     }
     
+    console.log(`📝 Saving onboarding step ${step} for user ${req.user.id}`);
+    
     const profile = await updateOnboardingStep(req.user.id, step, data);
+    
+    // Ensure session is saved after update
+    req.session.save((err) => {
+      if (err) {
+        console.error('Session save error after onboarding update:', err);
+      }
+    });
     
     res.json({
       success: true,
