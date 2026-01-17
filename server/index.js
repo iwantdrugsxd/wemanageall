@@ -11,6 +11,7 @@ dotenv.config();
 
 // Import database
 import pool, { testConnection, query } from './db/config.js';
+import { ensureUsersTable } from './db/ensure-users-table.js';
 
 // Import Passport configuration
 import passport from './config/passport.js';
@@ -47,6 +48,8 @@ const allowedOrigins = [
   'http://localhost:3000',
   process.env.CORS_ORIGIN,
   process.env.FRONTEND_URL,
+  'https://wemanageall.in',
+  'https://www.wemanageall.in',
 ].filter(Boolean); // Remove undefined values
 
 app.use(cors({
@@ -209,6 +212,9 @@ async function startServer() {
     console.error('\n⚠️  Database connection failed!');
     console.error('   Make sure PostgreSQL is running and configured correctly.');
     console.error('   Run "npm run db:init" to initialize the database.\n');
+  } else {
+    // Ensure users table exists (auto-initialize if missing)
+    await ensureUsersTable();
   }
   
   app.listen(PORT, () => {

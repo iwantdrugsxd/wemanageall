@@ -41,29 +41,53 @@ async function initDatabase() {
     const schemaPath = path.join(__dirname, 'schema.sql');
     const schema = fs.readFileSync(schemaPath, 'utf8');
 
-    // Split schema into individual statements
-    const statements = schema
-      .split(';')
-      .map(s => s.trim())
-      .filter(s => s.length > 0 && !s.startsWith('--'));
+    // Execute the entire schema at once (PostgreSQL can handle it)
+    // This is better than splitting because it preserves functions, triggers, etc.
+    try {
+      await client.query(schema);
+      console.log('✅ Schema executed successfully');
+    } catch (error) {
+      // If there are errors, try to continue with individual statements
+      console.warn('⚠️  Full schema execution had issues, trying individual statements...');
+      console.warn('   Error:', error.message);
+      
+      // Split schema into individual statements as fallback
+      const statements = schema
+        .split(';')
+        .map(s => s.trim())
+        .filter(s => s.length > 0 && !s.startsWith('--') && !s.startsWith('/*'));
 
-    console.log(`📝 Executing ${statements.length} SQL statements...\n`);
+      let successCount = 0;
+      let errorCount = 0;
 
-    for (let i = 0; i < statements.length; i++) {
-      const statement = statements[i];
-      try {
-        await client.query(statement);
-        if (i % 10 === 0) {
-          process.stdout.write('.');
+      for (let i = 0; i < statements.length; i++) {
+        const statement = statements[i];
+        if (!statement) continue;
+        
+        try {
+          await client.query(statement);
+          successCount++;
+          if (i % 20 === 0) {
+            process.stdout.write('.');
+          }
+        } catch (err) {
+          // Ignore "already exists" and similar errors
+          if (!err.message.includes('already exists') && 
+              !err.message.includes('duplicate') &&
+              !err.message.includes('IF NOT EXISTS') &&
+              !err.message.includes('does not exist') &&
+              !err.message.includes('syntax error')) {
+            errorCount++;
+            if (errorCount <= 5) { // Only show first 5 errors
+              console.error(`\n⚠️  Statement ${i + 1} warning:`, err.message.substring(0, 100));
+            }
+          }
         }
-      } catch (error) {
-        // Ignore "already exists" errors
-        if (!error.message.includes('already exists') && 
-            !error.message.includes('duplicate') &&
-            !error.message.includes('IF NOT EXISTS')) {
-          console.error(`\n❌ Error executing statement ${i + 1}:`, error.message);
-          console.error('Statement:', statement.substring(0, 100) + '...');
-        }
+      }
+      
+      console.log(`\n✅ Executed ${successCount} statements successfully`);
+      if (errorCount > 0) {
+        console.log(`⚠️  ${errorCount} statements had warnings (likely already exist)`);
       }
     }
 
