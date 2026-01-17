@@ -112,7 +112,7 @@ const sessionConfig = {
     secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
     httpOnly: true,
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 'none' needed for HTTPS cross-site
+    sameSite: 'lax', // Works for same-domain requests (wemanageall.in to wemanageall.in)
   }
 };
 
