@@ -309,6 +309,16 @@ export async function updateOnboardingStep(id, step, data = {}) {
     // Update step and completion status (5 steps total now)
     const completed = step >= 5;
     
+    console.log(`📝 Updating onboarding step ${step} for user ${id}`, {
+      step,
+      completed,
+      hasVision: data.identity?.vision !== undefined,
+      hasValues: data.identity?.values?.length > 0,
+      hasRoles: data.identity?.roles?.length > 0,
+      hasLifePhase: data.lifePhase !== undefined,
+      hasChallenges: data.challenges?.length > 0,
+    });
+    
     await client.query(
       `UPDATE users SET 
          onboarding_step = $1,
@@ -319,14 +329,15 @@ export async function updateOnboardingStep(id, step, data = {}) {
 
     // Update identity if provided
     if (data.identity) {
-      if (data.identity.vision !== undefined) {
+      if (data.identity.vision !== undefined && data.identity.vision !== null && data.identity.vision.trim() !== '') {
         await client.query(
           `UPDATE users SET vision = $1 WHERE id = $2`,
-          [data.identity.vision, id]
+          [data.identity.vision.trim(), id]
         );
+        console.log(`✅ Saved vision: ${data.identity.vision.substring(0, 50)}...`);
       }
 
-      if (data.identity.values) {
+      if (data.identity.values && Array.isArray(data.identity.values) && data.identity.values.length > 0) {
         await client.query(`DELETE FROM user_values WHERE user_id = $1`, [id]);
         for (const value of data.identity.values) {
           await client.query(
@@ -334,9 +345,10 @@ export async function updateOnboardingStep(id, step, data = {}) {
             [id, value]
           );
         }
+        console.log(`✅ Saved ${data.identity.values.length} values:`, data.identity.values);
       }
 
-      if (data.identity.roles) {
+      if (data.identity.roles && Array.isArray(data.identity.roles) && data.identity.roles.length > 0) {
         await client.query(`DELETE FROM user_roles WHERE user_id = $1`, [id]);
         for (const role of data.identity.roles) {
           await client.query(
@@ -344,19 +356,21 @@ export async function updateOnboardingStep(id, step, data = {}) {
             [id, role]
           );
         }
+        console.log(`✅ Saved ${data.identity.roles.length} roles:`, data.identity.roles);
       }
     }
 
     // Update life phase if provided
-    if (data.lifePhase !== undefined) {
+    if (data.lifePhase !== undefined && data.lifePhase !== null && data.lifePhase.trim() !== '') {
       await client.query(
         `UPDATE users SET life_phase = $1 WHERE id = $2`,
-        [data.lifePhase, id]
+        [data.lifePhase.trim(), id]
       );
+      console.log(`✅ Saved life phase: ${data.lifePhase}`);
     }
 
     // Update challenges (stored as focus areas)
-    if (data.challenges) {
+    if (data.challenges && Array.isArray(data.challenges) && data.challenges.length > 0) {
       await client.query(`DELETE FROM user_focus_areas WHERE user_id = $1`, [id]);
       for (const challenge of data.challenges) {
         await client.query(
@@ -364,9 +378,13 @@ export async function updateOnboardingStep(id, step, data = {}) {
           [id, challenge]
         );
       }
+      console.log(`✅ Saved ${data.challenges.length} challenges:`, data.challenges);
     }
 
-    return getUserProfile(id);
+    const profile = await getUserProfile(id);
+    console.log(`✅ Onboarding step ${step} saved. Completed: ${profile.onboardingCompleted}`);
+    
+    return profile;
   });
 }
 

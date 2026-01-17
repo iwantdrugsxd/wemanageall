@@ -68,31 +68,41 @@ export default function Onboarding() {
     
     setLoading(true);
     try {
-      // Save current step data
-      await updateOnboarding(currentStep, {
+      // Always save ALL collected data at each step to ensure nothing is lost
+      // This ensures all answers are stored in the database
+      const onboardingData = {
         identity: {
-          vision: currentStep === 1 ? data.vision : undefined,
-          values: currentStep === 2 ? data.values : undefined,
-          roles: currentStep === 3 ? data.roles : undefined,
+          // Always include vision if it exists (step 1)
+          vision: data.vision || undefined,
+          // Always include values if they exist (step 2)
+          values: data.values.length > 0 ? data.values : undefined,
+          // Always include roles if they exist (step 3)
+          roles: data.roles.length > 0 ? data.roles : undefined,
         },
-        lifePhase: currentStep === 4 ? data.lifePhase : undefined,
-        challenges: currentStep === 5 ? data.challenges : undefined,
+        // Always include lifePhase if it exists (step 4)
+        lifePhase: data.lifePhase || undefined,
+        // Always include challenges if they exist (step 5)
+        challenges: data.challenges.length > 0 ? data.challenges : undefined,
+      };
+
+      // Save all data at current step
+      const result = await updateOnboarding(currentStep, onboardingData);
+      
+      console.log(`✅ Saved onboarding step ${currentStep}:`, {
+        step: currentStep,
+        vision: data.vision,
+        values: data.values,
+        roles: data.roles,
+        lifePhase: data.lifePhase,
+        challenges: data.challenges,
+        completed: result.profile?.onboardingCompleted
       });
       
       if (currentStep < 5) {
+        // Move to next step
         setCurrentStep(currentStep + 1);
       } else {
-        // Complete onboarding
-        const result = await updateOnboarding(5, {
-          identity: {
-            vision: data.vision,
-            values: data.values,
-            roles: data.roles,
-          },
-          lifePhase: data.lifePhase,
-          challenges: data.challenges,
-        });
-        
+        // Complete onboarding - all data should already be saved above
         // Refresh auth state to get updated user with onboardingCompleted = true
         if (result.profile?.onboardingCompleted) {
           // Force a refresh of the auth state
@@ -107,7 +117,8 @@ export default function Onboarding() {
         }
       }
     } catch (error) {
-      console.error('Failed to save:', error);
+      console.error('Failed to save onboarding data:', error);
+      alert('Failed to save your answers. Please try again.');
     } finally {
       setLoading(false);
     }
