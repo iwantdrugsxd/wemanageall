@@ -203,9 +203,22 @@ export function AuthProvider({ children }) {
       body: JSON.stringify({ step, data }),
     });
 
+    // Handle 401 Unauthorized - session expired
+    if (response.status === 401) {
+      console.error('Session expired during onboarding. Redirecting to login...');
+      setUser(null);
+      // Don't throw error, let the caller handle it
+      return { error: 'Session expired. Please log in again.', unauthorized: true };
+    }
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Failed to save onboarding data' }));
+      throw new Error(errorData.error || 'Failed to save onboarding data');
+    }
+
     const result = await response.json();
 
-    if (response.ok) {
+    if (result.profile) {
       setUser(result.profile);
     }
 

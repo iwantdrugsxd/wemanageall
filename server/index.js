@@ -82,10 +82,13 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'ofa-life-os-secret-key-change-in-production',
   resave: false,
   saveUninitialized: false,
+  name: 'ofa.sid', // Custom session name
   cookie: {
-    secure: process.env.NODE_ENV === 'production',
+    secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
     httpOnly: true,
-    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    sameSite: 'lax', // Same-site requests (works for same domain)
+    // Don't set domain - let browser use default (works for exact domain match)
   }
 }));
 

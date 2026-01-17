@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -63,6 +63,30 @@ export default function Onboarding() {
     challenges: [],
   });
 
+  // Load existing onboarding data when component mounts or user changes
+  useEffect(() => {
+    if (user) {
+      // Restore saved data from user profile
+      setData({
+        vision: user.identity?.vision || '',
+        values: user.identity?.values || [],
+        roles: user.identity?.roles || [],
+        lifePhase: user.lifePhase || '',
+        challenges: user.focusAreas || [],
+      });
+      
+      // Restore current step (but don't go beyond step 5)
+      if (user.onboardingStep && user.onboardingStep > 0 && user.onboardingStep <= 5) {
+        setCurrentStep(user.onboardingStep);
+      }
+      
+      // If onboarding is already completed, redirect to welcome
+      if (user.onboardingCompleted) {
+        navigate('/welcome', { replace: true });
+      }
+    }
+  }, [user, navigate]);
+
   const handleNext = async () => {
     if (!validateStep()) return;
     
@@ -87,6 +111,18 @@ export default function Onboarding() {
 
       // Save all data at current step
       const result = await updateOnboarding(currentStep, onboardingData);
+      
+      // Check if session expired
+      if (result?.unauthorized) {
+        alert('Your session has expired. Please log in again.');
+        navigate('/login', { replace: true });
+        return;
+      }
+      
+      // Check for errors
+      if (result?.error) {
+        throw new Error(result.error);
+      }
       
       console.log(`✅ Saved onboarding step ${currentStep}:`, {
         step: currentStep,
@@ -118,7 +154,7 @@ export default function Onboarding() {
       }
     } catch (error) {
       console.error('Failed to save onboarding data:', error);
-      alert('Failed to save your answers. Please try again.');
+      alert(`Failed to save your answers: ${error.message}. Please try again.`);
     } finally {
       setLoading(false);
     }
