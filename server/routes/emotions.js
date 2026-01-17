@@ -12,10 +12,13 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Initialize OpenAI client (lazy initialization)
+let openai = null;
+if (process.env.OPENAI_API_KEY) {
+  openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+}
 
 const router = Router();
 
@@ -195,7 +198,7 @@ router.post('/process-transcript', requireAuth, async (req, res) => {
 // POST /api/emotions/transcribe - Transcribe audio using Whisper
 router.post('/transcribe', requireAuth, async (req, res) => {
   try {
-    if (!process.env.OPENAI_API_KEY) {
+    if (!process.env.OPENAI_API_KEY || !openai) {
       return res.status(500).json({ error: 'OpenAI API key not configured.' });
     }
 
