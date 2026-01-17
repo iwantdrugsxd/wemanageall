@@ -73,7 +73,7 @@ app.use(express.urlencoded({ extended: true }));
 // Session configuration with PostgreSQL store
 const PgSession = connectPgSimple(session);
 
-// Ensure session table exists
+// Ensure session table exists (let connect-pg-simple handle it, just verify)
 const ensureSessionTable = async () => {
   try {
     // Check if table exists
@@ -85,20 +85,8 @@ const ensureSessionTable = async () => {
       );
     `);
 
-    if (!tableExists.rows[0].exists) {
-      // Table doesn't exist, create it
-      await query(`
-        CREATE TABLE session (
-          sid VARCHAR NOT NULL COLLATE "default",
-          sess JSON NOT NULL,
-          expire TIMESTAMP(6) NOT NULL,
-          CONSTRAINT session_pkey PRIMARY KEY (sid) NOT DEFERRABLE INITIALLY IMMEDIATE
-        )
-        WITH (OIDS=FALSE);
-      `);
-      console.log('✅ Session table created');
-    } else {
-      // Table exists, check if it has the right structure
+    if (tableExists.rows[0].exists) {
+      // Table exists - verify it has the required structure
       const hasPrimaryKey = await query(`
         SELECT EXISTS (
           SELECT FROM information_schema.table_constraints 
@@ -108,28 +96,22 @@ const ensureSessionTable = async () => {
         );
       `);
 
-      if (!hasPrimaryKey.rows[0].exists) {
-        // Table exists but no primary key - add it (only if column exists)
-        try {
-          await query(`
-            ALTER TABLE session ADD CONSTRAINT session_pkey PRIMARY KEY (sid);
-          `);
-          console.log('✅ Session table primary key added');
-        } catch (err) {
-          console.warn('⚠️  Could not add primary key (may already exist):', err.message);
-        }
+      if (hasPrimaryKey.rows[0].exists) {
+        console.log('✅ Session table exists and is properly configured');
+      } else {
+        console.warn('⚠️  Session table exists but missing primary key - connect-pg-simple will handle it');
       }
-    }
 
-    // Create index if it doesn't exist
-    await query(`
-      CREATE INDEX IF NOT EXISTS IDX_session_expire ON session(expire);
-    `);
-    
-    console.log('✅ Session table ready');
+      // Ensure index exists
+      await query(`
+        CREATE INDEX IF NOT EXISTS IDX_session_expire ON session(expire);
+      `);
+    } else {
+      console.log('ℹ️  Session table does not exist - connect-pg-simple will create it');
+    }
   } catch (error) {
-    console.warn('⚠️  Session table creation warning:', error.message);
-    // Continue anyway - connect-pg-simple will try to create it
+    console.warn('⚠️  Session table check warning:', error.message);
+    // Continue anyway - connect-pg-simple will handle table creation
   }
 };
 
