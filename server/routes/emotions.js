@@ -22,11 +22,14 @@ if (process.env.OPENAI_API_KEY) {
 
 const router = Router();
 
-// Initialize Supabase client with service role key for server-side operations (for cleanup)
-const supabase = createClient(
-  process.env.VITE_SUPABASE_URL || '',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
-);
+// Initialize Supabase client (lazy initialization)
+let supabase = null;
+if (process.env.VITE_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  supabase = createClient(
+    process.env.VITE_SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+  );
+}
 
 const requireAuth = (req, res, next) => {
   if (req.isAuthenticated()) {
@@ -94,9 +97,15 @@ router.get('/', requireAuth, async (req, res) => {
           console.log('Generating public URL for file path:', fileName);
           
           // Try Supabase getPublicUrl first
-          const { data: publicUrlData, error: urlError } = supabase.storage
-            .from('unload-recordings')
-            .getPublicUrl(fileName);
+          let publicUrlData = null;
+          let urlError = null;
+          if (supabase) {
+            const result = supabase.storage
+              .from('unload-recordings')
+              .getPublicUrl(fileName);
+            publicUrlData = result;
+            // getPublicUrl doesn't return an error, it always returns a URL
+          }
           
           if (urlError) {
             console.error('Error getting public URL:', urlError);
@@ -229,13 +238,15 @@ router.post('/transcribe', requireAuth, async (req, res) => {
       }
 
       // If we don't have the buffer yet, download from Supabase
-      if (!audioBuffer) {
+      if (!audioBuffer && supabase) {
         const { data, error } = await supabase.storage
           .from('unload-recordings')
           .download(filePath);
 
         if (error) throw error;
         audioBuffer = Buffer.from(await data.arrayBuffer());
+      } else if (!audioBuffer) {
+        throw new Error('Supabase not configured and audio download failed');
       }
     } catch (downloadError) {
       console.error('Error downloading audio:', downloadError);
@@ -431,13 +442,15 @@ router.delete('/:id', requireAuth, async (req, res) => {
         const fileName = urlParts[urlParts.length - 1];
         const folderPath = `${req.user.id}/${fileName}`;
         
-        const { error: deleteError } = await supabase.storage
-          .from('unload-recordings')
-          .remove([folderPath]);
-        
-        if (deleteError) {
-          console.error('Failed to delete from storage:', deleteError);
-          // Continue with database deletion even if storage deletion fails
+        if (supabase) {
+          const { error: deleteError } = await supabase.storage
+            .from('unload-recordings')
+            .remove([folderPath]);
+          
+          if (deleteError) {
+            console.error('Failed to delete from storage:', deleteError);
+            // Continue with database deletion even if storage deletion fails
+          }
         }
       } catch (storageError) {
         console.error('Storage deletion error:', storageError);
