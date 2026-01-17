@@ -17,6 +17,17 @@ const requireAuth = (req, res, next) => {
   if (req.isAuthenticated()) {
     return next();
   }
+  
+  // Log session info for debugging
+  console.warn('⚠️  Unauthenticated request:', {
+    path: req.path,
+    method: req.method,
+    hasSession: !!req.session,
+    sessionID: req.sessionID,
+    isAuthenticated: req.isAuthenticated(),
+    cookies: req.headers.cookie ? 'present' : 'missing'
+  });
+  
   res.status(401).json({ error: 'Please log in to continue.' });
 };
 

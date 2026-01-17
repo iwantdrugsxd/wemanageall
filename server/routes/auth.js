@@ -41,11 +41,21 @@ router.post('/signup', async (req, res) => {
         return res.status(500).json({ error: 'Error logging in after signup.' });
       }
       
-      res.status(201).json({
-        success: true,
-        message: 'Account created successfully.',
-        user,
-        redirect: '/onboarding'
+      // Explicitly save the session to ensure it's persisted
+      req.session.save((saveErr) => {
+        if (saveErr) {
+          console.error('Session save error after signup:', saveErr);
+          return res.status(500).json({ error: 'Error saving session.' });
+        }
+        
+        console.log('✅ Session saved for new user:', user.email, 'Session ID:', req.sessionID);
+        
+        res.status(201).json({
+          success: true,
+          message: 'Account created successfully.',
+          user,
+          redirect: '/onboarding'
+        });
       });
     });
     
@@ -80,16 +90,26 @@ router.post('/login', (req, res, next) => {
         return res.status(500).json({ error: 'Error logging in.' });
       }
       
-      // Determine redirect based on onboarding status
-      const redirect = user.onboardingCompleted 
-        ? '/welcome' 
-        : '/onboarding';
-      
-      res.json({
-        success: true,
-        message: 'Login successful.',
-        user,
-        redirect
+      // Explicitly save the session to ensure it's persisted
+      req.session.save((saveErr) => {
+        if (saveErr) {
+          console.error('Session save error:', saveErr);
+          return res.status(500).json({ error: 'Error saving session.' });
+        }
+        
+        console.log('✅ Session saved for user:', user.email, 'Session ID:', req.sessionID);
+        
+        // Determine redirect based on onboarding status
+        const redirect = user.onboardingCompleted 
+          ? '/welcome' 
+          : '/onboarding';
+        
+        res.json({
+          success: true,
+          message: 'Login successful.',
+          user,
+          redirect
+        });
       });
     });
   })(req, res, next);
