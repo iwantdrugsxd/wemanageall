@@ -381,7 +381,34 @@ export async function updateOnboardingStep(id, step, data = {}) {
       console.log(`✅ Saved ${data.challenges.length} challenges:`, data.challenges);
     }
 
-    const profile = await getUserProfile(id);
+    // Query profile using the transaction client to see uncommitted changes
+    const profileResult = await client.query(
+      `SELECT id, name, email, created_at, onboarding_completed, onboarding_step,
+              vision, reminder_time, review_day, tone, current_goal, life_phase
+       FROM users WHERE id = $1`,
+      [id]
+    );
+
+    if (profileResult.rows.length === 0) {
+      throw new Error('User not found after update');
+    }
+
+    const user = profileResult.rows[0];
+
+    // Get values, roles, and focus areas using transaction client
+    const [valuesResult, rolesResult, focusAreasResult] = await Promise.all([
+      client.query('SELECT value FROM user_values WHERE user_id = $1', [id]),
+      client.query('SELECT role FROM user_roles WHERE user_id = $1', [id]),
+      client.query('SELECT focus_area FROM user_focus_areas WHERE user_id = $1', [id])
+    ]);
+
+    const profile = formatUserResponse({
+      ...user,
+      values: valuesResult.rows.map(r => r.value),
+      roles: rolesResult.rows.map(r => r.role),
+      focus_areas: focusAreasResult.rows.map(r => r.focus_area)
+    });
+
     console.log(`✅ Onboarding step ${step} saved. Completed: ${profile.onboardingCompleted}`);
     
     return profile;
