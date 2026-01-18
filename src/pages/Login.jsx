@@ -205,14 +205,3 @@ export default function Login() {
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-import { useAuth } from '../context/AuthContext';
-
