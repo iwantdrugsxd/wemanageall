@@ -157,10 +157,27 @@ app.use(passport.session());
 
 // Ensure passport session is properly restored
 app.use((req, res, next) => {
+  // Log cookie info for debugging
+  const cookieHeader = req.headers.cookie || '';
+  const hasOfaSid = cookieHeader.includes('ofa.sid');
+  
   // If session exists but passport data is missing, try to restore it
   if (req.session && !req.session.passport && req.sessionID) {
-    console.warn('⚠️  Session exists but passport data is missing. Session ID:', req.sessionID);
+    console.warn('⚠️  Session exists but passport data is missing. Session ID:', req.sessionID, {
+      hasCookie: hasOfaSid,
+      cookieHeader: cookieHeader.substring(0, 100)
+    });
   }
+  
+  // If no cookie but session exists, log it
+  if (req.session && !hasOfaSid && req.path.startsWith('/api/')) {
+    console.warn('⚠️  Session exists but ofa.sid cookie is missing:', {
+      path: req.path,
+      sessionID: req.sessionID,
+      allCookies: cookieHeader.split(';').map(c => c.trim())
+    });
+  }
+  
   next();
 });
 
