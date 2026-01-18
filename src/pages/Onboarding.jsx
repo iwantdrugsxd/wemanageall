@@ -80,11 +80,11 @@ export default function Onboarding() {
         setCurrentStep(user.onboardingStep);
       }
       
-      // If onboarding is already completed, redirect to welcome
+      // If onboarding is already completed, redirect to dashboard
       // This handles the case where user state updates after step 5 completion
       if (user.onboardingCompleted) {
-        console.log('✅ User onboarding completed detected, redirecting to welcome...');
-        navigate('/welcome', { replace: true });
+        console.log('✅ User onboarding completed detected, redirecting to dashboard...');
+        navigate('/dashboard', { replace: true });
       }
     }
   }, [user, navigate]);
@@ -137,13 +137,15 @@ export default function Onboarding() {
       });
       
       if (currentStep < 5) {
-        // Move to next step
+        // Move to next step - ensure smooth progression
+        console.log(`✅ Step ${currentStep} saved. Moving to step ${currentStep + 1}...`);
         setCurrentStep(currentStep + 1);
+        // Loading will be set to false in the finally block
       } else {
         // Complete onboarding - step 5 is the final step
         // Verify onboarding is actually completed
         if (result.profile?.onboardingCompleted) {
-          console.log('✅ Onboarding completed! Navigating to welcome...', {
+          console.log('✅ Onboarding completed! Navigating to dashboard...', {
             onboardingCompleted: result.profile.onboardingCompleted,
             step: currentStep,
             profileId: result.profile.id
@@ -154,13 +156,13 @@ export default function Onboarding() {
           // This prevents the ProtectedRoute from seeing stale user state
           requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-              navigate('/welcome', { replace: true });
+              navigate('/dashboard', { replace: true });
             });
           });
         } else {
           console.error('❌ Onboarding step 5 completed but onboardingCompleted is false!', result.profile);
           // Still navigate - let ProtectedRoute handle verification
-          navigate('/welcome', { replace: true });
+          navigate('/dashboard', { replace: true });
         }
       }
     } catch (error) {

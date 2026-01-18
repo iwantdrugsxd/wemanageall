@@ -175,7 +175,7 @@ router.post('/login', (req, res, next) => {
           
           // Determine redirect based on onboarding status
           const redirect = user.onboardingCompleted 
-            ? '/welcome' 
+            ? '/dashboard' 
             : '/onboarding';
           
           res.json({
@@ -270,7 +270,7 @@ router.get('/google/callback',
     try {
       // Determine redirect based on onboarding status
       const redirect = req.user.onboardingCompleted 
-        ? '/welcome' 
+        ? '/dashboard' 
         : '/onboarding';
       
       // Redirect to frontend with success

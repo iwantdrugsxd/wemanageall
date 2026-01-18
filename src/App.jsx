@@ -54,7 +54,7 @@ function ProtectedRoute({ children, requireOnboarding = false }) {
 
   // If onboarding completed but trying to access onboarding page
   if (!requireOnboarding && user.onboardingCompleted && window.location.pathname === '/onboarding') {
-    return <Navigate to="/welcome" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   return children;
@@ -71,8 +71,8 @@ function AuthRoute({ children }) {
   if (user) {
     // Redirect based on onboarding status
     if (user.onboardingCompleted) {
-      // Always go to welcome page first after login
-      return <Navigate to="/welcome" replace />;
+      // Go to dashboard after onboarding is completed
+      return <Navigate to="/dashboard" replace />;
     } else {
       return <Navigate to="/onboarding" replace />;
     }
