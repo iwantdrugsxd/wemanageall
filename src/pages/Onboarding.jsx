@@ -81,7 +81,9 @@ export default function Onboarding() {
       }
       
       // If onboarding is already completed, redirect to welcome
+      // This handles the case where user state updates after step 5 completion
       if (user.onboardingCompleted) {
+        console.log('✅ User onboarding completed detected, redirecting to welcome...');
         navigate('/welcome', { replace: true });
       }
     }
@@ -138,17 +140,26 @@ export default function Onboarding() {
         // Move to next step
         setCurrentStep(currentStep + 1);
       } else {
-        // Complete onboarding - all data should already be saved above
-        // Refresh auth state to get updated user with onboardingCompleted = true
+        // Complete onboarding - step 5 is the final step
+        // Verify onboarding is actually completed
         if (result.profile?.onboardingCompleted) {
-          // Force a refresh of the auth state
-          await checkAuth();
-          // Small delay to ensure state is updated
-          setTimeout(() => {
-            navigate('/welcome', { replace: true });
-          }, 100);
+          console.log('✅ Onboarding completed! Navigating to welcome...', {
+            onboardingCompleted: result.profile.onboardingCompleted,
+            step: currentStep,
+            profileId: result.profile.id
+          });
+          
+          // The user state is already updated by updateOnboarding() which calls setUser(result.profile)
+          // Use requestAnimationFrame to ensure React has processed the state update before navigation
+          // This prevents the ProtectedRoute from seeing stale user state
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              navigate('/welcome', { replace: true });
+            });
+          });
         } else {
-          // If still not completed, navigate anyway and let ProtectedRoute handle it
+          console.error('❌ Onboarding step 5 completed but onboardingCompleted is false!', result.profile);
+          // Still navigate - let ProtectedRoute handle verification
           navigate('/welcome', { replace: true });
         }
       }
