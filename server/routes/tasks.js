@@ -37,11 +37,23 @@ router.post('/', requireAuth, async (req, res) => {
   try {
     const { title, description, dueDate, priority, goalId, time_estimate, time_spent } = req.body;
 
+    // Map priority: convert number to string or use default
+    let priorityValue = 'medium'; // default
+    if (priority !== undefined && priority !== null) {
+      if (typeof priority === 'number') {
+        // Map 0=low, 1=medium, 2=high
+        const priorityMap = { 0: 'low', 1: 'medium', 2: 'high' };
+        priorityValue = priorityMap[priority] || 'medium';
+      } else if (typeof priority === 'string' && ['low', 'medium', 'high'].includes(priority.toLowerCase())) {
+        priorityValue = priority.toLowerCase();
+      }
+    }
+
     const result = await query(
       `INSERT INTO tasks (user_id, goal_id, title, description, due_date, priority, status, time_estimate, time_spent)
-       VALUES ($1, $2, $3, $4, $5, $6, 'pending', $7, $8)
+       VALUES ($1, $2, $3, $4, $5, $6, 'todo', $7, $8)
        RETURNING id, title, description, status, due_date, priority, time_estimate, time_spent, created_at`,
-      [req.user.id, goalId || null, title, description || null, dueDate || null, priority || 0, time_estimate || null, time_spent || 0]
+      [req.user.id, goalId || null, title, description || null, dueDate || null, priorityValue, time_estimate || null, time_spent || 0]
     );
 
     res.json({
