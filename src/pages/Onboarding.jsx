@@ -63,6 +63,9 @@ export default function Onboarding() {
     challenges: [],
   });
 
+  // Track if we've initialized the step to prevent resetting during progression
+  const [stepInitialized, setStepInitialized] = useState(false);
+
   // Load existing onboarding data when component mounts or user changes
   useEffect(() => {
     if (user) {
@@ -75,9 +78,18 @@ export default function Onboarding() {
         challenges: user.focusAreas || [],
       });
       
-      // Restore current step (but don't go beyond step 5)
-      if (user.onboardingStep && user.onboardingStep > 0 && user.onboardingStep <= 5) {
-        setCurrentStep(user.onboardingStep);
+      // Only restore current step on initial load, not on every user update
+      // This prevents resetting the step when we're progressing through onboarding
+      // Also, don't go backwards if we're already ahead
+      if (!stepInitialized && user.onboardingStep && user.onboardingStep > 0 && user.onboardingStep <= 5) {
+        // Only restore if we're not already ahead of the saved step
+        if (currentStep <= user.onboardingStep) {
+          console.log(`📍 Restoring onboarding step from database: ${user.onboardingStep}`);
+          setCurrentStep(user.onboardingStep);
+        } else {
+          console.log(`📍 Local step (${currentStep}) is ahead of database step (${user.onboardingStep}), keeping local step`);
+        }
+        setStepInitialized(true);
       }
       
       // If onboarding is already completed, redirect to dashboard
@@ -87,7 +99,7 @@ export default function Onboarding() {
         navigate('/dashboard', { replace: true });
       }
     }
-  }, [user, navigate]);
+  }, [user, navigate, stepInitialized]);
 
   const handleNext = async () => {
     if (!validateStep()) return;
