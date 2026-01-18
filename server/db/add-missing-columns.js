@@ -73,6 +73,72 @@ export async function addMissingColumns() {
     await query('CREATE INDEX IF NOT EXISTS idx_calendar_events_date_range ON calendar_events(user_id, start_time, end_time);');
     console.log('✅ calendar_events table updated');
 
+    // Create knowledge_events table if missing
+    console.log('📚 Checking knowledge_events table...');
+    const knowledgeEventsExists = await query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_schema = 'public' 
+        AND table_name = 'knowledge_events'
+      );
+    `);
+    
+    if (!knowledgeEventsExists.rows[0].exists) {
+      await query(`
+        CREATE TABLE knowledge_events (
+          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+          user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          source TEXT NOT NULL,
+          event_type TEXT NOT NULL,
+          content TEXT NOT NULL,
+          timestamp TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          project_id UUID NULL,
+          mood TEXT NULL,
+          sentiment TEXT NULL,
+          intensity INTEGER NULL,
+          tags TEXT[] DEFAULT ARRAY[]::TEXT[],
+          raw_metadata JSONB DEFAULT '{}'::JSONB
+        );
+      `);
+      await query('CREATE INDEX IF NOT EXISTS idx_knowledge_events_user_time ON knowledge_events(user_id, timestamp DESC);');
+      console.log('✅ Created knowledge_events table');
+    } else {
+      console.log('✅ knowledge_events table exists');
+    }
+
+    // Create knowledge_insights table if missing
+    console.log('💡 Checking knowledge_insights table...');
+    const knowledgeInsightsExists = await query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_schema = 'public' 
+        AND table_name = 'knowledge_insights'
+      );
+    `);
+    
+    if (!knowledgeInsightsExists.rows[0].exists) {
+      await query(`
+        CREATE TABLE knowledge_insights (
+          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+          user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          scope TEXT NOT NULL,
+          title TEXT NOT NULL,
+          body TEXT NOT NULL,
+          sources UUID[] DEFAULT ARRAY[]::UUID[],
+          confidence REAL DEFAULT 0.0,
+          created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+          seen_at TIMESTAMPTZ NULL,
+          dismissed_at TIMESTAMPTZ NULL,
+          muted BOOLEAN DEFAULT FALSE,
+          meta JSONB DEFAULT '{}'::JSONB
+        );
+      `);
+      await query('CREATE INDEX IF NOT EXISTS idx_knowledge_insights_user_scope ON knowledge_insights(user_id, scope, created_at DESC);');
+      console.log('✅ Created knowledge_insights table');
+    } else {
+      console.log('✅ knowledge_insights table exists');
+    }
+
     // Verify onboarding completion logic - check if step 5 sets completed correctly
     console.log('\n🔍 Verifying onboarding completion logic...');
     const checkResult = await query(`
@@ -94,7 +160,7 @@ export async function addMissingColumns() {
       console.log('✅ All users have correct onboarding status');
     }
 
-    console.log('\n✅ All missing columns added successfully!\n');
+    console.log('\n✅ All missing columns and tables added successfully!\n');
     return true;
 
   } catch (error) {
