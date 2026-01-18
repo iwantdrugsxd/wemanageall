@@ -406,3 +406,6 @@ export default function Pricing() {
   );
 }
 
+
+import { useNavigate } from 'react-router-dom';
+

@@ -100,6 +100,11 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
 
 // Serialize user for session storage (store only the user ID)
 passport.serializeUser((user, done) => {
+  console.log('📦 Serializing user to session:', {
+    userId: user.id,
+    userEmail: user.email,
+    hasUser: !!user
+  });
   done(null, user.id);
 });
 

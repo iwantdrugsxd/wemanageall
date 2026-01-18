@@ -362,3 +362,63 @@ async function startServer() {
 }
 
 startServer();
+
+  }
+  
+  app.listen(PORT, () => {
+    console.log(`
+╔════════════════════════════════════════════════════════╗
+║                                                        ║
+║   🧠 OFA - Personal Life OS                            ║
+║                                                        ║
+║   Server:   http://localhost:${PORT}                      ║
+║   Database: PostgreSQL ${dbConnected ? '✅' : '❌'}                         ║
+║                                                        ║
+║   API Endpoints:                                       ║
+║   • POST /api/auth/signup    - Create account          ║
+║   • POST /api/auth/login     - Login                   ║
+║   • POST /api/auth/logout    - Logout                  ║
+║   • GET  /api/auth/me        - Current user            ║
+║   • GET  /api/profile        - Get profile             ║
+║   • PUT  /api/profile        - Update profile          ║
+║   • POST /api/profile/onboarding - Update onboarding   ║
+║   • POST /api/profile/identity   - Update identity     ║
+║   • POST /api/profile/context    - Update context      ║
+║   • POST /api/profile/preferences - Update prefs       ║
+║                                                        ║
+╚════════════════════════════════════════════════════════╝
+    `);
+  });
+}
+
+startServer();
+
+  }
+  
+  app.listen(PORT, () => {
+    console.log(`
+╔════════════════════════════════════════════════════════╗
+║                                                        ║
+║   🧠 OFA - Personal Life OS                            ║
+║                                                        ║
+║   Server:   http://localhost:${PORT}                      ║
+║   Database: PostgreSQL ${dbConnected ? '✅' : '❌'}                         ║
+║                                                        ║
+║   API Endpoints:                                       ║
+║   • POST /api/auth/signup    - Create account          ║
+║   • POST /api/auth/login     - Login                   ║
+║   • POST /api/auth/logout    - Logout                  ║
+║   • GET  /api/auth/me        - Current user            ║
+║   • GET  /api/profile        - Get profile             ║
+║   • PUT  /api/profile        - Update profile          ║
+║   • POST /api/profile/onboarding - Update onboarding   ║
+║   • POST /api/profile/identity   - Update identity     ║
+║   • POST /api/profile/context    - Update context      ║
+║   • POST /api/profile/preferences - Update prefs       ║
+║                                                        ║
+╚════════════════════════════════════════════════════════╝
+    `);
+  });
+}
+
+startServer();
