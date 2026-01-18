@@ -134,6 +134,8 @@ const sessionConfig = {
     httpOnly: true,
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     sameSite: 'lax', // Works for same-domain requests (wemanageall.in to wemanageall.in)
+    path: '/', // Cookie available for all paths
+    // Don't set domain - let browser use default (exact domain match)
   },
   // Ensure session is saved even if not modified
   rolling: false, // Don't reset expiration on every request

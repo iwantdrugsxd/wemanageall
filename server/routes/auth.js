@@ -141,6 +141,10 @@ router.post('/login', (req, res, next) => {
           
           console.log('✅ Session saved for user:', user.email, 'Session ID:', req.sessionID);
           
+          // Verify cookie is being set
+          const setCookieHeader = res.getHeader('Set-Cookie');
+          console.log('🍪 Set-Cookie header:', setCookieHeader ? 'present' : 'missing', setCookieHeader);
+          
           // Determine redirect based on onboarding status
           const redirect = user.onboardingCompleted 
             ? '/welcome' 

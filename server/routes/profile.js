@@ -19,6 +19,9 @@ const requireAuth = (req, res, next) => {
   }
   
   // Log detailed session info for debugging
+  const cookieHeader = req.headers.cookie || '';
+  const hasOfaSid = cookieHeader.includes('ofa.sid');
+  
   console.warn('⚠️  Unauthenticated request:', {
     path: req.path,
     method: req.method,
@@ -29,7 +32,9 @@ const requireAuth = (req, res, next) => {
     userID: req.user?.id,
     isAuthenticated: req.isAuthenticated(),
     cookies: req.headers.cookie ? 'present' : 'missing',
-    cookieHeader: req.headers.cookie?.substring(0, 50) + '...'
+    hasOfaSidCookie: hasOfaSid,
+    cookieHeader: cookieHeader ? cookieHeader.substring(0, 100) : 'none',
+    allCookies: cookieHeader.split(';').map(c => c.trim().substring(0, 30))
   });
   
   // Check if session has passport data but user isn't set
