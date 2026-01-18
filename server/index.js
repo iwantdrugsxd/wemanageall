@@ -38,6 +38,13 @@ const __dirname = dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Trust proxy - CRITICAL for Render/Heroku/Vercel (TLS-terminating proxies)
+// This ensures Express knows the original request was HTTPS so it sets secure cookies
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+  console.log('✅ Trust proxy enabled for production (HTTPS cookie support)');
+}
+
 // ============================================
 // Middleware
 // ============================================
@@ -130,23 +137,26 @@ const sessionConfig = {
   saveUninitialized: false, // Don't save uninitialized sessions
   name: 'ofa.sid', // Custom session name
   cookie: {
-    secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
+    domain: process.env.COOKIE_DOMAIN || '.wemanageall.in', // Allow subdomain sharing (leading dot)
+    secure: process.env.NODE_ENV === 'production', // Must be true in production for SameSite=None
     httpOnly: true,
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    sameSite: 'lax', // Works for same-domain requests (wemanageall.in to wemanageall.in)
+    sameSite: process.env.SESSION_SAMESITE || 'none', // 'none' allows cross-site AJAX (requires Secure)
     path: '/', // Cookie available for all paths
-    // Don't set domain - let browser use default (exact domain match)
   },
-  // Ensure session is saved even if not modified
-  rolling: false, // Don't reset expiration on every request
+  // Keep session alive on activity
+  rolling: true, // Reset expiration on every request (keeps active users logged in)
 };
 
 // Log session config (without secret)
 console.log('🔐 Session config:', {
   secure: sessionConfig.cookie.secure,
   sameSite: sessionConfig.cookie.sameSite,
+  domain: sessionConfig.cookie.domain,
   hasSecret: !!process.env.SESSION_SECRET,
-  tableName: 'session'
+  tableName: 'session',
+  rolling: sessionConfig.rolling,
+  trustProxy: app.get('trust proxy')
 });
 
 app.use(session(sessionConfig));

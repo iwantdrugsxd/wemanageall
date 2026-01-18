@@ -68,6 +68,22 @@ router.post('/signup', async (req, res) => {
         
         console.log('✅ Session saved for new user:', user.email, 'Session ID:', req.sessionID);
         
+        // Verify cookie is being set with full details
+        const setCookieHeader = res.getHeader('Set-Cookie');
+        if (setCookieHeader) {
+          const cookieStr = Array.isArray(setCookieHeader) ? setCookieHeader.join('; ') : setCookieHeader;
+          console.log('🍪 Set-Cookie header after signup:', {
+            present: true,
+            cookie: cookieStr.substring(0, 200),
+            hasOfaSid: cookieStr.includes('ofa.sid'),
+            hasSecure: cookieStr.includes('Secure'),
+            hasSameSite: cookieStr.includes('SameSite'),
+            hasDomain: cookieStr.includes('Domain')
+          });
+        } else {
+          console.error('❌ Set-Cookie header MISSING after signup - cookie not set!');
+        }
+        
         res.status(201).json({
           success: true,
           message: 'Account created successfully.',
@@ -141,9 +157,21 @@ router.post('/login', (req, res, next) => {
           
           console.log('✅ Session saved for user:', user.email, 'Session ID:', req.sessionID);
           
-          // Verify cookie is being set
+          // Verify cookie is being set with full details
           const setCookieHeader = res.getHeader('Set-Cookie');
-          console.log('🍪 Set-Cookie header:', setCookieHeader ? 'present' : 'missing', setCookieHeader);
+          if (setCookieHeader) {
+            const cookieStr = Array.isArray(setCookieHeader) ? setCookieHeader.join('; ') : setCookieHeader;
+            console.log('🍪 Set-Cookie header after login:', {
+              present: true,
+              cookie: cookieStr.substring(0, 200),
+              hasOfaSid: cookieStr.includes('ofa.sid'),
+              hasSecure: cookieStr.includes('Secure'),
+              hasSameSite: cookieStr.includes('SameSite'),
+              hasDomain: cookieStr.includes('Domain')
+            });
+          } else {
+            console.error('❌ Set-Cookie header MISSING after login - cookie not set!');
+          }
           
           // Determine redirect based on onboarding status
           const redirect = user.onboardingCompleted 
