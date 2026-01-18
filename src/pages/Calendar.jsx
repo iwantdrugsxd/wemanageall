@@ -1316,8 +1316,3 @@ export default function Calendar() {
         ))}
       </div>
     </div>
-  );
-}
-
-import { useAuth } from '../context/AuthContext';
-
