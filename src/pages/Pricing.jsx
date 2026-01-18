@@ -405,7 +405,3 @@ export default function Pricing() {
     </div>
   );
 }
-
-
-import { useNavigate } from 'react-router-dom';
-
