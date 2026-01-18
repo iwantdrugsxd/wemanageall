@@ -10,6 +10,28 @@ const requireAuth = (req, res, next) => {
   res.status(401).json({ error: 'Please log in to continue.' });
 };
 
+// Helper function to map database status to frontend status
+const mapStatusToFrontend = (status) => {
+  const statusMap = {
+    'done': 'completed',
+    'todo': 'pending',
+    'in_progress': 'in-progress',
+    'cancelled': 'cancelled'
+  };
+  return statusMap[status] || status;
+};
+
+// Helper function to map frontend status to database status
+const mapStatusToDatabase = (status) => {
+  const statusMap = {
+    'completed': 'done',
+    'pending': 'todo',
+    'in-progress': 'in_progress',
+    'cancelled': 'cancelled'
+  };
+  return statusMap[status?.toLowerCase()] || status?.toLowerCase();
+};
+
 // GET /api/tasks - Get user's tasks
 router.get('/', requireAuth, async (req, res) => {
   try {
@@ -25,7 +47,12 @@ router.get('/', requireAuth, async (req, res) => {
     sqlQuery += ` ORDER BY created_at DESC`;
 
     const result = await query(sqlQuery, params);
-    res.json({ tasks: result.rows });
+    // Map status from database format to frontend format
+    const tasks = result.rows.map(task => ({
+      ...task,
+      status: mapStatusToFrontend(task.status)
+    }));
+    res.json({ tasks });
   } catch (error) {
     console.error('Get tasks error:', error);
     res.status(500).json({ error: 'Failed to fetch tasks.' });
@@ -56,9 +83,15 @@ router.post('/', requireAuth, async (req, res) => {
       [req.user.id, goalId || null, title, description || null, dueDate || null, priorityValue, time_estimate || null, time_spent || 0]
     );
 
+    // Map status from database format to frontend format
+    const task = {
+      ...result.rows[0],
+      status: mapStatusToFrontend(result.rows[0].status)
+    };
+
     res.json({
       success: true,
-      task: result.rows[0],
+      task,
     });
   } catch (error) {
     console.error('Create task error:', error);
@@ -83,12 +116,7 @@ router.patch('/:id', requireAuth, async (req, res) => {
         
         // Map status values: 'completed' -> 'done', 'pending' -> 'todo'
         if (key === 'status' && typeof value === 'string') {
-          const statusMap = {
-            'completed': 'done',
-            'pending': 'todo',
-            'in-progress': 'in_progress'
-          };
-          processedValue = statusMap[value.toLowerCase()] || value.toLowerCase();
+          processedValue = mapStatusToDatabase(value);
         }
         
         // Map priority: convert number to string or validate string
@@ -126,9 +154,15 @@ router.patch('/:id', requireAuth, async (req, res) => {
       return res.status(404).json({ error: 'Task not found.' });
     }
 
+    // Map status from database format to frontend format
+    const task = {
+      ...result.rows[0],
+      status: mapStatusToFrontend(result.rows[0].status)
+    };
+
     res.json({
       success: true,
-      task: result.rows[0],
+      task,
     });
   } catch (error) {
     console.error('Update task error:', error);
@@ -137,4 +171,3 @@ router.patch('/:id', requireAuth, async (req, res) => {
 });
 
 export default router;
-
