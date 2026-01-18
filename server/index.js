@@ -12,6 +12,7 @@ dotenv.config();
 // Import database
 import pool, { testConnection, query } from './db/config.js';
 import { ensureUsersTable } from './db/ensure-users-table.js';
+import { addMissingColumns } from './db/add-missing-columns.js';
 
 // Import Passport configuration
 import passport from './config/passport.js';
@@ -330,6 +331,8 @@ async function startServer() {
   } else {
     // Ensure users table exists (auto-initialize if missing)
     await ensureUsersTable();
+    // Add any missing columns to existing tables
+    await addMissingColumns();
   }
   
   app.listen(PORT, () => {

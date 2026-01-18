@@ -177,36 +177,45 @@ export async function ensureUsersTable() {
     await query('CREATE INDEX IF NOT EXISTS idx_journal_entries_user_id ON journal_entries(user_id);');
     await query('CREATE INDEX IF NOT EXISTS idx_journal_entries_entry_date ON journal_entries(entry_date);');
 
-    // Create calendar_events table (for dashboard)
+    // Create calendar_events table (for dashboard) - with all columns
     await query(`
       CREATE TABLE IF NOT EXISTS calendar_events (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         organization_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
-        title VARCHAR(255) NOT NULL,
+        title VARCHAR(500) NOT NULL,
         description TEXT,
+        type VARCHAR(20) DEFAULT 'event' CHECK (type IN ('event', 'task', 'note', 'reminder')),
         start_time TIMESTAMP WITH TIME ZONE NOT NULL,
-        end_time TIMESTAMP WITH TIME ZONE,
+        end_time TIMESTAMP WITH TIME ZONE NOT NULL,
         all_day BOOLEAN DEFAULT FALSE,
+        timezone VARCHAR(50) DEFAULT 'UTC',
+        color VARCHAR(7) DEFAULT '#3B6E5C',
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT valid_time_range CHECK (end_time > start_time)
       );
     `);
     await query('CREATE INDEX IF NOT EXISTS idx_calendar_events_user_id ON calendar_events(user_id);');
     await query('CREATE INDEX IF NOT EXISTS idx_calendar_events_start_time ON calendar_events(start_time);');
+    await query('CREATE INDEX IF NOT EXISTS idx_calendar_events_type ON calendar_events(type);');
+    await query('CREATE INDEX IF NOT EXISTS idx_calendar_events_date_range ON calendar_events(user_id, start_time, end_time);');
 
-    // Create tasks table (for dashboard)
+    // Create tasks table (for dashboard) - with all columns
     await query(`
       CREATE TABLE IF NOT EXISTS tasks (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         organization_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
         project_id UUID REFERENCES projects(id) ON DELETE SET NULL,
+        goal_id UUID,
         title VARCHAR(255) NOT NULL,
         description TEXT,
         status VARCHAR(50) DEFAULT 'todo' CHECK (status IN ('todo', 'in_progress', 'done', 'cancelled')),
         priority VARCHAR(50) DEFAULT 'medium' CHECK (priority IN ('low', 'medium', 'high')),
         due_date DATE,
+        time_estimate INTEGER,
+        time_spent INTEGER DEFAULT 0,
         completed_at TIMESTAMP WITH TIME ZONE,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
