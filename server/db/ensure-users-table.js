@@ -224,6 +224,46 @@ export async function ensureUsersTable() {
     await query('CREATE INDEX IF NOT EXISTS idx_tasks_user_id ON tasks(user_id);');
     await query('CREATE INDEX IF NOT EXISTS idx_tasks_project_id ON tasks(project_id);');
 
+    // Create knowledge_events table (for insights/knowledge system)
+    await query(`
+      CREATE TABLE IF NOT EXISTS knowledge_events (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        source TEXT NOT NULL,
+        event_type TEXT NOT NULL,
+        content TEXT NOT NULL,
+        timestamp TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        project_id UUID NULL,
+        mood TEXT NULL,
+        sentiment TEXT NULL,
+        intensity INTEGER NULL,
+        tags TEXT[] DEFAULT ARRAY[]::TEXT[],
+        raw_metadata JSONB DEFAULT '{}'::JSONB
+      );
+    `);
+    await query('CREATE INDEX IF NOT EXISTS idx_knowledge_events_user_time ON knowledge_events(user_id, timestamp DESC);');
+    console.log('✅ knowledge_events table');
+
+    // Create knowledge_insights table (for insights/knowledge system)
+    await query(`
+      CREATE TABLE IF NOT EXISTS knowledge_insights (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        scope TEXT NOT NULL,
+        title TEXT NOT NULL,
+        body TEXT NOT NULL,
+        sources UUID[] DEFAULT ARRAY[]::UUID[],
+        confidence REAL DEFAULT 0.0,
+        created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+        seen_at TIMESTAMPTZ NULL,
+        dismissed_at TIMESTAMPTZ NULL,
+        muted BOOLEAN DEFAULT FALSE,
+        meta JSONB DEFAULT '{}'::JSONB
+      );
+    `);
+    await query('CREATE INDEX IF NOT EXISTS idx_knowledge_insights_user_scope ON knowledge_insights(user_id, scope, created_at DESC);');
+    console.log('✅ knowledge_insights table');
+
     console.log('✅ Essential tables created successfully');
     console.log('⚠️  Note: Run "node server/db/init-render.js" to create all tables');
     return true;

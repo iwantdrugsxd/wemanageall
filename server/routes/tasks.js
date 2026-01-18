@@ -79,8 +79,32 @@ router.patch('/:id', requireAuth, async (req, res) => {
 
     for (const [key, value] of Object.entries(updates)) {
       if (allowedFields.includes(key) && value !== undefined) {
+        let processedValue = value;
+        
+        // Map status values: 'completed' -> 'done', 'pending' -> 'todo'
+        if (key === 'status' && typeof value === 'string') {
+          const statusMap = {
+            'completed': 'done',
+            'pending': 'todo',
+            'in-progress': 'in_progress'
+          };
+          processedValue = statusMap[value.toLowerCase()] || value.toLowerCase();
+        }
+        
+        // Map priority: convert number to string or validate string
+        if (key === 'priority') {
+          if (typeof value === 'number') {
+            const priorityMap = { 0: 'low', 1: 'medium', 2: 'high' };
+            processedValue = priorityMap[value] || 'medium';
+          } else if (typeof value === 'string' && ['low', 'medium', 'high'].includes(value.toLowerCase())) {
+            processedValue = value.toLowerCase();
+          } else {
+            processedValue = 'medium'; // default
+          }
+        }
+        
         setClause.push(`${key} = $${paramIndex}`);
-        values.push(value);
+        values.push(processedValue);
         paramIndex++;
       }
     }
