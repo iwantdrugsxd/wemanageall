@@ -843,24 +843,24 @@ export default function Emotions() {
                   return (
                     <div 
                       key={entry.id} 
-                      className="bg-white rounded-xl p-6 border border-gray-300 hover:shadow-[0_4px_12px_rgba(0,0,0,0.04)] transition-all relative group"
+                      className="bg-white rounded-xl p-6 border-2 border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all relative group"
                     >
                       {/* Left indicator */}
                       <div 
-                        className={`absolute left-0 top-0 bottom-0 w-1 rounded-l-xl ${
-                          entry.type === 'text' ? 'bg-[#DCE7F2]' : 'bg-[#DDEFE3]'
+                        className={`absolute left-0 top-0 bottom-0 w-2 rounded-l-xl ${
+                          entry.type === 'text' ? 'bg-blue-400' : 'bg-green-400'
                         }`}
                       ></div>
                       
-                      <div className="flex items-start gap-4 pl-2">
+                      <div className="flex items-start gap-4 pl-4">
                         {/* Icon */}
                         <div className="flex-shrink-0 mt-1">
                           {entry.type === 'text' ? (
-                            <div className="text-2xl">📄</div>
+                            <div className="text-3xl">📄</div>
                           ) : isPlaying ? (
-                            <div className="text-2xl">🔊</div>
+                            <div className="text-3xl">🔊</div>
                           ) : (
-                            <div className="text-2xl">🎙️</div>
+                            <div className="text-3xl">🎙️</div>
                           )}
                         </div>
 
@@ -868,7 +868,7 @@ export default function Emotions() {
                         <div className="flex-1 min-w-0">
                           {isPlaying && entry.type === 'voice' ? (
                             <div>
-                              <p className="text-[#1F2933] font-medium mb-3 text-base">Listening to: {entry.transcript || entry.content || 'Voice Entry'}</p>
+                              <p className="text-gray-900 font-semibold mb-3 text-lg">Listening to: {entry.transcript || entry.content || 'Voice Entry'}</p>
                               {entry.audio_url && (
                                 <div className="mb-2">
                                   <audio 
@@ -897,39 +897,38 @@ export default function Emotions() {
                             </div>
                           ) : (
                             <div>
-                              <div className="flex items-center gap-2 mb-2">
-                                <p className="text-[#1F2933] font-medium text-base">
+                              <div className="flex items-center gap-2 mb-3">
+                                <p className="text-gray-900 font-semibold text-lg">
                                   {entry.type === 'text' 
                                     ? `Written Entry (~${getWordCount(entry.content)} words)`
                                     : `Voice Entry (${Math.floor((entry.duration || 0) / 60)}:${((entry.duration || 0) % 60).toString().padStart(2, '0')})`
                                   }
                                 </p>
+                                {entry.locked && (
+                                  <span className="text-gray-500 text-sm">🔒</span>
+                                )}
                               </div>
                               {entry.transcript && (
-                                <p className="text-gray-700 text-sm mb-2 line-clamp-2 italic">
+                                <p className="text-gray-800 text-base mb-3 line-clamp-2 italic bg-gray-50 p-3 rounded-lg">
                                   "{entry.transcript}"
                                 </p>
                               )}
-                              <p className="text-gray-600 text-[13px]">{getHumanTime(entry.created_at)}</p>
+                              {entry.type === 'text' && entry.content && (
+                                <p className="text-gray-800 text-base mb-3 line-clamp-3 leading-relaxed">
+                                  {entry.content}
+                                </p>
+                              )}
+                              <p className="text-gray-600 text-sm font-medium">{getHumanTime(entry.created_at)}</p>
                             </div>
                           )}
                         </div>
 
                         {/* Actions */}
                         <div className="flex items-center gap-2 flex-shrink-0">
-                          {entry.locked && (
-                            <button
-                              className="p-2 text-gray-600 hover:text-black transition-colors"
-                              title="Locked"
-                            >
-                              🔒
-                            </button>
-                          )}
                           {entry.type === 'voice' && !isPlaying && entry.audio_url ? (
                             <button
                               onClick={async () => {
                                 setPlayingEntryId(entry.id);
-                                // Small delay to ensure audio element is rendered
                                 setTimeout(() => {
                                   const audioElements = document.querySelectorAll('audio');
                                   const targetAudio = Array.from(audioElements).find(
@@ -944,9 +943,9 @@ export default function Emotions() {
                                   }
                                 }, 100);
                               }}
-                              className="px-5 py-2 bg-[#F5F5F5] text-[#1F2933] rounded-full hover:bg-[#EEEEEE] hover:shadow-sm transition-all text-sm font-medium"
+                              className="px-5 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 hover:shadow-md transition-all text-sm font-semibold"
                             >
-                              Play
+                              ▶ Play
                             </button>
                           ) : entry.type === 'text' ? (
                             <button
@@ -954,7 +953,7 @@ export default function Emotions() {
                                 setSelectedEntry(entry);
                                 setView('read');
                               }}
-                              className="px-5 py-2 bg-[#F5F5F5] text-[#1F2933] rounded-full hover:bg-[#EEEEEE] hover:shadow-sm transition-all text-sm font-medium"
+                              className="px-5 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 hover:shadow-md transition-all text-sm font-semibold"
                             >
                               Read
                             </button>
@@ -965,7 +964,7 @@ export default function Emotions() {
                                 handleDeleteEntry(entry.id);
                               }
                             }}
-                            className="p-2 text-gray-600 hover:text-black transition-colors"
+                            className="p-2.5 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                             title="Delete"
                           >
                             🗑️
