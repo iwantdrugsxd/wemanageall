@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
-import { quickFixTranscript } from '../lib/transcriptProcessor';
 
 export default function Emotions() {
   const { user } = useAuth();
@@ -17,7 +16,7 @@ export default function Emotions() {
   const [showHistory, setShowHistory] = useState(false);
   const [filter, setFilter] = useState('all'); // all, text, voice, locked
   const [showSaveMessage, setShowSaveMessage] = useState(false);
-  
+
   // Voice recording states
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
@@ -25,16 +24,6 @@ export default function Emotions() {
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [audioUrl, setAudioUrl] = useState(null);
   const [playingEntryId, setPlayingEntryId] = useState(null);
-  const [transcribing, setTranscribing] = useState(false);
-  const [transcript, setTranscript] = useState(null);
-  const [speechRecognition, setSpeechRecognition] = useState(null);
-  const [usingFreeTranscription, setUsingFreeTranscription] = useState(false);
-  const [realTimeTranscript, setRealTimeTranscript] = useState('');
-  const [processedTranscript, setProcessedTranscript] = useState(null);
-  const [processingTranscript, setProcessingTranscript] = useState(false);
-  const [showPreview, setShowPreview] = useState(false);
-  const [editableTranscript, setEditableTranscript] = useState(null);
-  const [processingResult, setProcessingResult] = useState(null);
 
   useEffect(() => {
     // Always fetch entries when component mounts or filter changes
@@ -122,152 +111,6 @@ export default function Emotions() {
     }
   };
 
-
-  // Process transcript: browser quick fixes + server deep processing
-  const processTranscript = async (rawTranscript) => {
-    if (!rawTranscript || !rawTranscript.trim()) return;
-    
-    setProcessingTranscript(true);
-    
-    try {
-      // Step 1: Quick browser-side fixes
-      const quickFixed = quickFixTranscript(rawTranscript);
-      setTranscript(quickFixed);
-      
-      // Step 2: Server-side deep processing
-      const response = await fetch('/api/emotions/process-transcript', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ transcript: quickFixed }),
-      });
-      
-      if (response.ok) {
-        const result = await response.json();
-        setProcessedTranscript(result.processed);
-        setEditableTranscript(result.processed);
-        setProcessingResult(result);
-        setShowPreview(true);
-      } else {
-        // If server processing fails, use quick-fixed version
-        setProcessedTranscript(quickFixed);
-        setEditableTranscript(quickFixed);
-        setShowPreview(true);
-      }
-    } catch (error) {
-      console.error('Failed to process transcript:', error);
-      // Use quick-fixed version as fallback
-      const quickFixed = quickFixTranscript(rawTranscript);
-      setProcessedTranscript(quickFixed);
-      setEditableTranscript(quickFixed);
-      setShowPreview(true);
-    } finally {
-      setProcessingTranscript(false);
-    }
-  };
-
-  const handleTranscribe = async (audioBlobToTranscribe) => {
-    if (!audioBlobToTranscribe || !user?.id) return null;
-    
-    // PRIORITY 1: Always use free browser transcription if available
-    if (transcript && usingFreeTranscription) {
-      console.log('✅ Using free browser transcription (already available)');
-      return transcript;
-    }
-    
-    // PRIORITY 2: Check if we have real-time transcript from recording
-    if (realTimeTranscript && realTimeTranscript.trim()) {
-      console.log('✅ Using real-time browser transcription');
-      setTranscript(realTimeTranscript);
-      setUsingFreeTranscription(true);
-      return realTimeTranscript;
-    }
-    
-    // PRIORITY 3: Only try OpenAI if free transcription didn't work
-    // Skip OpenAI entirely if we know quota is exceeded
-    console.log('⚠️ No free transcription available, trying OpenAI (may fail due to quota)');
-    setTranscribing(true);
-    setUsingFreeTranscription(false);
-    
-    try {
-      // Upload audio temporarily for transcription
-      const fileName = `${user.id}/temp-${Date.now()}.webm`;
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('unload-recordings')
-        .upload(fileName, audioBlobToTranscribe, {
-          contentType: 'audio/webm',
-        });
-
-      if (uploadError) {
-        console.error('Upload error for transcription:', uploadError);
-        throw uploadError;
-      }
-
-      // Get public URL for transcription
-      const { data: urlData } = supabase.storage
-        .from('unload-recordings')
-        .getPublicUrl(fileName);
-
-      // Call transcription endpoint
-      const response = await fetch('/api/emotions/transcribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          audio_url: urlData.publicUrl,
-        }),
-      });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        let errorMessage = 'Failed to transcribe audio';
-        let errorCode = null;
-        try {
-          const errorData = JSON.parse(errorText);
-          errorMessage = errorData.error || errorMessage;
-          errorCode = errorData.code;
-        } catch {
-          errorMessage = errorText || errorMessage;
-        }
-        
-        // Handle quota errors gracefully - don't throw, just return null
-        if (response.status === 429 || errorCode === 'quota_exceeded' || errorCode === 'insufficient_quota') {
-          console.warn('⚠️ OpenAI quota exceeded - free browser transcription will be used if available');
-          // Clean up temp file
-          try {
-            await supabase.storage
-              .from('unload-recordings')
-              .remove([fileName]);
-          } catch (cleanupError) {
-            console.warn('Failed to cleanup temp file:', cleanupError);
-          }
-          return null; // Will use real-time transcript if available
-        }
-        
-        throw new Error(errorMessage);
-      }
-      
-      const data = await response.json();
-      
-      // Clean up temp file
-      try {
-        await supabase.storage
-          .from('unload-recordings')
-          .remove([fileName]);
-      } catch (cleanupError) {
-        console.warn('Failed to cleanup temp file:', cleanupError);
-      }
-      
-      return data.transcript;
-    } catch (error) {
-      console.error('Failed to transcribe:', error);
-      // If OpenAI fails, return null - free transcription should be used
-      return null;
-    } finally {
-      setTranscribing(false);
-    }
-  };
-
   const handleSaveVoice = async () => {
     if (!audioBlob || !user?.id) return;
     
@@ -289,45 +132,6 @@ export default function Emotions() {
         throw uploadError;
       }
 
-      // Get public URL (bucket should be public for easier access)
-      const { data: urlData } = supabase.storage
-        .from('unload-recordings')
-        .getPublicUrl(fileName);
-
-      // PRIORITY: Use free browser transcription first, then processed/edited, then try OpenAI
-      let finalTranscript = null;
-      
-      // 1. Check if we have free browser transcription (real-time)
-      if (realTimeTranscript && realTimeTranscript.trim()) {
-        finalTranscript = realTimeTranscript.trim();
-        setTranscript(finalTranscript);
-        setUsingFreeTranscription(true);
-        console.log('✅ Using real-time browser transcription for save');
-      }
-      // 2. Check if we have processed/edited transcript
-      else if (editableTranscript || processedTranscript || transcript) {
-        finalTranscript = editableTranscript || processedTranscript || transcript;
-        console.log('✅ Using existing transcript');
-      }
-      // 3. Only try OpenAI if we don't have free transcription
-      else {
-        console.log('⚠️ No free transcription available, attempting OpenAI (may fail)');
-        finalTranscript = await handleTranscribe(audioBlob);
-        // Process it if we just got it from OpenAI
-        if (finalTranscript && !usingFreeTranscription) {
-          await processTranscript(finalTranscript);
-          finalTranscript = editableTranscript || processedTranscript || finalTranscript;
-        }
-      }
-      
-      // If still no transcript, check one more time for real-time transcript
-      if (!finalTranscript && realTimeTranscript && realTimeTranscript.trim()) {
-        finalTranscript = realTimeTranscript.trim();
-        setTranscript(finalTranscript);
-        setUsingFreeTranscription(true);
-        console.log('✅ Fallback: Using real-time browser transcription');
-      }
-
       // Save entry to database via Express API
       // Store the file path, server will generate proper URL when fetching
       const response = await fetch('/api/emotions/voice', {
@@ -337,7 +141,7 @@ export default function Emotions() {
         body: JSON.stringify({
           audio_url: fileName, // Store file path, server will generate URL
           duration: recordingTime,
-          transcript: finalTranscript,
+          transcript: null,
           locked: false,
         }),
       });
@@ -360,11 +164,6 @@ export default function Emotions() {
       setNewEntryId(data.entry.id);
       setAudioBlob(null);
       setAudioUrl(null);
-      setTranscript(null);
-      setProcessedTranscript(null);
-      setEditableTranscript(null);
-      setProcessingResult(null);
-      setShowPreview(false);
       setRecordingTime(0);
       setShowLockPrompt(true);
       // Show emotional success message
@@ -429,114 +228,16 @@ export default function Emotions() {
       const recorder = new MediaRecorder(stream);
       const chunks = [];
 
-      // Start free browser-based real-time transcription
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      let recognition = null;
-      let accumulatedTranscript = '';
-
-      if (SpeechRecognition) {
-        recognition = new SpeechRecognition();
-        recognition.continuous = true;
-        recognition.interimResults = true;
-        recognition.lang = 'en-US';
-
-        recognition.onresult = (event) => {
-          let interimTranscript = '';
-          let newFinalText = '';
-
-          for (let i = event.resultIndex; i < event.results.length; i++) {
-            const transcript = event.results[i][0].transcript;
-            if (event.results[i].isFinal) {
-              newFinalText += transcript + ' ';
-            } else {
-              interimTranscript += transcript;
-            }
-          }
-
-          // Accumulate final transcripts
-          if (newFinalText) {
-            accumulatedTranscript += newFinalText;
-          }
-
-          // Update transcript in real-time (show accumulated + interim)
-          const fullTranscript = (accumulatedTranscript + interimTranscript).trim();
-          if (fullTranscript) {
-            setTranscript(fullTranscript);
-            setRealTimeTranscript(accumulatedTranscript.trim());
-            setUsingFreeTranscription(true);
-          }
-        };
-
-        recognition.onerror = (event) => {
-          console.warn('Speech recognition error:', event.error);
-          // Continue recording even if transcription fails
-        };
-
-        recognition.onend = () => {
-          // Restart recognition if still recording
-          if (isRecording && recognition) {
-            try {
-              recognition.start();
-            } catch (e) {
-              console.log('Recognition already started');
-            }
-          }
-        };
-
-        try {
-          recognition.start();
-          console.log('✅ Free real-time transcription started');
-        } catch (e) {
-          console.log('Could not start speech recognition:', e);
-        }
-      }
-
       recorder.ondataavailable = (e) => {
         if (e.data.size > 0) chunks.push(e.data);
       };
 
       recorder.onstop = async () => {
-        // Stop speech recognition
-        if (recognition) {
-          recognition.stop();
-          recognition = null;
-        }
-
         const blob = new Blob(chunks, { type: 'audio/webm' });
         setAudioBlob(blob);
         const url = URL.createObjectURL(blob);
         setAudioUrl(url);
         stream.getTracks().forEach(track => track.stop());
-        
-        // PRIORITY: Always use free browser transcription if available
-        let finalTranscript = null;
-        if (accumulatedTranscript.trim()) {
-          finalTranscript = accumulatedTranscript.trim();
-          setTranscript(finalTranscript);
-          setRealTimeTranscript(finalTranscript);
-          setUsingFreeTranscription(true);
-          console.log('✅ Free browser transcription captured:', finalTranscript.length, 'characters');
-          
-          // Process the free transcription
-          await processTranscript(finalTranscript);
-        } else if (transcript && usingFreeTranscription) {
-          // Use existing free transcript if available
-          finalTranscript = transcript;
-          setRealTimeTranscript(transcript);
-          console.log('✅ Using existing free browser transcription');
-          await processTranscript(finalTranscript);
-        } else {
-          // Fallback: try OpenAI transcription only if free transcription didn't work
-          console.log('⚠️ No free transcription available, attempting OpenAI (may fail due to quota)');
-          const transcribedText = await handleTranscribe(blob);
-          if (transcribedText) {
-            finalTranscript = transcribedText;
-            setTranscript(transcribedText);
-            await processTranscript(finalTranscript);
-          } else {
-            console.warn('⚠️ No transcription available (OpenAI quota exceeded and no free transcription)');
-          }
-        }
       };
 
       recorder.start();
@@ -552,11 +253,6 @@ export default function Emotions() {
 
   const handleStopRecording = () => {
     if (mediaRecorder && isRecording) {
-      // Stop speech recognition
-      if (speechRecognition) {
-        speechRecognition.stop();
-        setSpeechRecognition(null);
-      }
       mediaRecorder.stop();
       setIsRecording(false);
     }
@@ -642,147 +338,18 @@ export default function Emotions() {
                       <p className="text-sm text-gray-600 mb-3">Recording preview</p>
                       <audio controls src={audioUrl} className="w-full h-10 mb-3" />
                       
-                      {/* Show real-time transcript while recording */}
-                      {isRecording && transcript && (
-                        <div className="mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                          <p className="text-xs text-gray-500 mb-1 font-medium flex items-center gap-2">
-                            <span className="w-2 h-2 bg-gray-1000 rounded-full animate-pulse"></span>
-                            Transcribing in real-time (free):
-                          </p>
-                          <p className="text-sm text-black leading-relaxed italic">{transcript}</p>
-                        </div>
-                      )}
-                      
-                      {/* Transcription Status */}
-                      {transcribing && !isRecording && (
-                        <div className="mb-3 p-3 bg-gray-100 rounded-lg">
-                          <p className="text-sm text-gray-600 flex items-center gap-2">
-                            <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            Processing transcription...
-                          </p>
-                        </div>
-                      )}
-                      
-                      {/* Processing Status */}
-                      {processingTranscript && (
-                        <div className="mb-3 p-3 bg-gray-100 rounded-lg">
-                          <p className="text-sm text-gray-600 flex items-center gap-2">
-                            <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            Improving grammar and clarity...
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Preview: Before/After Comparison */}
-                      {showPreview && processingResult && processingResult.changed && (
-                        <div className="mb-3 p-4 bg-gray-50 rounded-lg border border-gray-300">
-                          <div className="flex items-center justify-between mb-3">
-                            <p className="text-xs text-gray-600 font-semibold">✨ Improved Version</p>
-                            <button
-                              onClick={() => setShowPreview(false)}
-                              className="text-xs text-gray-400 hover:text-gray-600"
-                            >
-                              Hide comparison
-                            </button>
-                          </div>
-                          
-                          <div className="space-y-3">
-                            <div>
-                              <p className="text-xs text-gray-500 mb-1 font-medium">Original:</p>
-                              <p className="text-sm text-gray-600 bg-gray-100 p-2 rounded border border-gray-200 italic line-through">
-                                {processingResult.original}
-                              </p>
-                            </div>
-                            
-                            <div className="flex items-center text-gray-400">
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                              </svg>
-                            </div>
-                            
-                            <div>
-                              <p className="text-xs text-gray-500 mb-1 font-medium">Improved:</p>
-                              <p className="text-sm text-black bg-white p-2 rounded border border-gray-300">
-                                {processingResult.processed}
-                              </p>
-                            </div>
-                            
-                            {processingResult.corrections && processingResult.corrections.length > 0 && (
-                              <div className="text-xs text-gray-500 mt-2">
-                                {processingResult.corrections.length} grammar improvement{processingResult.corrections.length !== 1 ? 's' : ''} applied
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Editable Transcript */}
-                      {editableTranscript && !processingTranscript && (
-                        <div className="mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                          <div className="flex items-center justify-between mb-2">
-                            <p className="text-xs text-gray-500 font-medium">Final transcript (editable):</p>
-                            {usingFreeTranscription && (
-                              <span className="text-xs text-gray-400">(Free transcription)</span>
-                            )}
-                          </div>
-                          <textarea
-                            value={editableTranscript}
-                            onChange={(e) => setEditableTranscript(e.target.value)}
-                            className="w-full text-sm text-black leading-relaxed p-2 border border-gray-300 rounded bg-white resize-y min-h-[80px] focus:outline-none focus:ring-2 focus:ring-gray-400"
-                            placeholder="Edit your transcript here..."
-                          />
-                          <p className="text-xs text-gray-400 mt-1">
-                            You can edit this text before saving. Changes will be saved with your recording.
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Fallback: Show raw transcript if no processing done */}
-                      {transcript && !editableTranscript && !processingTranscript && (
-                        <div className="mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                          <div className="flex items-center justify-between mb-1">
-                            <p className="text-xs text-gray-500 font-medium">Transcribed text:</p>
-                            {usingFreeTranscription && (
-                              <span className="text-xs text-gray-400">(Free transcription)</span>
-                            )}
-                          </div>
-                          <p className="text-sm text-black leading-relaxed">{transcript}</p>
-                        </div>
-                      )}
-                      
-                      {/* Show message if transcription failed due to quota */}
-                      {!transcript && !transcribing && audioUrl && (
-                        <div className="mb-3 p-3 bg-gray-100 rounded-lg border border-gray-300">
-                          <p className="text-xs text-gray-600 mb-1 font-medium">Note:</p>
-                          <p className="text-sm text-gray-700">
-                            Transcription is temporarily unavailable. You can still save your recording.
-                          </p>
-                        </div>
-                      )}
-                      
                       <div className="flex items-center gap-3">
                         <button
                           onClick={handleSaveVoice}
-                          disabled={saving || transcribing || processingTranscript}
+                          disabled={saving}
                           className="px-5 py-2.5 bg-[#1F2933] text-white rounded-lg hover:bg-[#2d3d4d] disabled:opacity-50 disabled:cursor-not-allowed transition-all text-sm font-medium shadow-sm"
                         >
-                          {saving ? 'Saving...' : transcribing ? 'Transcribing...' : processingTranscript ? 'Processing...' : 'Save Recording'}
+                          {saving ? 'Saving...' : 'Save Recording'}
                         </button>
                         <button
                           onClick={() => {
                             setAudioUrl(null);
                             setAudioBlob(null);
-                            setTranscript(null);
-                            setProcessedTranscript(null);
-                            setEditableTranscript(null);
-                            setProcessingResult(null);
-                            setShowPreview(false);
                             setRecordingTime(0);
                           }}
                           className="px-5 py-2.5 bg-white border border-[#ECEFF1] text-[#1F2933] rounded-lg hover:bg-[#FAFAFA] transition-all text-sm font-medium"
@@ -960,11 +527,7 @@ export default function Emotions() {
                                   <span className="text-gray-500 text-sm">🔒</span>
                                 )}
                               </div>
-                              {entry.transcript && (
-                                <p className="text-body-sm text-gray-800 mb-3 line-clamp-2 italic bg-gray-50 p-3 rounded-lg">
-                                  "{entry.transcript}"
-                                </p>
-                              )}
+                              {/* Voice entries are audio-only now; no transcript snippet shown */}
                               {entry.type === 'text' && entry.content && (
                                 <p className="text-body-sm text-gray-800 mb-3 line-clamp-3">
                                   {entry.content}
@@ -1648,12 +1211,6 @@ export default function Emotions() {
                         </div>
                       ) : (
                         <div className="mt-2 space-y-3">
-                          {entry.transcript && (
-                            <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-                              <p className="text-xs text-white/60 mb-2 font-medium">Transcribed text:</p>
-                              <p className="text-white/80 leading-relaxed">{entry.transcript}</p>
-                            </div>
-                          )}
                           {entry.audio_url ? (
                             <div className="bg-white/5 rounded-xl p-4 border border-white/10">
                               <audio controls src={entry.audio_url} className="w-full" />

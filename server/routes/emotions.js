@@ -1,24 +1,14 @@
 import { Router } from 'express';
 import { query } from '../db/config.js';
 import { createClient } from '@supabase/supabase-js';
-import OpenAI from 'openai';
 import dotenv from 'dotenv';
-import fs from 'fs';
 import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import { dirname } from 'path';
 
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-
-// Initialize OpenAI client (lazy initialization)
-let openai = null;
-if (process.env.OPENAI_API_KEY) {
-  openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-  });
-}
 
 const router = Router();
 
@@ -65,26 +55,13 @@ const ensureUnloadTable = async () => {
   }
 };
 
-// GET /api/emotions - Get user's unload entries
+// GET /api/emotions - Get user's unload entries (text + voice)
 router.get('/', requireAuth, async (req, res) => {
   try {
     const { type, locked } = req.query;
     
     // Ensure table exists
     await ensureUnloadTable();
-    
-    // Ensure transcript column exists (migration on-the-fly)
-    try {
-      await query(`
-        ALTER TABLE unload_entries 
-        ADD COLUMN IF NOT EXISTS transcript TEXT;
-      `);
-    } catch (migrationError) {
-      // Column might already exist (code 42701) or other error - continue anyway
-      if (migrationError.code !== '42701') {
-        console.log('Note: transcript column migration:', migrationError.message);
-      }
-    }
     
     let sql = `
       SELECT id, type, content, audio_url, duration, transcript, locked, created_at
@@ -210,180 +187,16 @@ router.post('/', requireAuth, async (req, res) => {
   }
 });
 
-// POST /api/emotions/process-transcript - Process and improve transcript
-router.post('/process-transcript', requireAuth, async (req, res) => {
-  try {
-    const { transcript } = req.body;
-    
-    if (!transcript || !transcript.trim()) {
-      return res.status(400).json({ error: 'Transcript is required.' });
-    }
-
-    // Import processing function
-    const { processTranscript } = await import('../services/transcriptProcessor.js');
-    const result = await processTranscript(transcript);
-
-    res.json({
-      success: true,
-      ...result,
-    });
-  } catch (error) {
-    console.error('❌ Transcript processing error:', error);
-    res.status(500).json({ 
-      error: 'Failed to process transcript.',
-      details: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
-  }
-});
-
-// POST /api/emotions/transcribe - Transcribe audio using Whisper
-router.post('/transcribe', requireAuth, async (req, res) => {
-  try {
-    if (!process.env.OPENAI_API_KEY || !openai) {
-      return res.status(500).json({ error: 'OpenAI API key not configured.' });
-    }
-
-    const { audio_url } = req.body;
-    
-    if (!audio_url) {
-      return res.status(400).json({ error: 'Audio URL is required.' });
-    }
-
-    console.log('Transcription request received for:', audio_url);
-
-    // Download audio from Supabase Storage
-    let audioBuffer;
-    try {
-      // Extract file path from URL if it's a full URL
-      let filePath = audio_url;
-      if (audio_url.startsWith('http')) {
-        // Extract path from Supabase URL
-        const urlParts = audio_url.split('/storage/v1/object/public/unload-recordings/');
-        if (urlParts.length > 1) {
-          filePath = urlParts[1];
-        } else {
-          // Try direct download
-          const response = await fetch(audio_url);
-          if (!response.ok) throw new Error('Failed to download audio');
-          audioBuffer = Buffer.from(await response.arrayBuffer());
-        }
-      }
-
-      // If we don't have the buffer yet, download from Supabase
-      if (!audioBuffer && supabase) {
-        const { data, error } = await supabase.storage
-          .from('unload-recordings')
-          .download(filePath);
-
-        if (error) throw error;
-        audioBuffer = Buffer.from(await data.arrayBuffer());
-      } else if (!audioBuffer) {
-        throw new Error('Supabase not configured and audio download failed');
-      }
-    } catch (downloadError) {
-      console.error('Error downloading audio:', downloadError);
-      return res.status(500).json({ error: 'Failed to download audio file.' });
-    }
-
-    // Save to temporary file for Whisper API
-    const tempDir = join(__dirname, '../../uploads/temp');
-    if (!fs.existsSync(tempDir)) {
-      fs.mkdirSync(tempDir, { recursive: true });
-    }
-    
-    const tempFilePath = join(tempDir, `transcribe-${Date.now()}.webm`);
-    fs.writeFileSync(tempFilePath, audioBuffer);
-
-    try {
-      // Transcribe using OpenAI Whisper
-      const transcription = await openai.audio.transcriptions.create({
-        file: fs.createReadStream(tempFilePath),
-        model: 'whisper-1',
-        language: 'en', // Optional: specify language for better accuracy
-        response_format: 'text', // Get plain text
-      });
-
-      // Clean up temp file
-      fs.unlinkSync(tempFilePath);
-
-      // Post-process: clean up the transcript
-      // When response_format is 'text', transcription is a string
-      let cleanedTranscript = (typeof transcription === 'string' ? transcription : transcription.text || '').trim();
-      
-      // Basic cleanup: remove excessive whitespace, fix capitalization
-      cleanedTranscript = cleanedTranscript
-        .replace(/\s+/g, ' ')
-        .replace(/\.\s*\./g, '.')
-        .trim();
-
-      // Capitalize first letter
-      if (cleanedTranscript.length > 0) {
-        cleanedTranscript = cleanedTranscript.charAt(0).toUpperCase() + cleanedTranscript.slice(1);
-      }
-
-      console.log('✅ Transcription successful, length:', cleanedTranscript.length);
-
-      res.json({
-        success: true,
-        transcript: cleanedTranscript,
-      });
-    } catch (transcribeError) {
-      // Clean up temp file on error
-      if (fs.existsSync(tempFilePath)) {
-        fs.unlinkSync(tempFilePath);
-      }
-      throw transcribeError;
-    }
-  } catch (error) {
-    console.error('❌ Transcription error:', error);
-    console.error('Error details:', {
-      status: error.status || error.statusCode,
-      code: error.code || error.error?.code,
-      type: error.type || error.error?.type,
-      message: error.message || error.error?.message,
-      response: error.response?.data
-    });
-    
-    // Handle specific OpenAI errors - check multiple possible error structures
-    const errorCode = error.code || error.error?.code || error.response?.data?.code;
-    const errorType = error.type || error.error?.type || error.response?.data?.type;
-    const errorStatus = error.status || error.statusCode || error.response?.status;
-    
-    if (errorStatus === 429 || errorCode === 'insufficient_quota' || errorType === 'insufficient_quota') {
-      console.warn('⚠️ OpenAI quota exceeded - transcription unavailable');
-      return res.status(429).json({ 
-        error: 'OpenAI API quota exceeded. Transcription is temporarily unavailable. You can still save your recording.',
-        code: 'quota_exceeded',
-        details: 'Your OpenAI API quota has been exceeded. Please add credits to your account or wait for quota reset. The app will use browser-based transcription as a fallback.'
-      });
-    }
-    
-    if (errorStatus === 401 || errorCode === 'invalid_api_key') {
-      return res.status(500).json({ 
-        error: 'OpenAI API key is invalid or not configured.',
-        code: 'api_key_error'
-      });
-    }
-    
-    res.status(500).json({ 
-      error: 'Failed to transcribe audio.',
-      code: 'transcription_error',
-      details: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
-  }
-});
-
-// POST /api/emotions/voice - Create a voice unload entry
+// POST /api/emotions/voice - Create a voice unload entry (audio only, no transcription)
 router.post('/voice', requireAuth, async (req, res) => {
   try {
-    console.log('Voice entry request received:', {
+    console.log('Voice entry request received (audio only):', {
       userId: req.user?.id,
       hasAudioUrl: !!req.body.audio_url,
-      hasTranscript: !!req.body.transcript,
-      duration: req.body.duration
+      duration: req.body.duration,
     });
     
-    const { audio_url, duration, transcript, locked = false } = req.body;
+    const { audio_url, duration, locked = false } = req.body;
     
     if (!audio_url) {
       return res.status(400).json({ error: 'Audio URL is required.' });
@@ -398,9 +211,9 @@ router.post('/voice', requireAuth, async (req, res) => {
     
     const result = await query(
       `INSERT INTO unload_entries (user_id, type, audio_url, duration, transcript, locked)
-       VALUES ($1, 'voice', $2, $3, $4, $5)
+       VALUES ($1, 'voice', $2, $3, NULL, $4)
        RETURNING id, type, audio_url, duration, transcript, locked, created_at`,
-      [req.user.id, audio_url, parseInt(duration) || 0, transcript || null, locked]
+      [req.user.id, audio_url, parseInt(duration) || 0, locked]
     );
 
     console.log('✅ Voice entry saved successfully:', result.rows[0].id);
