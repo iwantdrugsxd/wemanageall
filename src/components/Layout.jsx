@@ -8,9 +8,6 @@ export default function Layout({ children }) {
   const { user, logout } = useAuth();
   const [showQuickAction, setShowQuickAction] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [showOrgSwitcher, setShowOrgSwitcher] = useState(false);
-  const [organizations, setOrganizations] = useState([]);
-  const [currentOrg, setCurrentOrg] = useState(null);
   const [unreadCount, setUnreadCount] = useState(0);
 
   const firstName = user?.name?.split(' ')[0] || 'User';
@@ -47,7 +44,6 @@ export default function Layout({ children }) {
   useEffect(() => {
     if (user) {
       fetchUnreadCount();
-      fetchOrganizations();
       // Refresh every 30 seconds
       const interval = setInterval(fetchUnreadCount, 30000);
       
@@ -64,52 +60,6 @@ export default function Layout({ children }) {
     }
   }, [user, location.pathname]);
 
-  const fetchOrganizations = async () => {
-    try {
-      const response = await fetch('/api/organizations', {
-        credentials: 'include',
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setOrganizations(data.organizations || []);
-        if (user?.current_organization_id) {
-          const org = data.organizations?.find(o => o.id === user.current_organization_id);
-          setCurrentOrg(org);
-        }
-      }
-    } catch (error) {
-      console.error('Failed to fetch organizations:', error);
-    }
-  };
-
-  const switchToOrganization = async (orgId) => {
-    try {
-      const response = await fetch(`/api/organizations/${orgId}/switch`, {
-        method: 'PATCH',
-        credentials: 'include',
-      });
-      if (response.ok) {
-        window.location.reload();
-      }
-    } catch (error) {
-      console.error('Failed to switch organization:', error);
-    }
-  };
-
-  const switchToIndividual = async () => {
-    try {
-      const response = await fetch('/api/organizations/switch/individual', {
-        method: 'PATCH',
-        credentials: 'include',
-      });
-      if (response.ok) {
-        window.location.reload();
-      }
-    } catch (error) {
-      console.error('Failed to switch to individual:', error);
-    }
-  };
-
   // Handle ⌘K shortcut
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -120,7 +70,6 @@ export default function Layout({ children }) {
       if (e.key === 'Escape') {
         setShowQuickAction(false);
         setShowUserMenu(false);
-        setShowOrgSwitcher(false);
       }
     };
 
@@ -174,87 +123,6 @@ export default function Layout({ children }) {
 
             {/* Right Side Actions */}
             <div className="flex items-center gap-4">
-              {/* Organization Switcher */}
-              <div className="relative">
-                <button
-                  onClick={() => setShowOrgSwitcher(!showOrgSwitcher)}
-                  className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:border-black transition-colors flex items-center gap-2"
-                >
-                  <span className="text-xs">👥</span>
-                  <span className="hidden md:inline text-black">
-                    {currentOrg ? currentOrg.name : 'Individual'}
-                  </span>
-                  <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                
-                {showOrgSwitcher && (
-                  <div className="absolute right-0 top-full mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-xl z-50">
-                    <div className="p-2">
-                      <div
-                        onClick={() => {
-                          switchToIndividual();
-                          setShowOrgSwitcher(false);
-                        }}
-                        className={`p-3 rounded-lg cursor-pointer transition-colors ${
-                          !user?.current_organization_id
-                            ? 'bg-black text-white'
-                            : 'hover:bg-gray-100'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <span>👤</span>
-                          <span className="text-sm font-medium">Individual</span>
-                          {!user?.current_organization_id && (
-                            <span className="ml-auto text-xs">Active</span>
-                          )}
-                        </div>
-                      </div>
-                      
-                      {organizations.length > 0 && (
-                        <div className="mt-2 pt-2 border-t border-gray-200">
-                          {organizations.map((org) => (
-                            <div
-                              key={org.id}
-                              onClick={() => {
-                                switchToOrganization(org.id);
-                                setShowOrgSwitcher(false);
-                              }}
-                              className={`p-3 rounded-lg cursor-pointer transition-colors mb-1 ${
-                                user?.current_organization_id === org.id
-                                  ? 'bg-black text-white'
-                                  : 'hover:bg-gray-100'
-                              }`}
-                            >
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                  <span>👥</span>
-                                  <span className="text-sm font-medium">{org.name}</span>
-                                </div>
-                                {user?.current_organization_id === org.id && (
-                                  <span className="text-xs">Active</span>
-                                )}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                      
-                      <div className="mt-2 pt-2 border-t border-gray-200">
-                        <Link
-                          to="/organizations"
-                          onClick={() => setShowOrgSwitcher(false)}
-                          className="block p-2 text-sm text-black hover:bg-gray-100 rounded-lg text-center"
-                        >
-                          Manage Workspaces →
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
               {/* Date Display - shown on Money page */}
               {location.pathname === '/money' && (
                 <span className="text-sm text-gray-600 font-medium">

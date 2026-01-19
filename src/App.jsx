@@ -17,7 +17,6 @@ import Settings from './pages/Settings';
 import Notifications from './pages/Notifications';
 import Library from './pages/Library';
 import Lists from './pages/Lists';
-import Organizations from './pages/Organizations';
 import Pricing from './pages/Pricing';
 import Layout from './components/Layout';
 
@@ -202,16 +201,6 @@ function App() {
           <ProtectedRoute requireOnboarding>
             <Layout>
               <Notifications />
-            </Layout>
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/organizations" 
-        element={
-          <ProtectedRoute requireOnboarding>
-            <Layout>
-              <Organizations />
             </Layout>
           </ProtectedRoute>
         } 

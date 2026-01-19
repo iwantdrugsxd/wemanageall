@@ -11,13 +11,10 @@ export default function Pricing() {
   const [billingCycle, setBillingCycle] = useState('monthly');
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [teamSeats, setTeamSeats] = useState(2);
-  const [organizationId, setOrganizationId] = useState(null);
-  const [organizations, setOrganizations] = useState([]);
 
   useEffect(() => {
     fetchPlans();
     fetchCurrentSubscription();
-    fetchOrganizations();
   }, []);
 
   // Ensure Razorpay is loaded
@@ -60,20 +57,6 @@ export default function Pricing() {
     }
   };
 
-  const fetchOrganizations = async () => {
-    try {
-      const response = await fetch('/api/organizations', {
-        credentials: 'include',
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setOrganizations(data.organizations || []);
-      }
-    } catch (error) {
-      console.error('Failed to fetch organizations:', error);
-    }
-  };
-
   const handleSubscribe = async (planId) => {
     if (!user) {
       navigate('/login');
@@ -86,12 +69,6 @@ export default function Pricing() {
     const plan = plans.find(p => p.id === planId);
     const isTeamPlan = plan && plan.features.teamMembers > 0;
 
-    if (isTeamPlan && organizations.length === 0) {
-      alert('Please create an organization first to subscribe to a team plan.');
-      navigate('/organizations');
-      return;
-    }
-
     try {
       const response = await fetch('/api/subscriptions/create', {
         method: 'POST',
@@ -101,7 +78,7 @@ export default function Pricing() {
           planType: planId,
           billingCycle: billingCycle,
           seats: isTeamPlan ? teamSeats : 1,
-          organizationId: isTeamPlan ? organizationId : null,
+          organizationId: null,
         }),
       });
 
@@ -359,18 +336,6 @@ export default function Pricing() {
                       onChange={(e) => setTeamSeats(Math.max(plan.minSeats || 2, Math.min(plan.maxSeats || 25, parseInt(e.target.value) || 2)))}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                     />
-                    {organizations.length > 0 && (
-                      <select
-                        value={organizationId || ''}
-                        onChange={(e) => setOrganizationId(e.target.value)}
-                        className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-lg text-sm"
-                      >
-                        <option value="">Select Organization</option>
-                        {organizations.map(org => (
-                          <option key={org.id} value={org.id}>{org.name}</option>
-                        ))}
-                      </select>
-                    )}
                   </div>
                 )}
               </div>
