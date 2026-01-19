@@ -11,10 +11,10 @@ function Navbar() {
       <Link to="/" className="flex items-center gap-3">
         <div className="w-8 h-8 rounded-lg bg-black dark:bg-white flex items-center justify-center">
           <span className="font-display text-white dark:text-black text-sm font-semibold">O</span>
-        </div>
+            </div>
         <span className="font-display text-lg font-semibold text-black dark:text-white transition-colors">OFA</span>
-      </Link>
-        
+          </Link>
+          
       <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
         <a href="#philosophy" className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">Philosophy</a>
         <a href="#system" className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">System</a>
@@ -38,13 +38,13 @@ function Navbar() {
             </svg>
           )}
         </button>
-        
-        <Link 
-          to="/signup" 
+      
+      <Link 
+        to="/signup" 
           className="bg-black dark:bg-white text-white dark:text-black px-6 py-2.5 text-sm font-medium rounded-lg hover:bg-gray-900 dark:hover:bg-gray-100 transition-colors"
-        >
+      >
           Start Free
-        </Link>
+            </Link>
       </div>
     </header>
   );
@@ -58,36 +58,60 @@ function DashboardPreview() {
         <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">PERSONAL LIFE OS</div>
         <h3 className="text-lg font-display text-black dark:text-white mb-1">Good afternoon, vishnu.</h3>
         <p className="text-xs text-gray-500 dark:text-gray-400 italic">"The present moment is the only time over which we have dominion."</p>
-      </div>
+        </div>
       
       <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
         <div className="text-xs uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-3">TODAY'S INTENTION</div>
-        <input 
-          type="text" 
-          placeholder="Focus on high-fidelity architectural time management"
-          className="w-full px-2 py-1 border-b border-gray-200 dark:border-gray-700 text-sm bg-transparent focus:outline-none focus:border-gray-900 dark:focus:border-white"
-          readOnly
-        />
-      </div>
+        <p className="text-sm text-gray-800 dark:text-gray-100">
+          Focus on designing a calm, high-fidelity operating system for my life.
+        </p>
+        </div>
       
       <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
         <div className="text-xs uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-3">DAILY OBJECTIVES</div>
-        <p className="text-sm text-gray-500 dark:text-gray-400">No objectives yet</p>
-        <button className="mt-2 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white">+ ADD OBJECTIVE</button>
+        <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-200">
+          <li className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-black dark:bg-white"></span>
+            Review this week’s projects and pick one focus area.
+          </li>
+          <li className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-black dark:bg-white"></span>
+            Block 2 hours for deep work on the Calendar.
+          </li>
+          <li className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-black dark:bg-white"></span>
+            Log today’s expenses in Money and tag them by project.
+          </li>
+        </ul>
       </div>
-      
+
       <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
         <div className="text-xs uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-3">TIME ALLOCATION</div>
         <div className="flex items-center justify-center">
           <div className="relative w-24 h-24">
             <svg className="transform -rotate-90 w-24 h-24">
               <circle cx="48" cy="48" r="40" stroke="#e5e7eb" strokeWidth="4" fill="none" />
-              <circle cx="48" cy="48" r="40" stroke="#000000" dark:stroke="#ffffff" strokeWidth="4" fill="none" strokeDasharray={251} strokeDashoffset={251 * 0.7} />
+              {/* 65% of planned time used */}
+              <circle cx="48" cy="48" r="40" stroke="#000000" strokeWidth="4" fill="none" strokeDasharray={251} strokeDashoffset={251 * 0.35} />
             </svg>
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-xs text-gray-600 dark:text-gray-400">0%</span>
+              <span className="text-xs text-gray-600 dark:text-gray-400">65%</span>
             </div>
           </div>
+        </div>
+        <div className="mt-4 grid grid-cols-3 gap-2 text-xs text-gray-600 dark:text-gray-300">
+          <div>
+            <div className="font-medium">Deep work</div>
+            <div>3h 00m</div>
+                </div>
+          <div>
+            <div className="font-medium">Admin</div>
+            <div>1h 15m</div>
+              </div>
+              <div>
+            <div className="font-medium">Personal</div>
+            <div>45m</div>
+            </div>
         </div>
       </div>
     </div>
@@ -101,8 +125,8 @@ function ProjectsPreview() {
         <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">PERSONAL LIFE OS</div>
         <h3 className="text-lg font-display text-black dark:text-white">Project Selection Hub</h3>
         <p className="text-xs text-gray-500 dark:text-gray-400">Choose a focus area for your current session.</p>
-      </div>
-      
+        </div>
+
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 flex flex-col items-center justify-center min-h-[120px]">
           <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center mb-2">
@@ -113,12 +137,16 @@ function ProjectsPreview() {
         </div>
         
         <div className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700" style={{ borderLeftWidth: '4px', borderLeftColor: '#000000' }}>
-          <div className="h-16 bg-black dark:bg-white flex items-center justify-center">
-            <span className="text-xl">📋</span>
+          <div className="h-16 bg-black dark:bg-white flex items-center justify-between px-4">
+            <div className="flex items-center gap-2">
+              <span className="text-xl">📚</span>
+              <span className="text-xs font-medium text-white dark:text-black">Deep Work: Q1 Focus</span>
+            </div>
+            <span className="text-[10px] text-white/80 dark:text-black/80">Active</span>
           </div>
-          <div className="p-3">
-            <p className="text-xs font-medium text-black dark:text-white">Sample Project</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">0% complete</p>
+          <div className="p-3 space-y-1">
+            <p className="text-xs text-gray-500 dark:text-gray-400">Next step: Outline execution plan for Week 3.</p>
+            <p className="text-[11px] text-gray-500 dark:text-gray-400">4 tasks today · 12 open · 8 completed</p>
           </div>
         </div>
       </div>
@@ -132,18 +160,33 @@ function ListsPreview() {
       <div className="mb-4">
         <h3 className="text-lg font-display text-black dark:text-white mb-1">My Lists</h3>
         <p className="text-xs text-gray-500 dark:text-gray-400">Manage your personal intentions and collections.</p>
-      </div>
-      
+        </div>
+
       <div className="flex items-center gap-2 mb-4 text-xs text-gray-500 dark:text-gray-400">
         <span className="border-b border-black dark:border-white pb-1">All Lists</span>
         <span>Recent</span>
         <span>Pinned</span>
-      </div>
-      
-      <div className="text-center py-12">
-        <div className="text-4xl mb-3">⭐</div>
-        <p className="text-sm font-medium text-black dark:text-white mb-1">Start a new collection</p>
-        <p className="text-xs text-gray-500 dark:text-gray-400">Organize your thoughts, plans, and inspirations</p>
+        </div>
+
+      <div className="space-y-3">
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-black dark:text-white">Weekly Review Ritual</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Checklist for closing the week and planning the next.</p>
+          </div>
+          <span className="text-[11px] text-gray-500 dark:text-gray-400">12 items · Pinned</span>
+        </div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-black dark:text-white">Reading Queue — 2026</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Books, articles, and papers to process.</p>
+          </div>
+          <span className="text-[11px] text-gray-500 dark:text-gray-400">27 items</span>
+        </div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-dashed border-gray-300 dark:border-gray-700 text-center">
+          <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Need a new structure?</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Create a list for goals, errands, ideas, or anything else.</p>
+        </div>
       </div>
     </div>
   );
@@ -154,30 +197,46 @@ function CalendarPreview() {
     <div className="p-6 bg-white dark:bg-gray-800">
       <div className="mb-4">
         <h3 className="text-lg font-display text-black dark:text-white">Calendar</h3>
-      </div>
-      
+        <p className="text-xs text-gray-500 dark:text-gray-400">Week view of your deep work and life blocks.</p>
+        </div>
+
       <div className="flex gap-2 mb-4 text-xs">
         <span className="px-2 py-1 bg-black dark:bg-white text-white dark:text-black rounded">Week</span>
         <span className="px-2 py-1 text-gray-500 dark:text-gray-400">Day</span>
         <span className="px-2 py-1 text-gray-500 dark:text-gray-400">Month</span>
-      </div>
+                </div>
       
       <div className="grid grid-cols-7 gap-1 text-xs">
         {['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'].map((day, i) => (
           <div key={i} className="text-center py-2">
             <div className="text-gray-500 dark:text-gray-400 mb-1">{day}</div>
             <div className="text-gray-900 dark:text-white">{19 + i}</div>
-          </div>
-        ))}
+              </div>
+            ))}
       </div>
       
       <div className="mt-4 space-y-1">
-        {['12 AM', '1 AM', '2 AM', '3 AM'].map((time, i) => (
-          <div key={i} className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 py-1 border-b border-gray-100 dark:border-gray-800">
-            <span className="w-12">{time}</span>
-            <div className="flex-1 h-4"></div>
+        <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 py-1 border-b border-gray-100 dark:border-gray-800">
+          <span className="w-16">7:00 AM</span>
+          <div className="flex-1 h-6 bg-gray-50 dark:bg-gray-900 rounded-lg px-2 flex items-center justify-between border border-gray-200 dark:border-gray-800">
+            <span className="text-[11px] text-gray-700 dark:text-gray-200">Morning planning</span>
+            <span className="text-[10px] text-gray-500 dark:text-gray-400">30m</span>
           </div>
-        ))}
+        </div>
+        <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 py-1 border-b border-gray-100 dark:border-gray-800">
+          <span className="w-16">9:00 AM</span>
+          <div className="flex-1 h-6 bg-black/5 dark:bg-white/5 rounded-lg px-2 flex items-center justify-between border border-gray-200 dark:border-gray-700">
+            <span className="text-[11px] text-gray-800 dark:text-gray-100">Deep work — Q1 Strategy</span>
+            <span className="text-[10px] text-gray-500 dark:text-gray-400">2h</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 py-1 border-b border-gray-100 dark:border-gray-800">
+          <span className="w-16">2:00 PM</span>
+          <div className="flex-1 h-6 bg-gray-50 dark:bg-gray-900 rounded-lg px-2 flex items-center justify-between border border-gray-200 dark:border-gray-800">
+            <span className="text-[11px] text-gray-700 dark:text-gray-200">Review Money and Lists</span>
+            <span className="text-[10px] text-gray-500 dark:text-gray-400">45m</span>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -194,26 +253,52 @@ function MoneyPreview() {
       <div className="grid grid-cols-3 gap-3 mb-6">
         <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
           <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">TOTAL INCOME</div>
-          <div className="text-lg font-semibold text-green-600 dark:text-green-400">$0.00</div>
+          <div className="text-lg font-semibold text-green-600 dark:text-green-400">$8,450</div>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
           <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">TOTAL EXPENSES</div>
-          <div className="text-lg font-semibold text-red-600 dark:text-red-400">$0.00</div>
+          <div className="text-lg font-semibold text-red-600 dark:text-red-400">$3,120</div>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
           <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">NET BALANCE</div>
-          <div className="text-lg font-semibold text-green-600 dark:text-green-400">$0.00</div>
+          <div className="text-lg font-semibold text-green-600 dark:text-green-400">$5,330</div>
         </div>
       </div>
       
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
           <div className="text-xs uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2">INCOME</div>
-          <p className="text-xs text-gray-500 dark:text-gray-400">No income entries yet</p>
+          <ul className="space-y-1 text-xs text-gray-700 dark:text-gray-300">
+            <li className="flex justify-between">
+              <span>Client retainer — Q1</span>
+              <span className="text-green-600 dark:text-green-400">+$4,000</span>
+            </li>
+            <li className="flex justify-between">
+              <span>Freelance sprint — Design</span>
+              <span className="text-green-600 dark:text-green-400">+$2,250</span>
+            </li>
+            <li className="flex justify-between">
+              <span>Salary</span>
+              <span className="text-green-600 dark:text-green-400">+$2,200</span>
+            </li>
+          </ul>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
           <div className="text-xs uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2">EXPENSES</div>
-          <p className="text-xs text-gray-500 dark:text-gray-400">No expense entries yet</p>
+          <ul className="space-y-1 text-xs text-gray-700 dark:text-gray-300">
+            <li className="flex justify-between">
+              <span>Workspace rent</span>
+              <span className="text-red-600 dark:text-red-400">- $1,200</span>
+            </li>
+            <li className="flex justify-between">
+              <span>Tools & subscriptions</span>
+              <span className="text-red-600 dark:text-red-400">- $420</span>
+            </li>
+            <li className="flex justify-between">
+              <span>Savings transfer</span>
+              <span className="text-red-600 dark:text-red-400">- $1,500</span>
+            </li>
+          </ul>
         </div>
       </div>
     </div>
@@ -230,9 +315,28 @@ function LibraryPreview() {
       
       <div className="text-xs text-gray-500 dark:text-gray-400 mb-4 border-b border-black dark:border-white pb-1 inline-block">All Resources</div>
       
-      <div className="text-center py-12">
-        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">No resources yet.</p>
-        <button className="px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded text-xs">Add Your First Resource</button>
+      <div className="space-y-3 text-xs text-gray-700 dark:text-gray-300">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="font-medium text-black dark:text-white">The Effective Executive</p>
+            <p className="text-gray-500 dark:text-gray-400">Book · Notes linked to Projects: Q1 Focus</p>
+          </div>
+          <span className="text-gray-500 dark:text-gray-400">3 highlights</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="font-medium text-black dark:text-white">Energy Management, Not Time Management</p>
+            <p className="text-gray-500 dark:text-gray-400">Article · Tagged: Focus, Routines</p>
+          </div>
+          <span className="text-gray-500 dark:text-gray-400">Read yesterday</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="font-medium text-black dark:text-white">Personal OS — Architecture Diagram</p>
+            <p className="text-gray-500 dark:text-gray-400">PDF · Linked to Dashboard & Money</p>
+          </div>
+          <span className="text-gray-500 dark:text-gray-400">Pinned</span>
+        </div>
       </div>
     </div>
   );
@@ -248,7 +352,7 @@ function EmotionsPreview() {
       
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 mb-4">
         <textarea 
-          placeholder="What's on your mind? Let it out here..."
+          defaultValue={"I don’t feel like I’m moving fast enough, even though I’m doing my best. I want a calmer way to track progress without feeling behind all the time."}
           className="w-full min-h-[120px] bg-transparent text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none resize-none"
           readOnly
         />
@@ -263,9 +367,12 @@ function EmotionsPreview() {
         </div>
       </div>
       
-      <div className="text-center py-8">
-        <div className="text-3xl mb-2">📝</div>
-        <p className="text-xs text-gray-500 dark:text-gray-400">No entries yet</p>
+      <div className="py-4 border-t border-gray-200 dark:border-gray-700 mt-2">
+        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Recent unloads</p>
+        <div className="flex flex-col gap-1 text-xs text-gray-700 dark:text-gray-300">
+          <span>• Written entry — “Feeling scattered this week”</span>
+          <span>• Voice note — 3m reflection after planning session</span>
+        </div>
       </div>
     </div>
   );
@@ -301,22 +408,22 @@ function Hero() {
           <div>
             <h1 className="text-h1 mb-6">
               Your personal life operating system.
-            </h1>
+          </h1>
             <p className="text-body-lg text-gray-600 dark:text-gray-400 mb-6 max-w-xl">
               OFA brings your projects, lists, calendar, files, finances, thoughts, and knowledge into one quiet, intelligent workspace.
-            </p>
+        </p>
             <p className="text-body-sm text-gray-500 dark:text-gray-500 mb-12">
               Designed for people who take their life seriously.
-            </p>
+        </p>
             
             <div className="flex flex-col sm:flex-row gap-4 mb-8">
-              <Link 
-                to="/signup" 
+          <Link 
+            to="/signup" 
                 className="px-8 py-4 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-gray-900 dark:hover:bg-gray-100 transition-colors text-sm font-medium text-center"
-              >
+          >
                 Start Free
-              </Link>
-              <a 
+            </Link>
+          <a 
                 href="#system" 
                 className="px-8 py-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-black dark:text-white rounded-lg hover:border-black dark:hover:border-white transition-colors text-sm font-medium text-center"
               >
@@ -521,8 +628,8 @@ function ProductStory() {
                   <div className="bg-gray-50 dark:bg-gray-900 p-6">
                     <SceneComponent />
                   </div>
-                </div>
-              </div>
+        </div>
+            </div>
             );
           })}
         </div>
@@ -538,7 +645,7 @@ function TrustPrivacy() {
       <div className="max-w-4xl mx-auto text-center">
         <h2 className="text-h2 mb-8">
           Private by design.
-        </h2>
+          </h2>
         <div className="space-y-6 text-body text-gray-700 dark:text-gray-300 leading-relaxed max-w-2xl mx-auto">
           <p>
             Nothing here is shared.
@@ -549,7 +656,7 @@ function TrustPrivacy() {
             OFA is your space. Period.
           </p>
         </div>
-      </div>
+        </div>
     </section>
   );
 }
@@ -594,9 +701,9 @@ function HowItWorks() {
             A simple system that grows more powerful the longer you use it.
           </p>
         </div>
-        
+
         <div className="space-y-12">
-          {steps.map((step, index) => (
+            {steps.map((step, index) => (
             <div key={index} className="grid md:grid-cols-3 gap-8 items-start">
               <div className="md:col-span-1">
                 <div className="flex items-center gap-4 mb-4">
@@ -610,8 +717,8 @@ function HowItWorks() {
               </div>
               <div className="md:col-span-2">
                 <p className="text-body text-gray-700 dark:text-gray-300 leading-relaxed">{step.detail}</p>
-              </div>
-            </div>
+          </div>
+        </div>
           ))}
         </div>
       </div>
@@ -747,7 +854,7 @@ function Benefits() {
               <p className="text-body-sm text-gray-600 dark:text-gray-400 leading-relaxed">
                 {benefit.description}
               </p>
-            </div>
+          </div>
           ))}
         </div>
       </div>
@@ -769,13 +876,13 @@ function FinalCTA() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-            <Link 
-              to="/signup" 
+          <Link 
+            to="/signup" 
               className="px-8 py-4 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-gray-900 dark:hover:bg-gray-100 transition-colors text-sm font-medium"
-            >
+          >
               Start Free
             </Link>
-            <a 
+          <a 
               href="#system" 
               className="px-8 py-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-black dark:text-white rounded-lg hover:border-black dark:hover:border-white transition-colors text-sm font-medium"
             >
