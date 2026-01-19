@@ -373,13 +373,7 @@ router.get('/', requireAuth, getOrganizationContext, async (req, res) => {
     
     const params = [req.user.id];
     
-    // Organization filter
-    if (req.organizationId) {
-      queryText += ` AND p.organization_id = $${params.length + 1}`;
-      params.push(req.organizationId);
-    } else {
-      queryText += ` AND p.organization_id IS NULL`;
-    }
+    // Organization filter removed - no longer using organizations
     
     // Always filter out archived projects by default unless explicitly requested
     if (archived !== 'true') {
@@ -654,8 +648,8 @@ router.post('/', requireAuth, getOrganizationContext, async (req, res) => {
     }
 
     const result = await query(
-      `INSERT INTO projects (user_id, name, description, cover_image_url, start_date, progress, color, icon, template_id, organization_id)
-       VALUES ($1, $2, $3, $4, $5, 0, $6, $7, $8, $9)
+      `INSERT INTO projects (user_id, name, description, cover_image_url, start_date, progress, color, icon, template_id)
+       VALUES ($1, $2, $3, $4, $5, 0, $6, $7, $8)
        RETURNING *`,
       [
         req.user.id,
@@ -665,8 +659,7 @@ router.post('/', requireAuth, getOrganizationContext, async (req, res) => {
         start_date || null,
         color || '#9333EA',
         icon || '📋',
-        template_id || null,
-        req.organizationId || null
+        template_id || null
       ]
     );
     

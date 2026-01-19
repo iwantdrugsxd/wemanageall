@@ -16,9 +16,9 @@ const requireAuth = (req, res, next) => {
 };
 
 // Configure Cloudinary
-const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-const apiKey = process.env.CLOUDINARY_API_KEY;
-const apiSecret = process.env.CLOUDINARY_API_SECRET;
+const cloudName = process.env.CLOUDINARY_CLOUD_NAME?.trim();
+const apiKey = process.env.CLOUDINARY_API_KEY?.trim();
+const apiSecret = process.env.CLOUDINARY_API_SECRET?.trim();
 
 if (!cloudName || cloudName === 'your_cloud_name_here' || !apiKey || !apiSecret) {
   console.error('⚠️ Cloudinary configuration missing or incomplete!');
