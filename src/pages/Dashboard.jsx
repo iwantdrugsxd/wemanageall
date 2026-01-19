@@ -713,7 +713,7 @@ export default function Dashboard() {
           {/* Today's Intention */}
           <div className="bg-white rounded-lg p-6 border border-gray-200">
           <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xs uppercase tracking-wider text-gray-700 font-medium">TODAY'S INTENTION</h3>
+              <h3 className="text-label text-gray-700">TODAY'S INTENTION</h3>
               {intentionSaved && (
                 <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -816,7 +816,7 @@ export default function Dashboard() {
           {/* Daily Objectives */}
           <div className="bg-white rounded-lg p-6 border border-gray-200">
           <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xs uppercase tracking-wider text-gray-700 font-medium">DAILY OBJECTIVES</h2>
+              <h2 className="text-label text-gray-700">DAILY OBJECTIVES</h2>
               <span className="text-xs text-gray-600">{progressPercentage}%</span>
             </div>
             
@@ -913,7 +913,7 @@ export default function Dashboard() {
 
           {/* Time Allocation */}
           <div className="bg-white rounded-lg p-6 border border-gray-200">
-            <h2 className="text-xs uppercase tracking-wider text-gray-700 font-medium mb-4">TIME ALLOCATION</h2>
+            <h2 className="text-label text-gray-700 mb-4">TIME ALLOCATION</h2>
             {pieChartData.length > 0 ? (
               <div className="space-y-4">
                 {/* Pie Chart */}
@@ -1018,11 +1018,11 @@ export default function Dashboard() {
         <div className="space-y-6">
           {/* Current Local Time */}
           <div className="bg-white rounded-lg p-6 border border-gray-200 text-center">
-            <div className="text-xs uppercase tracking-wider text-gray-500 mb-3">CURRENT LOCAL TIME</div>
+            <div className="text-label text-gray-500 mb-3">CURRENT LOCAL TIME</div>
             <div className="text-5xl font-light text-gray-900 mb-2 tracking-tight">
               {currentTime}
             </div>
-            <div className="text-xs uppercase tracking-wider text-gray-600">
+            <div className="text-label text-gray-600">
               {currentDate}
             </div>
           </div>
@@ -1030,7 +1030,7 @@ export default function Dashboard() {
           {/* Schedule */}
           <div className="bg-white rounded-lg p-6 border border-gray-200">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xs uppercase tracking-wider text-gray-700 font-medium">SCHEDULE</h2>
+                <h2 className="text-label text-gray-700">SCHEDULE</h2>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setShowAddEvent(true)}
@@ -1177,7 +1177,7 @@ export default function Dashboard() {
           <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
-                <h2 className="text-xs uppercase tracking-wider text-gray-700 font-medium">THINKING SPACE</h2>
+                <h2 className="text-label text-gray-700">THINKING SPACE</h2>
               <button
                 onClick={() => setShowThinkingSpace(!showThinkingSpace)}
                   className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
