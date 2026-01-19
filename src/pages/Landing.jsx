@@ -100,18 +100,18 @@ function DashboardPreview() {
           </div>
         </div>
         <div className="mt-4 grid grid-cols-3 gap-2 text-xs text-gray-600 dark:text-gray-300">
-          <div>
+            <div>
             <div className="font-medium">Deep work</div>
             <div>3h 00m</div>
-                </div>
+            </div>
           <div>
             <div className="font-medium">Admin</div>
             <div>1h 15m</div>
-              </div>
+            </div>
               <div>
             <div className="font-medium">Personal</div>
             <div>45m</div>
-            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -125,13 +125,13 @@ function ProjectsPreview() {
         <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">PERSONAL LIFE OS</div>
         <h3 className="text-lg font-display text-black dark:text-white">Project Selection Hub</h3>
         <p className="text-xs text-gray-500 dark:text-gray-400">Choose a focus area for your current session.</p>
-        </div>
+                </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 flex flex-col items-center justify-center min-h-[120px]">
           <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center mb-2">
             <span className="text-lg">+</span>
-          </div>
+              </div>
           <p className="text-xs text-black dark:text-white font-medium">Create New Project</p>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Start from scratch</p>
         </div>
@@ -170,10 +170,10 @@ function ListsPreview() {
 
       <div className="space-y-3">
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 flex items-center justify-between">
-          <div>
+              <div>
             <p className="text-sm font-medium text-black dark:text-white">Weekly Review Ritual</p>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Checklist for closing the week and planning the next.</p>
-          </div>
+              </div>
           <span className="text-[11px] text-gray-500 dark:text-gray-400">12 items · Pinned</span>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 flex items-center justify-between">
@@ -211,10 +211,10 @@ function CalendarPreview() {
           <div key={i} className="text-center py-2">
             <div className="text-gray-500 dark:text-gray-400 mb-1">{day}</div>
             <div className="text-gray-900 dark:text-white">{19 + i}</div>
-              </div>
-            ))}
-      </div>
-      
+            </div>
+          ))}
+        </div>
+
       <div className="mt-4 space-y-1">
         <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 py-1 border-b border-gray-100 dark:border-gray-800">
           <span className="w-16">7:00 AM</span>
@@ -250,21 +250,21 @@ function MoneyPreview() {
         <p className="text-xs text-gray-500 dark:text-gray-400">Track your income and expenses</p>
       </div>
       
-      <div className="grid grid-cols-3 gap-3 mb-6">
+        <div className="grid grid-cols-3 gap-3 mb-6">
         <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
           <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">TOTAL INCOME</div>
           <div className="text-lg font-semibold text-green-600 dark:text-green-400">$8,450</div>
-        </div>
+          </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
           <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">TOTAL EXPENSES</div>
           <div className="text-lg font-semibold text-red-600 dark:text-red-400">$3,120</div>
-        </div>
+          </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
           <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">NET BALANCE</div>
           <div className="text-lg font-semibold text-green-600 dark:text-green-400">$5,330</div>
+          </div>
         </div>
-      </div>
-      
+
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
           <div className="text-xs uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2">INCOME</div>
@@ -282,7 +282,7 @@ function MoneyPreview() {
               <span className="text-green-600 dark:text-green-400">+$2,200</span>
             </li>
           </ul>
-        </div>
+                </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
           <div className="text-xs uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2">EXPENSES</div>
           <ul className="space-y-1 text-xs text-gray-700 dark:text-gray-300">
@@ -299,9 +299,9 @@ function MoneyPreview() {
               <span className="text-red-600 dark:text-red-400">- $1,500</span>
             </li>
           </ul>
+              </div>
+          </div>
         </div>
-      </div>
-    </div>
   );
 }
 
@@ -426,15 +426,15 @@ function Hero() {
           <a 
                 href="#system" 
                 className="px-8 py-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-black dark:text-white rounded-lg hover:border-black dark:hover:border-white transition-colors text-sm font-medium text-center"
-              >
+          >
                 View Live Demo
-              </a>
-            </div>
+            </a>
+          </div>
             
             <p className="text-caption text-gray-500 dark:text-gray-500">
               Private by design · No credit card · Takes 2 minutes
             </p>
-          </div>
+        </div>
 
           {/* Right: UI Preview */}
           <div className="relative">
@@ -622,8 +622,8 @@ function ProductStory() {
                   <p className="text-body text-gray-600 dark:text-gray-400 mb-4">{scene.description}</p>
                   <div className="text-caption text-gray-500 dark:text-gray-500">
                     {scene.view}
-                  </div>
-                </div>
+        </div>
+            </div>
                 <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg overflow-hidden">
                   <div className="bg-gray-50 dark:bg-gray-900 p-6">
                     <SceneComponent />
@@ -709,15 +709,15 @@ function HowItWorks() {
                 <div className="flex items-center gap-4 mb-4">
                   <div className="w-16 h-16 rounded-xl bg-black dark:bg-white text-white dark:text-black flex items-center justify-center font-display text-2xl font-bold">
                     {step.number}
-                  </div>
+                    </div>
                   <div className="flex-1 h-px bg-gray-200 dark:bg-gray-800"></div>
-                </div>
+                    </div>
                 <h3 className="text-h4 mb-3">{step.title}</h3>
                 <p className="text-body-sm text-gray-600 dark:text-gray-400 mb-4">{step.description}</p>
-              </div>
+                  </div>
               <div className="md:col-span-2">
                 <p className="text-body text-gray-700 dark:text-gray-300 leading-relaxed">{step.detail}</p>
-          </div>
+                    </div>
         </div>
           ))}
         </div>
@@ -778,12 +778,12 @@ function UseCases() {
                 <div>
                   <p className="text-label text-gray-500 dark:text-gray-400 mb-2">The Challenge</p>
                   <p className="text-body text-gray-700 dark:text-gray-300">{useCase.scenario}</p>
-                </div>
+                      </div>
                 <div>
                   <p className="text-label text-gray-500 dark:text-gray-400 mb-2">How OFA Helps</p>
                   <p className="text-body text-gray-700 dark:text-gray-300">{useCase.solution}</p>
+                  </div>
                 </div>
-              </div>
               <div>
                 <p className="text-label text-gray-500 dark:text-gray-400 mb-3">Key Features</p>
                 <div className="flex flex-wrap gap-2">
@@ -794,8 +794,55 @@ function UseCases() {
                     >
                       {feature}
                     </span>
-                  ))}
-                </div>
+            ))}
+          </div>
+        </div>
+          </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// Feature Highlights Section
+function FeatureHighlights() {
+  const features = [
+    {
+      icon: '🎯',
+      title: 'Stay focused',
+      description: 'Daily intentions keep you aligned. Time allocation shows where your energy goes.',
+    },
+    {
+      icon: '📅',
+      title: 'Plan your time',
+      description: 'Calendar integrates tasks, events, and projects. See your week at a glance.',
+    },
+    {
+      icon: '💰',
+      title: 'Track your money',
+      description: 'Income and expenses in one place. Financial clarity without complexity.',
+    },
+    {
+      icon: '💭',
+      title: 'Capture your thoughts',
+      description: 'Voice or text entries. Private space to process. Nothing gets lost.',
+    },
+  ];
+
+  return (
+    <section className="py-24 md:py-32 px-6 lg:px-12 bg-white dark:bg-gray-900 transition-colors">
+      <div className="max-w-5xl mx-auto">
+        <div className="space-y-6">
+          {features.map((feature, index) => (
+            <div 
+              key={index}
+              className="flex items-start gap-6 p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-all"
+            >
+              <div className="text-3xl flex-shrink-0">{feature.icon}</div>
+              <div className="flex-1">
+                <h3 className="text-h5 mb-2">{feature.title}</h3>
+                <p className="text-body-sm text-gray-600 dark:text-gray-400">{feature.description}</p>
               </div>
             </div>
           ))}
@@ -837,7 +884,7 @@ function Benefits() {
           <h2 className="text-h2 mb-6">
             Why this works
           </h2>
-        </div>
+          </div>
         
         <div className="grid md:grid-cols-2 gap-6">
           {benefits.map((benefit, index) => (
@@ -856,6 +903,62 @@ function Benefits() {
               </p>
           </div>
           ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// Social Proof Section
+function SocialProof() {
+  return (
+    <section className="py-24 md:py-32 px-6 lg:px-12 bg-white dark:bg-gray-900 transition-colors">
+      <div className="max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-8 mb-12">
+          <div className="text-center">
+            <div className="text-3xl font-display text-black dark:text-white mb-2">2,400+</div>
+            <div className="text-body-sm text-gray-600 dark:text-gray-400">Active users</div>
+          </div>
+          <div className="text-center">
+            <div className="text-3xl font-display text-black dark:text-white mb-2">47,000+</div>
+            <div className="text-body-sm text-gray-600 dark:text-gray-400">Tasks completed</div>
+          </div>
+          <div className="text-center">
+            <div className="text-3xl font-display text-black dark:text-white mb-2">12,000+</div>
+            <div className="text-body-sm text-gray-600 dark:text-gray-400">Hours tracked</div>
+          </div>
+        </div>
+        
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+            <p className="text-body text-gray-700 dark:text-gray-300 mb-4 italic">
+              "Finally, a system that respects how I actually work. Not another productivity app—a real operating system for life."
+            </p>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">S</span>
+              </div>
+              <div>
+                <div className="text-sm font-medium text-black dark:text-white">Sarah Chen</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">Product Designer</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+            <p className="text-body text-gray-700 dark:text-gray-300 mb-4 italic">
+              "The connection between projects, calendar, and money is what makes this different. Everything finally makes sense together."
+            </p>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">M</span>
+              </div>
+              <div>
+                <div className="text-sm font-medium text-black dark:text-white">Marcus Johnson</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">Software Engineer</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -885,10 +988,10 @@ function FinalCTA() {
           <a 
               href="#system" 
               className="px-8 py-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-black dark:text-white rounded-lg hover:border-black dark:hover:border-white transition-colors text-sm font-medium"
-            >
+          >
               View Demo
-            </a>
-          </div>
+          </a>
+        </div>
           
           <div className="flex items-center justify-center gap-6 text-xs text-gray-500 dark:text-gray-400">
             <div className="flex items-center gap-2">
@@ -921,26 +1024,61 @@ function Footer() {
   return (
     <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 py-16 px-6 lg:px-12 transition-colors">
       <div className="max-w-6xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-black dark:bg-white flex items-center justify-center">
-              <span className="font-display text-white dark:text-black text-sm font-semibold">O</span>
+        <div className="grid md:grid-cols-4 gap-12 mb-12">
+          {/* Brand */}
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-8 h-8 rounded-lg bg-black dark:bg-white flex items-center justify-center">
+                <span className="font-display text-white dark:text-black text-sm font-semibold">O</span>
             </div>
-            <span className="font-display text-lg font-semibold text-black dark:text-white">OFA</span>
+              <span className="font-display text-lg font-semibold text-black dark:text-white">OFA</span>
           </div>
-          
-          <div className="flex items-center gap-8 text-sm text-gray-600 dark:text-gray-400">
-            <a href="#philosophy" className="hover:text-black dark:hover:text-white transition-colors">Philosophy</a>
-            <a href="#system" className="hover:text-black dark:hover:text-white transition-colors">System</a>
-            <a href="#trust" className="hover:text-black dark:hover:text-white transition-colors">Privacy</a>
-            <Link to="/login" className="hover:text-black dark:hover:text-white transition-colors">Login</Link>
-          </div>
+            <p className="text-body-sm text-gray-600 dark:text-gray-400">
+              Your personal life operating system.
+          </p>
         </div>
+          
+          {/* Product */}
+        <div>
+            <h4 className="text-label text-gray-900 dark:text-white mb-4">Product</h4>
+            <ul className="space-y-3">
+              <li><a href="#system" className="text-body-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">Features</a></li>
+              <li><Link to="/pricing" className="text-body-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">Pricing</Link></li>
+              <li><a href="#philosophy" className="text-body-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">Philosophy</a></li>
+          </ul>
+        </div>
+          
+          {/* Company */}
+        <div>
+            <h4 className="text-label text-gray-900 dark:text-white mb-4">Company</h4>
+            <ul className="space-y-3">
+              <li><a href="#trust" className="text-body-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">Privacy</a></li>
+              <li><a href="#" className="text-body-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">Terms</a></li>
+              <li><a href="#" className="text-body-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">Contact</a></li>
+          </ul>
+        </div>
+          
+          {/* Account */}
+        <div>
+            <h4 className="text-label text-gray-900 dark:text-white mb-4">Account</h4>
+            <ul className="space-y-3">
+              <li><Link to="/login" className="text-body-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">Login</Link></li>
+              <li><Link to="/signup" className="text-body-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">Sign Up</Link></li>
+          </ul>
+        </div>
+      </div>
         
-        <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800 text-center">
+        <div className="pt-8 border-t border-gray-200 dark:border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-caption text-gray-500 dark:text-gray-500">
             © 2024 OFA. All rights reserved.
           </p>
+          <div className="flex items-center gap-6 text-xs text-gray-500 dark:text-gray-500">
+            <span>Private by design</span>
+            <span>•</span>
+            <span>No tracking</span>
+            <span>•</span>
+            <span>Your data</span>
+          </div>
         </div>
       </div>
     </footer>
@@ -959,7 +1097,9 @@ export default function Landing() {
       <TrustPrivacy />
       <HowItWorks />
       <UseCases />
+      <FeatureHighlights />
       <Benefits />
+      <SocialProof />
       <FinalCTA />
       <Footer />
     </div>
