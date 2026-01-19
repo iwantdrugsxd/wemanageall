@@ -16,10 +16,22 @@ const requireAuth = (req, res, next) => {
 };
 
 // Configure Cloudinary
+const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+const apiKey = process.env.CLOUDINARY_API_KEY;
+const apiSecret = process.env.CLOUDINARY_API_SECRET;
+
+if (!cloudName || !apiKey || !apiSecret) {
+  console.error('⚠️ Cloudinary configuration missing!');
+  console.error('Required environment variables:');
+  console.error('  - CLOUDINARY_CLOUD_NAME:', cloudName ? '✓' : '✗ MISSING');
+  console.error('  - CLOUDINARY_API_KEY:', apiKey ? '✓' : '✗ MISSING');
+  console.error('  - CLOUDINARY_API_SECRET:', apiSecret ? '✓' : '✗ MISSING');
+}
+
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+  cloud_name: cloudName,
+  api_key: apiKey,
+  api_secret: apiSecret,
 });
 
 // Configure multer with Cloudinary storage
@@ -56,6 +68,15 @@ const upload = multer({
 // POST /api/upload/image - Upload image to Cloudinary
 router.post('/image', requireAuth, upload.single('image'), async (req, res) => {
   try {
+    // Check Cloudinary configuration
+    if (!cloudName || !apiKey || !apiSecret) {
+      console.error('Cloudinary not configured properly');
+      return res.status(500).json({ 
+        error: 'Image upload service not configured. Please contact support.',
+        details: 'Missing Cloudinary credentials'
+      });
+    }
+
     if (!req.file) {
       return res.status(400).json({ error: 'No image file provided.' });
     }
@@ -68,8 +89,18 @@ router.post('/image', requireAuth, upload.single('image'), async (req, res) => {
     });
   } catch (error) {
     console.error('Upload error:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      cloudinaryConfig: {
+        hasCloudName: !!cloudName,
+        hasApiKey: !!apiKey,
+        hasApiSecret: !!apiSecret
+      }
+    });
     res.status(500).json({ 
-      error: error.message || 'Failed to upload image.' 
+      error: error.message || 'Failed to upload image.',
+      details: error.message.includes('api_key') ? 'Cloudinary API key is missing or invalid' : undefined
     });
   }
 });
