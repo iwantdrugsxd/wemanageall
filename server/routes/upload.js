@@ -20,12 +20,16 @@ const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
 const apiKey = process.env.CLOUDINARY_API_KEY;
 const apiSecret = process.env.CLOUDINARY_API_SECRET;
 
-if (!cloudName || !apiKey || !apiSecret) {
-  console.error('⚠️ Cloudinary configuration missing!');
+if (!cloudName || cloudName === 'your_cloud_name_here' || !apiKey || !apiSecret) {
+  console.error('⚠️ Cloudinary configuration missing or incomplete!');
   console.error('Required environment variables:');
-  console.error('  - CLOUDINARY_CLOUD_NAME:', cloudName ? '✓' : '✗ MISSING');
+  console.error('  - CLOUDINARY_CLOUD_NAME:', cloudName && cloudName !== 'your_cloud_name_here' ? '✓' : '✗ MISSING or placeholder');
   console.error('  - CLOUDINARY_API_KEY:', apiKey ? '✓' : '✗ MISSING');
   console.error('  - CLOUDINARY_API_SECRET:', apiSecret ? '✓' : '✗ MISSING');
+  console.error('\nTo fix:');
+  console.error('1. Get your Cloud Name from https://cloudinary.com/console');
+  console.error('2. Update .env file with: CLOUDINARY_CLOUD_NAME=your_actual_cloud_name');
+  console.error('3. For production (Render), add all 3 variables in Environment settings');
 }
 
 cloudinary.config({
@@ -69,11 +73,17 @@ const upload = multer({
 router.post('/image', requireAuth, upload.single('image'), async (req, res) => {
   try {
     // Check Cloudinary configuration
-    if (!cloudName || !apiKey || !apiSecret) {
-      console.error('Cloudinary not configured properly');
+    if (!cloudName || cloudName === 'your_cloud_name_here' || !apiKey || !apiSecret) {
+      console.error('Cloudinary upload attempted but configuration is incomplete');
+      const missing = [];
+      if (!cloudName || cloudName === 'your_cloud_name_here') missing.push('CLOUDINARY_CLOUD_NAME');
+      if (!apiKey) missing.push('CLOUDINARY_API_KEY');
+      if (!apiSecret) missing.push('CLOUDINARY_API_SECRET');
+      
       return res.status(500).json({ 
-        error: 'Image upload service not configured. Please contact support.',
-        details: 'Missing Cloudinary credentials'
+        error: 'Image upload service not configured.',
+        details: `Missing: ${missing.join(', ')}`,
+        help: 'Please configure Cloudinary credentials in your environment variables. Get your Cloud Name from https://cloudinary.com/console'
       });
     }
 
