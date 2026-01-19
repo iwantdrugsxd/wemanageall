@@ -1,173 +1,155 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTheme } from '../context/ThemeContext';
 
 // Navbar Component
 function Navbar() {
+  const { theme, toggleTheme } = useTheme();
+  
   return (
-    <header className="fixed top-0 w-full z-50 bg-white/95 backdrop-blur-xl border-b border-gray-200 px-6 lg:px-12 py-4 flex items-center justify-between">
+    <header className="fixed top-0 w-full z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 px-6 lg:px-12 py-4 flex items-center justify-between transition-colors">
       <Link to="/" className="flex items-center gap-3">
-        <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
-          <span className="text-white font-bold text-sm">O</span>
-            </div>
-        <span className="text-sm font-bold tracking-wide">OFA</span>
-          </Link>
-          
-      <nav className="hidden md:flex items-center gap-8 text-xs font-medium uppercase tracking-wide">
-        <a href="#philosophy" className="hover:text-orange-500 transition-colors">Philosophy</a>
-        <a href="#pillars" className="hover:text-orange-500 transition-colors">Pillars</a>
-        <a href="#features" className="hover:text-orange-500 transition-colors">Features</a>
-        <a href="#faq" className="hover:text-orange-500 transition-colors">Support</a>
+        <div className="w-8 h-8 rounded-lg bg-black dark:bg-white flex items-center justify-center">
+          <span className="font-display text-white dark:text-black text-sm font-semibold">O</span>
+        </div>
+        <span className="font-display text-lg font-semibold text-black dark:text-white transition-colors">OFA</span>
+      </Link>
+        
+      <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
+        <a href="#philosophy" className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">Philosophy</a>
+        <a href="#system" className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">System</a>
+        <a href="#trust" className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">Privacy</a>
       </nav>
       
-      <Link 
-        to="/signup" 
-        className="bg-orange-500 text-white px-6 py-2.5 text-xs font-semibold uppercase tracking-wide rounded-md hover:bg-orange-600 transition-colors shadow-sm"
-      >
-        Get Access
-            </Link>
+      <div className="flex items-center gap-4">
+        {/* Theme Toggle */}
+        <button
+          onClick={toggleTheme}
+          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+        >
+          {theme === 'light' ? (
+            <svg className="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+            </svg>
+          ) : (
+            <svg className="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          )}
+        </button>
+        
+        <Link 
+          to="/signup" 
+          className="bg-black dark:bg-white text-white dark:text-black px-6 py-2.5 text-sm font-medium rounded-lg hover:bg-gray-900 dark:hover:bg-gray-100 transition-colors"
+        >
+          Start Free
+        </Link>
+      </div>
     </header>
-  );
-}
-
-// Features UI Mockup Component
-function FeaturesUIMockup() {
-  const features = [
-    { icon: 'dashboard', label: 'Dashboard', value: 'Unified Control', status: 'Active', color: 'bg-blue-500' },
-    { icon: 'folder', label: 'Projects', value: '12 Active', status: 'In Progress', color: 'bg-purple-500' },
-    { icon: 'check_circle', label: 'Tasks', value: '47 Total', status: '8 Today', color: 'bg-green-500' },
-    { icon: 'calendar_today', label: 'Calendar', value: '5 Events', status: 'This Week', color: 'bg-red-500' },
-    { icon: 'mic', label: 'Unload', value: '23 Entries', status: 'Voice Enabled', color: 'bg-orange-500' },
-    { icon: 'account_balance', label: 'Money', value: '$12,450', status: 'This Month', color: 'bg-emerald-500' },
-    { icon: 'library_books', label: 'Library', value: '156 Items', status: 'Organized', color: 'bg-indigo-500' },
-    { icon: 'settings', label: 'Settings', value: 'Configured', status: 'Synced', color: 'bg-gray-500' }
-  ];
-
-  return (
-    <div className="bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden max-w-5xl mx-auto">
-      {/* Browser Chrome */}
-      <div className="bg-gray-100 border-b border-gray-200 px-4 py-2.5 flex items-center gap-2">
-        <div className="flex gap-1.5">
-          <div className="w-3 h-3 rounded-full bg-red-400"></div>
-          <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
-          <div className="w-3 h-3 rounded-full bg-green-400"></div>
-        </div>
-        <div className="flex-1 bg-white rounded-md px-3 py-1.5 text-xs text-gray-500 ml-4 border border-gray-200">
-          ofa.app/dashboard
-        </div>
-      </div>
-
-      {/* Dashboard Content */}
-      <div className="bg-gray-50 p-6">
-        {/* Header */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-2">
-            <div>
-              <h3 className="text-xl font-serif text-gray-900 mb-1">OFA Dashboard</h3>
-              <p className="text-sm text-gray-500">Complete system overview</p>
-            </div>
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-white rounded-lg border border-gray-200">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-xs text-gray-600 font-medium">Online</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Features Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-          {features.map((feature, index) => (
-            <div 
-              key={index} 
-              className="bg-white rounded-lg p-4 border border-gray-200 hover:border-orange-500 transition-all shadow-sm hover:shadow-md group cursor-pointer"
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div className={`w-10 h-10 ${feature.color} rounded-lg flex items-center justify-center shadow-sm`}>
-                  <span className="material-symbols-outlined text-white text-lg">{feature.icon}</span>
-                </div>
-                <span className="text-[10px] px-2 py-0.5 bg-gray-100 text-gray-600 rounded-md group-hover:bg-orange-50 group-hover:text-orange-600 transition-colors font-medium">
-                  {feature.status}
-                </span>
-              </div>
-              <div>
-                <h4 className="text-sm font-semibold text-gray-900 mb-1">{feature.label}</h4>
-                <p className="text-xs text-gray-500">{feature.value}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Quick Stats */}
-        <div className="grid grid-cols-3 gap-3 mb-6">
-          <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
-            <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-2 font-medium">Today's Focus</p>
-            <p className="text-xl font-bold text-gray-900">8 Tasks</p>
-          </div>
-          <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
-            <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-2 font-medium">This Week</p>
-            <p className="text-xl font-bold text-gray-900">24 Completed</p>
-          </div>
-          <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
-            <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-2 font-medium">Progress</p>
-            <p className="text-xl font-bold text-orange-500">68%</p>
-          </div>
-        </div>
-
-        {/* Recent Activity */}
-        <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
-          <h4 className="text-sm font-semibold text-gray-900 mb-3">Recent Activity</h4>
-          <div className="space-y-2.5">
-            {[
-              { action: 'Completed task', item: 'Design Review', time: '2h ago' },
-              { action: 'Added project', item: 'Q4 Planning', time: '5h ago' },
-              { action: 'Voice entry', item: 'Unload session', time: '1d ago' }
-            ].map((activity, index) => (
-              <div key={index} className="flex items-center justify-between text-xs py-1">
-                <div className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
-                  <span className="text-gray-600">{activity.action}</span>
-                  <span className="text-gray-900 font-semibold">{activity.item}</span>
-                </div>
-                <span className="text-gray-400">{activity.time}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
   );
 }
 
 // Hero Section
 function Hero() {
+  const [currentView, setCurrentView] = useState(0);
+  const views = [
+    { name: 'Dashboard', caption: 'Everything you manage, finally in one place.' },
+    { name: 'Projects', caption: 'Every meaningful outcome starts as a project.' },
+    { name: 'Lists', caption: 'Structure your thoughts into action.' },
+    { name: 'Calendar', caption: 'Your time and your tasks finally live together.' },
+    { name: 'Upload', caption: 'Every file. Exactly where it belongs.' },
+    { name: 'Money', caption: 'Know where your money goes. Quietly.' },
+    { name: 'Library', caption: 'Your second brain, built into your workflow.' },
+    { name: 'Thinking Space', caption: 'You don\'t need to be okay here.' },
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentView((prev) => (prev + 1) % views.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <section className="min-h-screen flex flex-col justify-center px-6 lg:px-12 pt-24 pb-20 overflow-hidden bg-white">
-      <div className="max-w-5xl mx-auto text-center mb-16">
-        <span className="text-xs font-semibold uppercase tracking-wider text-orange-500 block mb-6">System Release V4.0</span>
-        <h1 className="text-5xl md:text-6xl lg:text-7xl mb-6 leading-tight font-serif text-gray-900">
-          Your life deserves an operating system.
-          </h1>
-        <p className="text-lg md:text-xl font-light leading-relaxed max-w-2xl mx-auto mb-4 text-gray-600">
-          You already optimize your work. Why is your life still running on random habits?
-        </p>
-        <p className="text-base md:text-lg font-serif italic text-gray-500 mb-12">
-          Built for people who are tired of productivity apps and want clarity instead.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Link 
-            to="/signup" 
-            className="w-full sm:w-auto bg-orange-500 text-white px-8 py-4 text-sm font-semibold uppercase tracking-wide rounded-md hover:bg-orange-600 transition-colors shadow-md"
-          >
-            Get Started Free
-            </Link>
-          <a 
-            href="#pillars" 
-            className="w-full sm:w-auto border-2 border-gray-300 px-8 py-4 text-sm font-semibold uppercase tracking-wide rounded-md hover:border-orange-500 hover:text-orange-500 transition-all"
-          >
-            See How It Works
-            </a>
+    <section className="min-h-screen flex items-center px-6 lg:px-12 pt-24 pb-20 bg-white dark:bg-gray-900 transition-colors">
+      <div className="max-w-7xl mx-auto w-full">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
+          {/* Left: Editorial Text */}
+          <div>
+            <h1 className="text-h1 mb-6">
+              Your personal life operating system.
+            </h1>
+            <p className="text-body-lg text-gray-600 dark:text-gray-400 mb-6 max-w-xl">
+              OFA brings your projects, lists, calendar, files, finances, thoughts, and knowledge into one quiet, intelligent workspace.
+            </p>
+            <p className="text-body-sm text-gray-500 dark:text-gray-500 mb-12">
+              Designed for people who take their life seriously.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 mb-8">
+              <Link 
+                to="/signup" 
+                className="px-8 py-4 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-gray-900 dark:hover:bg-gray-100 transition-colors text-sm font-medium text-center"
+              >
+                Start Free
+              </Link>
+              <a 
+                href="#system" 
+                className="px-8 py-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-black dark:text-white rounded-lg hover:border-black dark:hover:border-white transition-colors text-sm font-medium text-center"
+              >
+                View Live Demo
+              </a>
+            </div>
+            
+            <p className="text-caption text-gray-500 dark:text-gray-500">
+              Private by design · No credit card · Takes 2 minutes
+            </p>
+          </div>
+
+          {/* Right: UI Preview */}
+          <div className="relative">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl overflow-hidden transition-all duration-500">
+              {/* Browser Chrome */}
+              <div className="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center gap-2">
+                <div className="flex gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                  <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+                  <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                </div>
+                <div className="flex-1 bg-white dark:bg-gray-800 rounded-md px-3 py-1.5 text-xs text-gray-500 dark:text-gray-400 ml-4 border border-gray-200 dark:border-gray-700">
+                  wemanageall.in/{views[currentView].name.toLowerCase().replace(' ', '')}
+                </div>
+              </div>
+
+              {/* Content Preview */}
+              <div className="bg-white dark:bg-gray-800 p-8 min-h-[400px] flex items-center justify-center">
+                <div className="text-center">
+                  <div className="w-16 h-16 rounded-xl bg-gray-100 dark:bg-gray-700 mx-auto mb-4 flex items-center justify-center">
+                    <span className="text-2xl">📊</span>
+                  </div>
+                  <h3 className="text-h4 mb-2">{views[currentView].name}</h3>
+                  <p className="text-body-sm text-gray-500 dark:text-gray-400">{views[currentView].caption}</p>
+                </div>
+              </div>
+            </div>
+            
+            {/* View Indicator */}
+            <div className="flex justify-center gap-2 mt-6">
+              {views.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentView(index)}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    index === currentView 
+                      ? 'bg-black dark:bg-white w-8' 
+                      : 'bg-gray-300 dark:bg-gray-700'
+                  }`}
+                />
+              ))}
+            </div>
           </div>
         </div>
-      <div className="w-full max-w-6xl mx-auto">
-        <FeaturesUIMockup />
       </div>
     </section>
   );
@@ -175,327 +157,152 @@ function Hero() {
 
 // Philosophy Section
 function Philosophy() {
-  const problems = [
-    {
-      title: 'Scattered Tools',
-      desc: 'Your data exists in silos. Notes in one app, tasks in another, finances in a third. Context is lost in the gaps.'
-    },
-    {
-      title: 'No Connection',
-      desc: 'Your daily actions aren\'t tied to your long-term identity. You\'re busy, but you aren\'t moving.'
-    },
-    {
-      title: 'Reactive Living',
-      desc: 'Spending the day answering notifications instead of building the life you envisioned.'
-    },
-    {
-      title: 'Lost Context',
-      desc: 'Forgetting the "why" behind the "what." A system that loses the human element.'
-    }
-  ];
-
   return (
-    <section className="py-20 md:py-28 bg-gray-900 text-white px-6 lg:px-12" id="philosophy">
-      <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
-        <div>
-          <span className="text-xs font-semibold uppercase tracking-wider text-orange-400 mb-4 block">The Protocol</span>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl mb-10 font-serif">The Problem We're Solving</h2>
-          <div className="space-y-8">
-            {problems.map((problem, index) => (
-              <div key={index} className="flex gap-6 border-l-2 border-orange-500 pl-6 py-2">
-                <div>
-                  <h4 className="text-sm font-bold uppercase tracking-wide mb-2 text-orange-400">{problem.title}</h4>
-                  <p className="text-gray-300 text-sm leading-relaxed">{problem.desc}</p>
-        </div>
-            </div>
-          ))}
-        </div>
-          </div>
-        <div className="relative aspect-square border-2 border-gray-700 rounded-lg p-8 flex flex-col justify-center items-center text-center bg-gray-800/50 backdrop-blur-sm">
-          <span className="material-symbols-outlined text-7xl font-thin mb-6 opacity-30 text-orange-400">all_inclusive</span>
-          <p className="text-xl font-serif italic max-w-sm text-gray-200">"The quality of your life is determined by the quality of the systems you inhabit."</p>
-          <span className="mt-6 text-xs font-semibold uppercase tracking-wider text-gray-500">Architectural Truth</span>
+    <section className="py-24 md:py-32 px-6 lg:px-12 bg-gray-50 dark:bg-gray-950 transition-colors" id="philosophy">
+      <div className="max-w-4xl mx-auto">
+        <h2 className="text-h2 mb-8 text-center">
+          Life is complex.<br />
+          Your tools shouldn't be.
+        </h2>
+        <div className="space-y-6 text-body text-gray-700 dark:text-gray-300 leading-relaxed">
+          <p>
+            Most apps solve one tiny problem.
+            Tasks here. Notes there. Files somewhere else. Money in a spreadsheet.
+            Your thoughts nowhere.
+          </p>
+          <p>
+            OFA exists to replace your entire personal operating stack with one coherent system.
+          </p>
         </div>
       </div>
     </section>
   );
 }
 
-// Three Pillars Section
-function Pillars() {
-  const pillars = [
-    {
-      num: '01',
-      title: 'Identity',
-      desc: 'Define the architect. Codify your values, long-term visions, and the person you are becoming. This is the source code of your system.'
-    },
-    {
-      num: '02',
-      title: 'Actions',
-      desc: 'The daily execution. Projects, tasks, and habits that translate abstract goals into concrete physical progress through systematic focus.'
-    },
-    {
-      num: '03',
-      title: 'Outcomes',
-      desc: 'The feedback loop. Tracking finances, health data, and weekly reflections to ensure the system is optimized for peak performance.'
-    }
-  ];
-
-  return (
-    <section className="py-20 md:py-32 px-6 lg:px-12" id="pillars">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-end mb-16">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif">The Three Pillars</h2>
-          <span className="text-xs font-semibold uppercase tracking-wider text-gray-400 hidden md:block">Structural Core</span>
-        </div>
-        <div className="grid md:grid-cols-3 gap-6">
-          {pillars.map((pillar, index) => (
-            <div key={index} className="bg-white p-8 lg:p-10 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-orange-500 text-white rounded-lg flex items-center justify-center font-serif text-xl font-bold">
-                  {pillar.num}
-                </div>
-                <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">Pillar {pillar.num}</span>
-              </div>
-              <h3 className="text-2xl mb-4 font-serif">{pillar.title}</h3>
-              <p className="text-sm leading-relaxed text-gray-600">{pillar.desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// Features Section
-function Features() {
-  const features = [
+// System Overview Section
+function SystemOverview() {
+  const modules = [
     {
       title: 'Dashboard',
-      desc: 'Unified mission control for your day.',
-      why: 'Zero-friction navigation.'
+      description: 'Your real-time command center for life.',
     },
     {
       title: 'Projects',
-      desc: 'Structured roadmap for complex goals.',
-      why: 'Clear next-step visibility.'
+      description: 'Plan and execute meaningful work from idea to completion.',
     },
     {
       title: 'Lists',
-      desc: 'The database of every moving part.',
-      why: 'Absolute mental clarity.'
+      description: 'Capture everything. Structure later. Forget nothing.',
     },
     {
       title: 'Calendar',
-      desc: 'Temporal visualization of your life.',
-      why: 'Intentional time ownership.'
+      description: 'See your time, tasks, and priorities in one unified timeline.',
     },
     {
-      title: 'Unload',
-      desc: 'Rapid entry for thoughts and tasks. Voice-to-text with free transcription.',
-      why: 'Never lose an idea again.'
+      title: 'Upload',
+      description: 'Store files exactly where they belong.',
     },
     {
       title: 'Money',
-      desc: 'Clinical oversight of your capital.',
-      why: 'Financial peace of mind.'
+      description: 'Track income, expenses, and financial clarity effortlessly.',
     },
     {
       title: 'Library',
-      desc: 'Permanent archive of your learning.',
-      why: 'Build a second brain.'
+      description: 'Your personal knowledge base for ideas, notes, and learning.',
     },
     {
-      title: 'Settings',
-      desc: 'Global configuration for your OS.',
-      why: 'Tailored for your style.'
-    }
+      title: 'Thinking Space',
+      description: 'A private place to process your thoughts. No judgment. No audience.',
+    },
   ];
 
   return (
-    <section className="py-20 md:py-28 bg-gray-50 px-6 lg:px-12" id="features">
+    <section className="py-24 md:py-32 px-6 lg:px-12 bg-white dark:bg-gray-900 transition-colors" id="system">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-16">
-          <span className="text-xs font-semibold uppercase tracking-wider text-orange-500 block mb-4">The Complete Suite</span>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl mb-4 font-serif">Everything You Need.<br/>Nothing You Don't.</h2>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {features.map((feature, index) => (
-            <div key={index} className="bg-white p-6 rounded-lg border border-gray-200 group hover:border-orange-500 transition-all shadow-sm hover:shadow-md">
-              <h4 className="font-bold text-sm uppercase tracking-wide mb-3 text-gray-900">{feature.title}</h4>
-              <p className="text-sm leading-relaxed text-gray-600 mb-4">{feature.desc}</p>
-              <p className="text-xs font-semibold text-orange-500 italic">{feature.why}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// Quote Section
-function Quote() {
-  return (
-    <section className="py-20 md:py-32 bg-white px-6 lg:px-12">
-      <div className="max-w-4xl mx-auto text-center">
-        <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif italic leading-tight text-gray-900">
-          "You don't need to become more disciplined. You need a system that respects how human you are."
-          </h2>
-        </div>
-    </section>
-  );
-}
-
-// Implementation Section
-function Implementation() {
-  const steps = [
-    {
-      num: '01',
-      title: 'Define',
-      desc: 'Map out your current reality and desired future. We start by cleaning the slate and identifying the core metrics that actually move the needle.',
-      icon: '📋'
-    },
-    {
-      num: '02',
-      title: 'Connect',
-      desc: 'Integrate your disparate tools into a single, cohesive source of truth. Bridge the gap between who you are and what you do every day.',
-      icon: '🔗',
-      highlight: true
-    },
-    {
-      num: '03',
-      title: 'Learn',
-      desc: 'Operate within the system and refine it weekly. The OS evolves with you, becoming more precise and automated over time.',
-      icon: '📈'
-    }
-  ];
-
-  return (
-    <section className="py-24 md:py-32 px-6 lg:px-12 bg-white relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute inset-0" style={{
-          backgroundImage: 'radial-gradient(circle at 2px 2px, #000 1px, transparent 0)',
-          backgroundSize: '40px 40px'
-        }}></div>
-      </div>
-      
-      <div className="max-w-5xl mx-auto relative">
-        <div className="text-center mb-16">
-          <span className="text-xs font-semibold uppercase tracking-wider text-orange-500 block mb-4">Process</span>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl mb-4 font-serif text-black">Implementation</h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">A systematic approach to building your personal operating system</p>
-        </div>
-
-        <div className="relative">
-          {/* Connecting line (desktop only) */}
-          <div className="hidden md:block absolute left-12 top-0 bottom-0 w-0.5 bg-gradient-to-b from-orange-200 via-orange-400 to-orange-200" style={{ height: 'calc(100% - 6rem)' }}></div>
-
-          <div className="space-y-16 md:space-y-24">
-            {steps.map((step, index) => (
-              <div key={index} className="relative">
-                <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-start">
-                  {/* Number Badge */}
-                  <div className="relative flex-shrink-0">
-                    <div className={`relative w-24 h-24 rounded-2xl flex items-center justify-center transition-all duration-300 ${
-                      step.highlight 
-                        ? 'bg-orange-500 text-white shadow-xl shadow-orange-500/30 scale-105' 
-                        : 'bg-white border-2 border-gray-200 text-black hover:border-orange-500 hover:shadow-lg'
-                    }`}>
-                      <span className="text-3xl font-serif font-bold">{step.num}</span>
-                      {step.highlight && (
-                        <div className="absolute -top-1 -right-1 w-6 h-6 bg-orange-400 rounded-full animate-pulse"></div>
-                      )}
-                    </div>
-                    {/* Icon */}
-                    <div className={`absolute -bottom-2 -right-2 w-10 h-10 rounded-full flex items-center justify-center text-xl ${
-                      step.highlight ? 'bg-white text-orange-500 shadow-md' : 'bg-gray-100 text-gray-600'
-                    }`}>
-                      {step.icon}
-                    </div>
-                  </div>
-
-                  {/* Content */}
-                  <div className="flex-1 pt-2">
-                    <div className="mb-4">
-                      <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2 block">
-                        Step {step.num}
-                      </span>
-                      <h3 className="text-3xl md:text-4xl mb-4 font-serif text-black">{step.title}</h3>
-                    </div>
-                    <p className="text-base md:text-lg text-gray-600 leading-relaxed max-w-2xl">
-                      {step.desc}
-                    </p>
-                    
-                    {/* Progress indicator */}
-                    {index < steps.length - 1 && (
-                      <div className="mt-6 flex items-center gap-2 text-xs text-gray-400">
-                        <div className="flex-1 h-px bg-gray-200"></div>
-                        <span>Next step</span>
-                        <div className="flex-1 h-px bg-gray-200"></div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Bottom CTA */}
-        <div className="mt-16 text-center">
-          <div className="inline-flex items-center gap-3 px-6 py-3 bg-gray-50 rounded-full border border-gray-200">
-            <span className="text-sm text-gray-600">Ready to start?</span>
-            <Link 
-              to="/signup" 
-              className="text-sm font-semibold text-orange-500 hover:text-orange-600 transition-colors"
+        <h2 className="text-h2 mb-16 text-center">
+          One system. Seven core spaces.
+        </h2>
+        
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {modules.map((module, index) => (
+            <div 
+              key={index}
+              className="bg-white dark:bg-gray-800 rounded-xl p-8 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-all"
             >
-              Begin Implementation →
-            </Link>
-          </div>
+              <h3 className="text-h5 mb-3">{module.title}</h3>
+              <p className="text-body-sm text-gray-600 dark:text-gray-400">{module.description}</p>
+            </div>
+          ))}
         </div>
       </div>
     </section>
   );
 }
 
-// Testimonials Section
-function Testimonials() {
-  const testimonials = [
+// Scroll-Driven Product Story
+function ProductStory() {
+  const scenes = [
     {
-      quote: '"The OFA system changed how I view my time. It\'s not just about productivity; it\'s about clarity of purpose."',
-      name: 'Sarah Chen',
-      role: 'Creative Director',
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCj4xKsctwS_lpvCWM_J1j8ltwkvQV342arqDaguBhojx6_1wUGbnaImawey89ohGPCpJ9w8Bdw8Q__3eIaVX3hDSOEo2BwNFVrVA4JkbUz_E_Mcm1mcFcc8BVj11DXpuEpSeYRSTL8KC0pqrn84e7HcfDMCkXT-DAJjfJ3mCAGCrD_K9twbWVwXwWCn2weCMLlOzW1YSVT4gXGxzMmXq0NaPNM-JrqZqr1I8EM2ReJ1yLZ67ZILPyIzc9cFXkRL3XIOHWjkNGohyA'
+      title: 'Start your day with clarity, not chaos.',
+      view: 'Dashboard',
+      description: 'Today\'s intention, daily objectives, time allocation, and schedule in one view.',
     },
     {
-      quote: '"I\'ve tried every app and template out there. This is the first one that feels like a professional-grade tool."',
-      name: 'Marcus Johnson',
-      role: 'Software Engineer',
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCOYkYCfdkRIxe-024MgyLILvGSudXduqzUnwr9hbj_HZVdQ_ql7WYGt-DwtE4dVGsAW10x3XznwJfiiqOQ4cSmcY2wxiEXY_8mjFXfz926fwf1LpVgTfQB1uNNQ6oMmP8bqTi_q8WttF5Fg-V9ULJqbOUrmsmQVPMU49houfWiJvM6C7oxKNX3tHKT5ThOJJkWeexkwA1Dt0lteEgH4mlx4NSTjvcLaTH5blOzaOV0K_SD4DGU0su4CGruqorS3g_JbfawDe4pQ2E'
+      title: 'Every meaningful outcome starts as a project.',
+      view: 'Projects',
+      description: 'From idea to completion. Structure your work, track progress, see everything.',
     },
     {
-      quote: '"It\'s like an architecture for the mind. My stress levels have halved because I trust the system."',
-      name: 'Emily Rodriguez',
-      role: 'Product Founder',
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC0qyE0xAJQHjoij1EIsJAguhhlLl7WQ5jL94fLlUvA8mJModdH17tJJ0eo5OYimnZK41ZQKMpYFBrxoQ1p62GVPqPzgMZ-AFo80zMHToNqElLRK3z4wjfAWgwZcClKmL7vIuoP6HeQcajOD1ty7lHbQ7E1-m65Unq3cz3P3F7CQmCAp0CMWd9sUCkFSBfdTiPPkIVRqXJsXaJV5ag4R7j3lsWRdCrX0xJMKF6AhSOIfHnP4k-nmYmN0BoFbTHsZ2VY244SizKOMXA'
-    }
+      title: 'Structure your thoughts into action.',
+      view: 'Lists',
+      description: 'Capture everything. Organize later. Never lose an idea or task.',
+    },
+    {
+      title: 'Your time and your tasks finally live together.',
+      view: 'Calendar',
+      description: 'See your schedule, tasks, and priorities in one unified timeline.',
+    },
+    {
+      title: 'Every file. Exactly where it belongs.',
+      view: 'Upload',
+      description: 'Store documents, images, and resources linked to your projects and lists.',
+    },
+    {
+      title: 'Know where your money goes. Quietly.',
+      view: 'Money',
+      description: 'Track income, expenses, and financial clarity without the noise.',
+    },
+    {
+      title: 'Your second brain, built into your workflow.',
+      view: 'Library',
+      description: 'Resources, reading logs, notes, and knowledge all in one place.',
+    },
+    {
+      title: 'You don\'t need to be okay here.',
+      view: 'Thinking Space',
+      description: 'A private place to process your thoughts. No judgment. No audience.',
+    },
   ];
 
   return (
-    <section className="py-20 md:py-32 border-y border-gray-200 px-6 lg:px-12 bg-gray-50">
+    <section className="py-24 md:py-32 px-6 lg:px-12 bg-gray-50 dark:bg-gray-950 transition-colors">
       <div className="max-w-6xl mx-auto">
-        <div className="grid md:grid-cols-3 gap-8">
-          {testimonials.map((testimonial, index) => (
-            <div key={index} className="flex flex-col gap-6 p-6 bg-white rounded-lg border border-gray-200 shadow-sm">
-              <p className="text-lg font-serif italic text-gray-700 leading-relaxed">"{testimonial.quote}"</p>
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-gray-200 overflow-hidden">
-                  <img alt={testimonial.name} className="w-full h-full object-cover" src={testimonial.image} />
+        <div className="space-y-32">
+          {scenes.map((scene, index) => (
+            <div key={index} className="grid md:grid-cols-2 gap-12 items-center">
+              <div>
+                <h3 className="text-h3 mb-6">{scene.title}</h3>
+                <p className="text-body text-gray-600 dark:text-gray-400 mb-4">{scene.description}</p>
+                <div className="text-caption text-gray-500 dark:text-gray-500">
+                  {scene.view}
                 </div>
-                <div>
-                  <p className="text-sm font-bold text-gray-900">{testimonial.name}</p>
-                  <p className="text-xs text-gray-500">{testimonial.role}</p>
+              </div>
+              <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-8 min-h-[300px] flex items-center justify-center">
+                <div className="text-center">
+                  <div className="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-700 mx-auto mb-4 flex items-center justify-center">
+                    <span className="text-xl">📊</span>
+                  </div>
+                  <p className="text-body-sm text-gray-500 dark:text-gray-400">{scene.view}</p>
                 </div>
               </div>
             </div>
@@ -506,43 +313,66 @@ function Testimonials() {
   );
 }
 
-// FAQ Section
-function FAQ() {
-  const faqs = [
+// Trust & Privacy Section
+function TrustPrivacy() {
+  return (
+    <section className="py-24 md:py-32 px-6 lg:px-12 bg-white dark:bg-gray-900 transition-colors" id="trust">
+      <div className="max-w-4xl mx-auto text-center">
+        <h2 className="text-h2 mb-8">
+          Private by design.
+        </h2>
+        <div className="space-y-6 text-body text-gray-700 dark:text-gray-300 leading-relaxed max-w-2xl mx-auto">
+          <p>
+            Nothing here is shared.
+            Nothing is analyzed.
+            Nothing is sold.
+          </p>
+          <p>
+            OFA is your space. Period.
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// Who This Is For Section
+function WhoThisIsFor() {
+  const personas = [
     {
-      question: 'Is OFA free?',
-      answer: 'OFA offers a lifetime license for a one-time fee. We don\'t believe in rent-seeking subscriptions for your personal operating system.'
+      title: 'The Individual Operator',
+      description: 'Clarity, habits, goals, structure',
     },
     {
-      question: 'Is my data private?',
-      answer: 'Yes. The OS is local-first. We do not store your personal data on our servers. You own your system and your data.'
+      title: 'The Student / Builder',
+      description: 'Projects, deadlines, learning, ideas',
     },
     {
-      question: 'Does it work on mobile?',
-      answer: 'The system is fully responsive and features a dedicated \'Rapid Entry\' interface optimized for iOS and Android workflows.'
+      title: 'The Founder',
+      description: 'Execution, finance, focus, thinking',
     },
     {
-      question: 'Is it hard to set up?',
-      answer: 'The initialization process takes about 2-3 hours. We provide a step-by-step \'Blueprint\' guide to help you migrate your life.'
-    }
+      title: 'The Reflective Mind',
+      description: 'Thoughts, emotions, journaling',
+    },
   ];
 
   return (
-    <section className="py-20 md:py-32 px-6 lg:px-12" id="faq">
-      <div className="max-w-3xl mx-auto">
-        <span className="text-xs font-semibold uppercase tracking-wider text-orange-500 block text-center mb-4">Help & Data</span>
-        <h2 className="text-4xl md:text-5xl mb-12 text-center font-serif">Frequently Asked</h2>
-        <div className="divide-y divide-gray-200">
-          {faqs.map((faq, index) => (
-            <details key={index} className="group py-6">
-              <summary className="flex justify-between items-center cursor-pointer list-none">
-                <span className="font-semibold text-sm text-gray-900">{faq.question}</span>
-                <span className="material-symbols-outlined transition-transform group-open:rotate-45 text-orange-500">add</span>
-              </summary>
-              <div className="mt-4 text-sm text-gray-600 leading-relaxed">
-                {faq.answer}
-          </div>
-            </details>
+    <section className="py-24 md:py-32 px-6 lg:px-12 bg-gray-50 dark:bg-gray-950 transition-colors">
+      <div className="max-w-6xl mx-auto">
+        <h2 className="text-h2 mb-16 text-center">
+          Built for people who think long-term.
+        </h2>
+        
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {personas.map((persona, index) => (
+            <div 
+              key={index}
+              className="bg-white dark:bg-gray-800 rounded-xl p-8 border border-gray-200 dark:border-gray-700"
+            >
+              <h3 className="text-h5 mb-3">{persona.title}</h3>
+              <p className="text-body-sm text-gray-600 dark:text-gray-400">{persona.description}</p>
+            </div>
           ))}
         </div>
       </div>
@@ -550,27 +380,33 @@ function FAQ() {
   );
 }
 
-// CTA Section
-function CTA() {
+// Final CTA Section
+function FinalCTA() {
   return (
-    <section className="py-20 md:py-32 px-6 lg:px-12 bg-gray-900 text-white text-center">
-      <div className="max-w-4xl mx-auto">
-        <h2 className="text-3xl md:text-4xl lg:text-5xl mb-12 font-serif italic">Start Building the System You'll Thank Yourself For in 5 Years.</h2>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center mt-12">
+    <section className="py-24 md:py-32 px-6 lg:px-12 bg-white dark:bg-gray-900 transition-colors">
+      <div className="max-w-4xl mx-auto text-center">
+        <h2 className="text-h2 mb-12">
+          Build the system your future self will thank you for.
+        </h2>
+        
+        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
           <Link 
             to="/signup" 
-            className="bg-orange-500 text-white px-10 py-4 text-sm font-semibold uppercase tracking-wide rounded-md hover:bg-orange-600 transition-colors shadow-lg"
+            className="px-8 py-4 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-gray-900 dark:hover:bg-gray-100 transition-colors text-sm font-medium"
           >
-            Get Started Free — $0
-            </Link>
+            Start Free
+          </Link>
           <a 
-            href="#pillars" 
-            className="border-2 border-gray-600 px-10 py-4 text-sm font-semibold uppercase tracking-wide rounded-md hover:border-orange-500 hover:text-orange-500 transition-all"
+            href="#system" 
+            className="px-8 py-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-black dark:text-white rounded-lg hover:border-black dark:hover:border-white transition-colors text-sm font-medium"
           >
-            See How It Works
+            View Demo
           </a>
         </div>
-        <p className="mt-10 text-xs font-semibold uppercase tracking-wider text-gray-400">Join 12,000+ Verified Architects</p>
+        
+        <p className="text-caption text-gray-500 dark:text-gray-500">
+          No credit card · Private by default · Takes 2 minutes
+        </p>
       </div>
     </section>
   );
@@ -579,50 +415,28 @@ function CTA() {
 // Footer
 function Footer() {
   return (
-    <footer className="bg-white py-16 px-6 lg:px-12 border-t border-gray-200">
-      <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-12">
-        <div className="col-span-2 md:col-span-1">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">O</span>
+    <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 py-16 px-6 lg:px-12 transition-colors">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-8">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-black dark:bg-white flex items-center justify-center">
+              <span className="font-display text-white dark:text-black text-sm font-semibold">O</span>
             </div>
-            <span className="text-base font-bold">OFA</span>
+            <span className="font-display text-lg font-semibold text-black dark:text-white">OFA</span>
           </div>
-          <p className="text-xs text-gray-600 leading-relaxed">
-            The clinical operating system for high-output individuals. Built on the principles of essentialism and architectural precision.
+          
+          <div className="flex items-center gap-8 text-sm text-gray-600 dark:text-gray-400">
+            <a href="#philosophy" className="hover:text-black dark:hover:text-white transition-colors">Philosophy</a>
+            <a href="#system" className="hover:text-black dark:hover:text-white transition-colors">System</a>
+            <a href="#trust" className="hover:text-black dark:hover:text-white transition-colors">Privacy</a>
+            <Link to="/login" className="hover:text-black dark:hover:text-white transition-colors">Login</Link>
+          </div>
+        </div>
+        
+        <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800 text-center">
+          <p className="text-caption text-gray-500 dark:text-gray-500">
+            © 2024 OFA. All rights reserved.
           </p>
-        </div>
-        <div>
-          <h5 className="text-xs font-bold uppercase tracking-wide mb-6 text-gray-900">System</h5>
-          <ul className="space-y-3 text-xs text-gray-600">
-            <li><a href="#features" className="hover:text-orange-500 transition-colors">Components</a></li>
-            <li><a href="#pillars" className="hover:text-orange-500 transition-colors">Integration</a></li>
-            <li><a href="#philosophy" className="hover:text-orange-500 transition-colors">Manifesto</a></li>
-          </ul>
-        </div>
-        <div>
-          <h5 className="text-xs font-bold uppercase tracking-wide mb-6 text-gray-900">Resources</h5>
-          <ul className="space-y-3 text-xs text-gray-600">
-            <li><a href="#" className="hover:text-orange-500 transition-colors">Documentation</a></li>
-            <li><a href="#" className="hover:text-orange-500 transition-colors">Video Tutorials</a></li>
-            <li><a href="#" className="hover:text-orange-500 transition-colors">Community</a></li>
-          </ul>
-        </div>
-        <div>
-          <h5 className="text-xs font-bold uppercase tracking-wide mb-6 text-gray-900">Protocol</h5>
-          <ul className="space-y-3 text-xs text-gray-600">
-            <li><a href="#" className="hover:text-orange-500 transition-colors">Privacy Policy</a></li>
-            <li><a href="#" className="hover:text-orange-500 transition-colors">Terms of Service</a></li>
-            <li><a href="#" className="hover:text-orange-500 transition-colors">Contact</a></li>
-          </ul>
-        </div>
-      </div>
-      <div className="max-w-6xl mx-auto mt-12 pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center gap-6">
-        <p className="text-xs text-gray-500">© 2024 OFA. All rights reserved.</p>
-        <div className="flex gap-6 text-gray-400">
-          <span className="material-symbols-outlined text-lg hover:text-orange-500 transition-colors cursor-pointer">terminal</span>
-          <span className="material-symbols-outlined text-lg hover:text-orange-500 transition-colors cursor-pointer">architecture</span>
-          <span className="material-symbols-outlined text-lg hover:text-orange-500 transition-colors cursor-pointer">grid_view</span>
         </div>
       </div>
     </footer>
@@ -632,17 +446,15 @@ function Footer() {
 // Main Landing Page Component
 export default function Landing() {
   return (
-    <div className="overflow-x-hidden">
+    <div className="overflow-x-hidden bg-white dark:bg-gray-900 transition-colors">
       <Navbar />
       <Hero />
       <Philosophy />
-      <Pillars />
-      <Features />
-      <Quote />
-      <Implementation />
-      <Testimonials />
-      <FAQ />
-      <CTA />
+      <SystemOverview />
+      <ProductStory />
+      <TrustPrivacy />
+      <WhoThisIsFor />
+      <FinalCTA />
       <Footer />
     </div>
   );
