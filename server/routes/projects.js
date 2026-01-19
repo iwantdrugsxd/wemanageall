@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { query } from '../db/config.js';
-import { getOrganizationContext } from '../middleware/organization.js';
+// Organization middleware removed - no longer using organizations
 
 const router = Router();
 
@@ -337,7 +337,7 @@ const checkProjectAccess = async (projectId, userId) => {
 };
 
 // GET /api/projects - Get all user's projects with next task info
-router.get('/', requireAuth, getOrganizationContext, async (req, res) => {
+router.get('/', requireAuth, async (req, res) => {
   try {
     await ensureTables();
     
@@ -610,11 +610,11 @@ router.get('/:id', requireAuth, async (req, res) => {
 });
 
 // POST /api/projects - Create new project
-router.post('/', requireAuth, getOrganizationContext, async (req, res) => {
+router.post('/', requireAuth, async (req, res) => {
   // Check project limit
   try {
     const { canCreateProject } = await import('../services/subscription.js');
-    const canCreate = await canCreateProject(req.user.id, req.organizationId || null);
+    const canCreate = await canCreateProject(req.user.id, null);
     
     if (!canCreate) {
       return res.status(403).json({
