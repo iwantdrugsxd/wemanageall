@@ -97,10 +97,10 @@ export default function Layout({ children }) {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link to="/dashboard" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center">
-                <span className="font-display text-white text-sm font-semibold">O</span>
+              <div className="w-9 h-9 rounded-xl bg-black flex items-center justify-center shadow-[0_8px_24px_rgba(0,0,0,0.6)] border border-gray-800/80">
+                <span className="font-display text-white text-lg leading-none font-semibold">W</span>
               </div>
-              <span className="font-display text-lg font-semibold text-black dark:text-white transition-colors">OFA</span>
+              <span className="font-display text-lg font-semibold text-black dark:text-white transition-colors">wemanageall</span>
             </Link>
 
             {/* Navigation Links */}
