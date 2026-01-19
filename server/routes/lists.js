@@ -180,7 +180,7 @@ router.post('/', requireAuth, async (req, res) => {
   try {
     await ensureTables();
 
-    const { name, icon, description } = req.body;
+    const { name, icon, description, cover_image_url } = req.body;
 
     if (!name || !name.trim()) {
       return res.status(400).json({ error: 'List name is required.' });
