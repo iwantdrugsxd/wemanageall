@@ -694,14 +694,14 @@ export default function Dashboard() {
     <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
       {/* Header */}
       <div className="mb-8">
-        <div className="text-xs uppercase tracking-wider text-gray-500 mb-2">PERSONAL LIFE OS</div>
-        <h1 className="font-display text-4xl md:text-5xl text-black mb-3 font-light">
+        <div className="text-label text-gray-500 mb-2">PERSONAL LIFE OS</div>
+        <h1 className="text-h2 text-gray-900 mb-3">
           {greeting}, {firstName}.
-                </h1>
-        <p className="text-gray-600 italic text-base font-serif">
+        </h1>
+        <p className="text-body-sm text-gray-600 italic font-serif">
           "The present moment is the only time over which we have dominion."
-                </p>
-              </div>
+        </p>
+      </div>
 
       {/* Insights Widget */}
       <InsightsWidget />

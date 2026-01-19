@@ -570,10 +570,10 @@ export default function Emotions() {
         <div className="max-w-6xl mx-auto px-6 lg:px-8 py-16">
           {/* Hero Section */}
           <div className="text-center mb-12">
-            <h1 className="font-display text-4xl md:text-5xl lg:text-[48px] text-[#1F2933] mb-4 leading-tight">
+            <h1 className="text-h2 text-gray-900 mb-4">
               You don't need to be <span className="italic text-[#3B6E5C]">okay</span> here.
             </h1>
-            <p className="text-base md:text-lg text-gray-600 max-w-xl mx-auto leading-relaxed">
+            <p className="text-body text-gray-600 max-w-xl mx-auto">
               This is your private space to let things out. No judgment, no audience.
             </p>
           </div>
@@ -821,7 +821,7 @@ export default function Emotions() {
           {entries.length > 0 && (
             <div className="mt-12">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="font-display text-3xl font-bold text-gray-900">Recent Unloads</h2>
+                <h2 className="text-h3 text-gray-900">Recent Unloads</h2>
                 <button
                   onClick={() => {
                     setShowHistory(true);
@@ -898,7 +898,7 @@ export default function Emotions() {
                           ) : (
                             <div>
                               <div className="flex items-center gap-2 mb-3">
-                                <p className="text-gray-900 font-semibold text-lg">
+                                <p className="text-h6 text-gray-900">
                                   {entry.type === 'text' 
                                     ? `Written Entry (~${getWordCount(entry.content)} words)`
                                     : `Voice Entry (${Math.floor((entry.duration || 0) / 60)}:${((entry.duration || 0) % 60).toString().padStart(2, '0')})`
@@ -909,16 +909,16 @@ export default function Emotions() {
                                 )}
                               </div>
                               {entry.transcript && (
-                                <p className="text-gray-800 text-base mb-3 line-clamp-2 italic bg-gray-50 p-3 rounded-lg">
+                                <p className="text-body-sm text-gray-800 mb-3 line-clamp-2 italic bg-gray-50 p-3 rounded-lg">
                                   "{entry.transcript}"
                                 </p>
                               )}
                               {entry.type === 'text' && entry.content && (
-                                <p className="text-gray-800 text-base mb-3 line-clamp-3 leading-relaxed">
+                                <p className="text-body-sm text-gray-800 mb-3 line-clamp-3">
                                   {entry.content}
                                 </p>
                               )}
-                              <p className="text-gray-600 text-sm font-medium">{getHumanTime(entry.created_at)}</p>
+                              <p className="text-caption text-gray-600">{getHumanTime(entry.created_at)}</p>
                             </div>
                           )}
                         </div>
@@ -943,7 +943,7 @@ export default function Emotions() {
                                   }
                                 }, 100);
                               }}
-                              className="px-5 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 hover:shadow-md transition-all text-sm font-semibold"
+                              className="px-5 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 hover:shadow-md transition-all text-body-sm font-semibold"
                             >
                               ▶ Play
                             </button>
@@ -953,7 +953,7 @@ export default function Emotions() {
                                 setSelectedEntry(entry);
                                 setView('read');
                               }}
-                              className="px-5 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 hover:shadow-md transition-all text-sm font-semibold"
+                              className="px-5 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 hover:shadow-md transition-all text-body-sm font-semibold"
                             >
                               Read
                             </button>
@@ -1336,11 +1336,8 @@ export default function Emotions() {
   // READ ENTRY VIEW (for text entries)
   if (view === 'read' && selectedEntry && selectedEntry.type === 'text') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-ofa-ink/95 to-ofa-charcoal" style={{
-        backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0)`,
-        backgroundSize: '40px 40px'
-      }}>
-        <div className="max-w-4xl mx-auto px-6 lg:px-8 py-12">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="max-w-4xl mx-auto px-6 lg:px-8 py-8 md:py-12">
           {/* Header */}
           <div className="mb-8">
             <button
@@ -1348,54 +1345,62 @@ export default function Emotions() {
                 setSelectedEntry(null);
                 setView('home');
               }}
-              className="text-white/80 hover:text-white transition-colors mb-4 text-sm flex items-center gap-2"
+              className="text-body-sm text-gray-600 hover:text-gray-900 transition-colors mb-6 flex items-center gap-2 font-medium"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              Back
+              Back to Unload
             </button>
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="font-display text-3xl text-white mb-2">Written Entry</h2>
-                <p className="text-white/60 text-sm">
-                  {formatDate(selectedEntry.created_at)} • {getWordCount(selectedEntry.content)} words
-                </p>
-              </div>
-              {selectedEntry.locked && (
-                <div className="flex items-center gap-2 text-white/60">
-                  <span>🔒</span>
-                  <span className="text-sm">Locked</span>
+            <div className="flex items-start justify-between mb-8 pb-6 border-b border-gray-200">
+              <div className="flex-1">
+                <h1 className="text-h3 text-gray-900 mb-3">Written Entry</h1>
+                <div className="flex items-center gap-4 flex-wrap">
+                  <p className="text-caption text-gray-600">
+                    {formatDate(selectedEntry.created_at)}
+                  </p>
+                  <span className="text-gray-300">•</span>
+                  <p className="text-caption text-gray-600">
+                    {getWordCount(selectedEntry.content)} words
+                  </p>
+                  {selectedEntry.locked && (
+                    <>
+                      <span className="text-gray-300">•</span>
+                      <div className="flex items-center gap-2 text-caption text-gray-600">
+                        <span>🔒</span>
+                        <span>Locked</span>
+                      </div>
+                    </>
+                  )}
                 </div>
-              )}
+              </div>
             </div>
           </div>
 
-          {/* Content */}
-          <div className="bg-white/10 rounded-3xl p-8 border border-white/20 mb-6">
-            <div className="prose prose-invert max-w-none">
-              <p className="text-white/90 text-lg leading-relaxed whitespace-pre-wrap">
+          {/* Content Card */}
+          <div className="bg-white rounded-2xl p-8 md:p-12 border-2 border-gray-200 shadow-lg mb-8">
+            <div className="prose prose-lg max-w-none">
+              <div className="text-body whitespace-pre-wrap text-gray-900 leading-relaxed">
                 {selectedEntry.content}
-              </p>
+              </div>
             </div>
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-4 pt-6 border-t border-gray-200">
             <div className="flex items-center gap-3">
-              {!selectedEntry.locked && (
+              {!selectedEntry.locked ? (
                 <button
                   onClick={() => handleLockEntry(selectedEntry.id, true)}
-                  className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors text-sm flex items-center gap-2"
+                  className="px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-body-sm font-semibold flex items-center gap-2 shadow-md"
                 >
                   <span>🔒</span>
                   <span>Lock Entry</span>
                 </button>
-              )}
-              {selectedEntry.locked && (
+              ) : (
                 <button
                   onClick={() => handleLockEntry(selectedEntry.id, false)}
-                  className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors text-sm flex items-center gap-2"
+                  className="px-6 py-3 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 transition-colors text-body-sm font-semibold flex items-center gap-2 border-2 border-gray-300"
                 >
                   <span>🔓</span>
                   <span>Unlock Entry</span>
@@ -1404,13 +1409,13 @@ export default function Emotions() {
             </div>
             <button
               onClick={() => {
-                if (confirm('Delete this entry?')) {
+                if (confirm('Delete this entry? This action cannot be undone.')) {
                   handleDeleteEntry(selectedEntry.id);
                   setSelectedEntry(null);
                   setView('home');
                 }
               }}
-              className="px-4 py-2 bg-red-500/20 text-red-300 rounded-xl hover:bg-red-500/30 transition-colors text-sm flex items-center gap-2"
+              className="px-6 py-3 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors text-body-sm font-semibold flex items-center gap-2 border-2 border-red-200"
             >
               <span>🗑️</span>
               <span>Delete</span>
