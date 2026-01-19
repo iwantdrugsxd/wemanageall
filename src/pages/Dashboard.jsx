@@ -915,21 +915,22 @@ export default function Dashboard() {
                         strokeWidth="12"
                       />
                       {(() => {
-                        let currentOffset = 0;
-                        const circumference = 2 * Math.PI * 80;
+                        let currentAngle = 0;
+                        const radius = 80;
+                        const circumference = 2 * Math.PI * radius;
                         return pieChartData.map((item, index) => {
-                          const percentage = (item.minutes / totalTimeEstimated) * 100;
-                          const dashArray = circumference;
-                          const dashLength = (circumference * percentage / 100);
+                          const percentage = (item.minutes / totalTimeEstimated);
+                          const angle = percentage * 360;
+                          const dashLength = (circumference * percentage);
                           const gapLength = circumference - dashLength;
-                          const offset = currentOffset;
-                          currentOffset += dashLength;
+                          const offset = currentAngle * (circumference / 360);
+                          currentAngle += angle;
                           return (
                             <circle
                               key={index}
                               cx="96"
                               cy="96"
-                              r="80"
+                              r={radius}
                               fill="none"
                               stroke={item.color}
                               strokeWidth="12"
