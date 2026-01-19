@@ -462,7 +462,7 @@ router.get('/:id/file', requireAuth, async (req, res) => {
     await ensureTables();
 
     const result = await query(
-      `SELECT file_url FROM resources WHERE id = $1 AND user_id = $2`,
+      `SELECT file_url, file_name FROM resources WHERE id = $1 AND user_id = $2`,
       [req.params.id, req.user.id]
     );
 
@@ -471,13 +471,33 @@ router.get('/:id/file', requireAuth, async (req, res) => {
     }
 
     const fileUrl = result.rows[0].file_url;
-    const filePath = join(__dirname, '../..', fileUrl);
+    const fileName = result.rows[0].file_name;
+    
+    // Handle both absolute and relative paths
+    let filePath;
+    if (fileUrl.startsWith('/') || fileUrl.startsWith('http')) {
+      // If it's already an absolute path or URL, use it directly
+      if (fileUrl.startsWith('http')) {
+        // If it's a URL, redirect to it
+        return res.redirect(fileUrl);
+      }
+      filePath = join(__dirname, '../..', fileUrl);
+    } else {
+      // Relative path - construct from uploads directory
+      filePath = join(uploadsDir, fileUrl);
+    }
 
     console.log('Serving file:', { fileUrl, filePath, exists: fs.existsSync(filePath) });
 
     if (!fs.existsSync(filePath)) {
       console.error('File not found at path:', filePath);
-      return res.status(404).json({ error: 'File not found.' });
+      // Try alternative path construction
+      const altPath = join(__dirname, '../../uploads/resources', fileUrl.split('/').pop());
+      if (fs.existsSync(altPath)) {
+        filePath = altPath;
+      } else {
+        return res.status(404).json({ error: 'File not found.' });
+      }
     }
 
     await query(
@@ -486,7 +506,7 @@ router.get('/:id/file', requireAuth, async (req, res) => {
     );
 
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `inline; filename="${result.rows[0].file_url.split('/').pop()}"`);
+    res.setHeader('Content-Disposition', `inline; filename="${fileName || fileUrl.split('/').pop()}"`);
     res.sendFile(filePath);
   } catch (error) {
     console.error('Serve file error:', error);

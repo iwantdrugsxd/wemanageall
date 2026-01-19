@@ -38,15 +38,45 @@ const requireAuth = (req, res, next) => {
   res.status(401).json({ error: 'Please log in to continue.' });
 };
 
+// Ensure unload_entries table exists
+const ensureUnloadTable = async () => {
+  try {
+    await query(`
+      CREATE TABLE IF NOT EXISTS unload_entries (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        type VARCHAR(20) NOT NULL CHECK (type IN ('text', 'voice')),
+        content TEXT,
+        audio_url TEXT,
+        duration INTEGER,
+        transcript TEXT,
+        locked BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    await query(`CREATE INDEX IF NOT EXISTS idx_unload_entries_user_id ON unload_entries(user_id)`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_unload_entries_created_at ON unload_entries(created_at DESC)`);
+  } catch (error) {
+    // Table might already exist, continue
+    if (error.code !== '42P07') {
+      console.error('Error ensuring unload_entries table:', error);
+    }
+  }
+};
+
 // GET /api/emotions - Get user's unload entries
 router.get('/', requireAuth, async (req, res) => {
   try {
     const { type, locked } = req.query;
     
+    // Ensure table exists
+    await ensureUnloadTable();
+    
     // Ensure transcript column exists (migration on-the-fly)
     try {
       await query(`
-        ALTER TABLE public.unload_entries 
+        ALTER TABLE unload_entries 
         ADD COLUMN IF NOT EXISTS transcript TEXT;
       `);
     } catch (migrationError) {
@@ -58,7 +88,7 @@ router.get('/', requireAuth, async (req, res) => {
     
     let sql = `
       SELECT id, type, content, audio_url, duration, transcript, locked, created_at
-      FROM public.unload_entries
+      FROM unload_entries
       WHERE user_id = $1
     `;
     const params = [req.user.id];
@@ -161,8 +191,10 @@ router.post('/', requireAuth, async (req, res) => {
       return res.status(400).json({ error: 'Use /api/emotions/voice for voice entries' });
     }
     
+    await ensureUnloadTable();
+    
     const result = await query(
-      `INSERT INTO public.unload_entries (user_id, type, content, locked)
+      `INSERT INTO unload_entries (user_id, type, content, locked)
        VALUES ($1, $2, $3, $4)
        RETURNING id, type, content, locked, created_at`,
       [req.user.id, type, content, locked]
@@ -349,18 +381,11 @@ router.post('/voice', requireAuth, async (req, res) => {
       return res.status(401).json({ error: 'User not authenticated.' });
     }
     
-    // Test table access first
-    try {
-      const testQuery = await query('SELECT 1 FROM public.unload_entries LIMIT 1');
-      console.log('✅ Table access test passed');
-    } catch (testError) {
-      console.error('❌ Table access test failed:', testError.message);
-      console.error('Full error:', testError);
-      throw new Error(`Table access failed: ${testError.message}`);
-    }
+    // Ensure table exists
+    await ensureUnloadTable();
     
     const result = await query(
-      `INSERT INTO public.unload_entries (user_id, type, audio_url, duration, transcript, locked)
+      `INSERT INTO unload_entries (user_id, type, audio_url, duration, transcript, locked)
        VALUES ($1, 'voice', $2, $3, $4, $5)
        RETURNING id, type, audio_url, duration, transcript, locked, created_at`,
       [req.user.id, audio_url, parseInt(duration) || 0, transcript || null, locked]
@@ -395,8 +420,10 @@ router.patch('/:id', requireAuth, async (req, res) => {
     const { id } = req.params;
     const { locked } = req.body;
     
+    await ensureUnloadTable();
+    
     const result = await query(
-      `UPDATE public.unload_entries
+      `UPDATE unload_entries
        SET locked = $1, updated_at = CURRENT_TIMESTAMP
        WHERE id = $2 AND user_id = $3
        RETURNING id, locked`,
@@ -422,9 +449,11 @@ router.delete('/:id', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     
+    await ensureUnloadTable();
+    
     // Get entry to check if it has audio_url for cleanup
     const entryResult = await query(
-      `SELECT audio_url, type FROM public.unload_entries WHERE id = $1 AND user_id = $2`,
+      `SELECT audio_url, type FROM unload_entries WHERE id = $1 AND user_id = $2`,
       [id, req.user.id]
     );
 
@@ -460,7 +489,7 @@ router.delete('/:id', requireAuth, async (req, res) => {
 
     // Delete entry from database
     await query(
-      `DELETE FROM public.unload_entries WHERE id = $1 AND user_id = $2`,
+      `DELETE FROM unload_entries WHERE id = $1 AND user_id = $2`,
       [id, req.user.id]
     );
 
