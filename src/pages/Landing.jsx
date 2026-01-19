@@ -554,42 +554,199 @@ function TrustPrivacy() {
   );
 }
 
-// Who This Is For Section
-function WhoThisIsFor() {
-  const personas = [
+// How It Works Section
+function HowItWorks() {
+  const steps = [
     {
-      title: 'The Individual Operator',
-      description: 'Clarity, habits, goals, structure',
+      number: '01',
+      title: 'Set your intention',
+      description: 'Start each day by defining what matters. Your intention becomes the filter for everything else.',
+      detail: 'Every morning, you set a clear intention. This isn\'t a to-do list—it\'s your north star for the day. All your tasks, projects, and decisions align with this single focus.',
     },
     {
-      title: 'The Student / Builder',
-      description: 'Projects, deadlines, learning, ideas',
+      number: '02',
+      title: 'Capture everything',
+      description: 'Tasks, thoughts, files, expenses. Everything goes into the system. Nothing gets lost.',
+      detail: 'Whether it\'s a voice note, a receipt, a project idea, or a random thought—capture it instantly. The system organizes it later. Your job is just to get it out of your head.',
     },
     {
-      title: 'The Founder',
-      description: 'Execution, finance, focus, thinking',
+      number: '03',
+      title: 'See the connections',
+      description: 'Your calendar shows your tasks. Your projects link to your files. Your expenses connect to your goals.',
+      detail: 'Everything in OFA is connected. A project task appears in your calendar. An expense links to a project. Your thoughts connect to your objectives. You see the full picture.',
     },
     {
-      title: 'The Reflective Mind',
-      description: 'Thoughts, emotions, journaling',
+      number: '04',
+      title: 'Reflect and refine',
+      description: 'Weekly reviews show patterns. What worked? What didn\'t? The system learns with you.',
+      detail: 'Every week, you see what actually happened versus what you planned. Patterns emerge. You adjust. The system gets smarter about how you work and live.',
     },
   ];
 
   return (
     <section className="py-24 md:py-32 px-6 lg:px-12 bg-gray-50 dark:bg-gray-950 transition-colors">
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-h2 mb-16 text-center">
-          Built for people who think long-term.
-        </h2>
+        <div className="text-center mb-16">
+          <h2 className="text-h2 mb-6">
+            How it works
+          </h2>
+          <p className="text-body text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            A simple system that grows more powerful the longer you use it.
+          </p>
+        </div>
         
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {personas.map((persona, index) => (
+        <div className="space-y-12">
+          {steps.map((step, index) => (
+            <div key={index} className="grid md:grid-cols-3 gap-8 items-start">
+              <div className="md:col-span-1">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-16 h-16 rounded-xl bg-black dark:bg-white text-white dark:text-black flex items-center justify-center font-display text-2xl font-bold">
+                    {step.number}
+                  </div>
+                  <div className="flex-1 h-px bg-gray-200 dark:bg-gray-800"></div>
+                </div>
+                <h3 className="text-h4 mb-3">{step.title}</h3>
+                <p className="text-body-sm text-gray-600 dark:text-gray-400 mb-4">{step.description}</p>
+              </div>
+              <div className="md:col-span-2">
+                <p className="text-body text-gray-700 dark:text-gray-300 leading-relaxed">{step.detail}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// Use Cases Section
+function UseCases() {
+  const useCases = [
+    {
+      title: 'The Individual Operator',
+      scenario: 'You manage multiple projects, track expenses, and need clarity on daily priorities.',
+      solution: 'Dashboard shows your intention and objectives. Projects organize your work. Money tracks your finances. Everything connects.',
+      features: ['Daily intention setting', 'Project progress tracking', 'Expense categorization', 'Time allocation insights'],
+    },
+    {
+      title: 'The Student / Builder',
+      scenario: 'You juggle coursework, personal projects, deadlines, and learning resources.',
+      solution: 'Projects break down complex work. Calendar shows deadlines. Library stores your learning. Lists capture ideas instantly.',
+      features: ['Project-based organization', 'Deadline management', 'Resource library', 'Quick capture lists'],
+    },
+    {
+      title: 'The Founder',
+      scenario: 'You need to execute on vision, manage finances, maintain focus, and process decisions.',
+      solution: 'Projects structure execution. Money tracks cash flow. Thinking Space processes decisions. Calendar protects deep work.',
+      features: ['Strategic project planning', 'Financial clarity', 'Decision processing', 'Time blocking'],
+    },
+    {
+      title: 'The Reflective Mind',
+      scenario: 'You value introspection, emotional processing, and understanding your patterns.',
+      solution: 'Thinking Space provides a private outlet. Dashboard shows patterns. Calendar reveals time use. Everything supports self-awareness.',
+      features: ['Private thought processing', 'Pattern recognition', 'Emotional tracking', 'Reflection tools'],
+    },
+  ];
+
+  return (
+    <section className="py-24 md:py-32 px-6 lg:px-12 bg-white dark:bg-gray-900 transition-colors">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="text-h2 mb-6">
+            Built for people who think long-term
+          </h2>
+          <p className="text-body text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            Different roles, one system. OFA adapts to how you actually work and live.
+          </p>
+        </div>
+        
+        <div className="space-y-8">
+          {useCases.map((useCase, index) => (
+            <div 
+              key={index}
+              className="bg-white dark:bg-gray-800 rounded-xl p-8 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-all"
+            >
+              <h3 className="text-h4 mb-4">{useCase.title}</h3>
+              <div className="grid md:grid-cols-2 gap-8 mb-6">
+                <div>
+                  <p className="text-label text-gray-500 dark:text-gray-400 mb-2">The Challenge</p>
+                  <p className="text-body text-gray-700 dark:text-gray-300">{useCase.scenario}</p>
+                </div>
+                <div>
+                  <p className="text-label text-gray-500 dark:text-gray-400 mb-2">How OFA Helps</p>
+                  <p className="text-body text-gray-700 dark:text-gray-300">{useCase.solution}</p>
+                </div>
+              </div>
+              <div>
+                <p className="text-label text-gray-500 dark:text-gray-400 mb-3">Key Features</p>
+                <div className="flex flex-wrap gap-2">
+                  {useCase.features.map((feature, fIndex) => (
+                    <span 
+                      key={fIndex}
+                      className="px-3 py-1 bg-gray-50 dark:bg-gray-900 text-sm text-gray-700 dark:text-gray-300 rounded-lg border border-gray-200 dark:border-gray-700"
+                    >
+                      {feature}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// Benefits Section
+function Benefits() {
+  const benefits = [
+    {
+      title: 'One system, not ten apps',
+      description: 'Stop switching between task managers, note apps, calendars, and spreadsheets. Everything lives in one place.',
+      metric: 'Save 2+ hours weekly',
+    },
+    {
+      title: 'Everything connects',
+      description: 'Your calendar shows your tasks. Your expenses link to projects. Your thoughts connect to objectives. See the full picture.',
+      metric: '100% context preserved',
+    },
+    {
+      title: 'Private by default',
+      description: 'Your data stays yours. No tracking, no analysis, no sharing. Just your system, working for you.',
+      metric: 'Zero data sharing',
+    },
+    {
+      title: 'Gets smarter over time',
+      description: 'The longer you use OFA, the better it understands your patterns. Weekly reviews reveal insights you didn\'t see.',
+      metric: 'Pattern recognition',
+    },
+  ];
+
+  return (
+    <section className="py-24 md:py-32 px-6 lg:px-12 bg-gray-50 dark:bg-gray-950 transition-colors">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="text-h2 mb-6">
+            Why this works
+          </h2>
+        </div>
+        
+        <div className="grid md:grid-cols-2 gap-6">
+          {benefits.map((benefit, index) => (
             <div 
               key={index}
               className="bg-white dark:bg-gray-800 rounded-xl p-8 border border-gray-200 dark:border-gray-700"
             >
-              <h3 className="text-h5 mb-3">{persona.title}</h3>
-              <p className="text-body-sm text-gray-600 dark:text-gray-400">{persona.description}</p>
+              <div className="flex items-start justify-between mb-4">
+                <h3 className="text-h5">{benefit.title}</h3>
+                <span className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 px-2 py-1 bg-gray-50 dark:bg-gray-900 rounded">
+                  {benefit.metric}
+                </span>
+              </div>
+              <p className="text-body-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                {benefit.description}
+              </p>
             </div>
           ))}
         </div>
@@ -602,29 +759,51 @@ function WhoThisIsFor() {
 function FinalCTA() {
   return (
     <section className="py-24 md:py-32 px-6 lg:px-12 bg-white dark:bg-gray-900 transition-colors">
-      <div className="max-w-4xl mx-auto text-center">
-        <h2 className="text-h2 mb-12">
-          Build the system your future self will thank you for.
-        </h2>
-        
-        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-          <Link 
-            to="/signup" 
-            className="px-8 py-4 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-gray-900 dark:hover:bg-gray-100 transition-colors text-sm font-medium"
-          >
-            Start Free
-          </Link>
-          <a 
-            href="#system" 
-            className="px-8 py-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-black dark:text-white rounded-lg hover:border-black dark:hover:border-white transition-colors text-sm font-medium"
-          >
-            View Demo
-          </a>
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-12 text-center">
+          <h2 className="text-h2 mb-6">
+            Build the system your future self will thank you for
+          </h2>
+          <p className="text-body text-gray-600 dark:text-gray-400 mb-10 max-w-2xl mx-auto">
+            Start free. No credit card required. Set up takes 2 minutes. Your data stays private.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+            <Link 
+              to="/signup" 
+              className="px-8 py-4 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-gray-900 dark:hover:bg-gray-100 transition-colors text-sm font-medium"
+            >
+              Start Free
+            </Link>
+            <a 
+              href="#system" 
+              className="px-8 py-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-black dark:text-white rounded-lg hover:border-black dark:hover:border-white transition-colors text-sm font-medium"
+            >
+              View Demo
+            </a>
+          </div>
+          
+          <div className="flex items-center justify-center gap-6 text-xs text-gray-500 dark:text-gray-400">
+            <div className="flex items-center gap-2">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              <span>Private by default</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>2-minute setup</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+              </svg>
+              <span>No credit card</span>
+            </div>
+          </div>
         </div>
-        
-        <p className="text-caption text-gray-500 dark:text-gray-500">
-          No credit card · Private by default · Takes 2 minutes
-        </p>
       </div>
     </section>
   );
@@ -671,7 +850,9 @@ export default function Landing() {
       <SystemOverview />
       <ProductStory />
       <TrustPrivacy />
-      <WhoThisIsFor />
+      <HowItWorks />
+      <UseCases />
+      <Benefits />
       <FinalCTA />
       <Footer />
     </div>
