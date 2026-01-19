@@ -1,6 +1,35 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
+
+// Scroll Animation Hook
+function useScrollAnimation() {
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -100px 0px' }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => {
+      if (ref.current) {
+        observer.unobserve(ref.current);
+      }
+    };
+  }, []);
+
+  return [ref, isVisible];
+}
 
 // Navbar Component
 function Navbar() {
@@ -53,7 +82,7 @@ function Navbar() {
 // UI Preview Components
 function DashboardPreview() {
   return (
-    <div className="space-y-5">
+    <div className="space-y-4 max-w-full">
       <div className="pb-2 border-b border-gray-100 dark:border-gray-800">
         <div className="text-[10px] uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1.5 font-semibold">PERSONAL LIFE OS</div>
         <h3 className="text-xl font-display text-black dark:text-white mb-1.5 leading-tight">Good afternoon, vishnu.</h3>
@@ -119,7 +148,7 @@ function DashboardPreview() {
 
 function ProjectsPreview() {
   return (
-    <div className="space-y-5">
+    <div className="space-y-4 max-w-full">
       <div className="pb-2 border-b border-gray-100 dark:border-gray-800">
         <div className="text-[10px] uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1.5 font-semibold">PERSONAL LIFE OS</div>
         <h3 className="text-xl font-display text-black dark:text-white mb-1.5 leading-tight">Project Selection Hub</h3>
@@ -155,7 +184,7 @@ function ProjectsPreview() {
 
 function ListsPreview() {
   return (
-    <div className="space-y-5">
+    <div className="space-y-4 max-w-full">
       <div className="pb-2 border-b border-gray-100 dark:border-gray-800">
         <h3 className="text-xl font-display text-black dark:text-white mb-1.5 leading-tight">My Lists</h3>
         <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Manage your personal intentions and collections.</p>
@@ -193,7 +222,7 @@ function ListsPreview() {
 
 function CalendarPreview() {
   return (
-    <div className="space-y-5">
+    <div className="space-y-4 max-w-full">
       <div className="pb-2 border-b border-gray-100 dark:border-gray-800">
         <h3 className="text-xl font-display text-black dark:text-white mb-1.5 leading-tight">Calendar</h3>
         <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Week view of your deep work and life blocks.</p>
@@ -243,7 +272,7 @@ function CalendarPreview() {
 
 function MoneyPreview() {
   return (
-    <div className="space-y-5">
+    <div className="space-y-4 max-w-full">
       <div className="pb-2 border-b border-gray-100 dark:border-gray-800">
         <h3 className="text-xl font-display text-black dark:text-white mb-1.5 leading-tight">Money</h3>
         <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Track your income and expenses</p>
@@ -306,7 +335,7 @@ function MoneyPreview() {
 
 function LibraryPreview() {
   return (
-    <div className="space-y-5">
+    <div className="space-y-4 max-w-full">
       <div className="pb-2 border-b border-gray-100 dark:border-gray-800">
         <h3 className="text-xl font-display text-black dark:text-white mb-1.5 leading-tight">Resource Library</h3>
         <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Curated intellectual assets and reading logs.</p>
@@ -343,7 +372,7 @@ function LibraryPreview() {
 
 function EmotionsPreview() {
   return (
-    <div className="space-y-5">
+    <div className="space-y-4 max-w-full">
       <div className="text-center pb-2 border-b border-gray-100 dark:border-gray-800">
         <h3 className="text-xl font-display text-black dark:text-white mb-2 leading-tight">You don't need to be <span className="italic text-[#3B6E5C] dark:text-[#4ade80]">okay</span> here.</h3>
         <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">This is your private space to let things out. No judgment, no audience.</p>
@@ -443,35 +472,53 @@ function Hero() {
 
           {/* Right: UI Preview */}
           <div className="relative">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl overflow-hidden transition-all duration-500">
-              {/* Browser Chrome */}
-              <div className="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center gap-2">
+            {/* Subtle glow effect */}
+            <div className="absolute -inset-1 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 rounded-3xl opacity-20 blur-xl"></div>
+            
+            <div className="relative bg-white dark:bg-gray-800 rounded-2xl border-2 border-gray-200 dark:border-gray-700 shadow-[0_25px_80px_-15px_rgba(0,0,0,0.15)] dark:shadow-[0_25px_80px_-15px_rgba(0,0,0,0.4)] overflow-hidden transition-all duration-500">
+              {/* Browser Chrome - More realistic */}
+              <div className="bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950 border-b border-gray-200 dark:border-gray-700 px-5 py-3.5 flex items-center gap-3">
                 <div className="flex gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-red-400"></div>
-                  <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
-                  <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                  <div className="w-3 h-3 rounded-full bg-red-400 shadow-sm"></div>
+                  <div className="w-3 h-3 rounded-full bg-yellow-400 shadow-sm"></div>
+                  <div className="w-3 h-3 rounded-full bg-green-400 shadow-sm"></div>
                 </div>
-                <div className="flex-1 bg-white dark:bg-gray-800 rounded-md px-3 py-1.5 text-xs text-gray-500 dark:text-gray-400 ml-4 border border-gray-200 dark:border-gray-700">
+                <div className="flex-1 bg-white dark:bg-gray-800 rounded-md px-4 py-2 text-xs text-gray-600 dark:text-gray-400 ml-4 border border-gray-200 dark:border-gray-700 shadow-sm font-medium flex items-center gap-2">
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
                   wemanageall.in/{views[currentView].name.toLowerCase().replace(' ', '')}
+                </div>
+                <div className="flex items-center gap-1.5 ml-2">
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
                 </div>
               </div>
 
-              {/* Content Preview - Actual UI */}
-              <div className="bg-gray-50 dark:bg-gray-900 min-h-[500px] max-h-[600px] overflow-y-auto">
-                <CurrentPreview />
+              {/* Content Preview - Actual UI with proper padding and containment */}
+              <div className="bg-white dark:bg-gray-800 p-6 max-h-[600px] overflow-y-auto">
+                <div className="transition-opacity duration-500 max-w-full">
+                  <CurrentPreview />
+                </div>
               </div>
             </div>
             
+            {/* Caption */}
+            <p className="text-center mt-8 text-body-sm text-gray-600 dark:text-gray-400 italic">
+              {views[currentView].caption}
+            </p>
+            
             {/* View Indicator */}
-            <div className="flex justify-center gap-2 mt-6">
+            <div className="flex justify-center gap-2 mt-4">
               {views.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentView(index)}
-                  className={`w-2 h-2 rounded-full transition-all ${
+                  className={`h-1.5 rounded-full transition-all ${
                     index === currentView 
                       ? 'bg-black dark:bg-white w-8' 
-                      : 'bg-gray-300 dark:bg-gray-700'
+                      : 'bg-gray-300 dark:bg-gray-700 w-1.5'
                   }`}
                 />
               ))}
@@ -485,8 +532,18 @@ function Hero() {
 
 // Philosophy Section
 function Philosophy() {
+  const [ref, isVisible] = useScrollAnimation();
+  
   return (
-    <section className="py-24 md:py-32 px-6 lg:px-12 bg-gray-50 dark:bg-gray-950 transition-colors" id="philosophy">
+    <section 
+      ref={ref}
+      className={`py-24 md:py-32 px-6 lg:px-12 bg-gray-50 dark:bg-gray-950 transition-all duration-700 ${
+        isVisible 
+          ? 'opacity-100 translate-y-0' 
+          : 'opacity-0 translate-y-8'
+      }`}
+      id="philosophy"
+    >
       <div className="max-w-4xl mx-auto">
         <h2 className="text-h2 mb-8 text-center">
           Life is complex.<br />
@@ -509,6 +566,8 @@ function Philosophy() {
 
 // System Overview Section
 function SystemOverview() {
+  const [ref, isVisible] = useScrollAnimation();
+  
   const modules = [
     {
       title: 'Dashboard',
@@ -545,7 +604,15 @@ function SystemOverview() {
   ];
 
   return (
-    <section className="py-24 md:py-32 px-6 lg:px-12 bg-white dark:bg-gray-900 transition-colors" id="system">
+    <section 
+      ref={ref}
+      className={`py-24 md:py-32 px-6 lg:px-12 bg-white dark:bg-gray-900 transition-all duration-700 ${
+        isVisible 
+          ? 'opacity-100 translate-y-0' 
+          : 'opacity-0 translate-y-8'
+      }`}
+      id="system"
+    >
       <div className="max-w-6xl mx-auto">
         <h2 className="text-h2 mb-16 text-center">
           One system. Seven core spaces.
@@ -569,6 +636,8 @@ function SystemOverview() {
 
 // Scroll-Driven Product Story
 function ProductStory() {
+  const [ref, isVisible] = useScrollAnimation();
+  
   const scenes = [
     {
       title: 'Start your day with clarity, not chaos.',
@@ -615,13 +684,29 @@ function ProductStory() {
   ];
 
   return (
-    <section className="py-24 md:py-32 px-6 lg:px-12 bg-gray-50 dark:bg-gray-950 transition-colors">
+    <section 
+      ref={ref}
+      className={`py-24 md:py-32 px-6 lg:px-12 bg-gray-50 dark:bg-gray-950 transition-all duration-700 ${
+        isVisible 
+          ? 'opacity-100 translate-y-0' 
+          : 'opacity-0 translate-y-8'
+      }`}
+    >
       <div className="max-w-6xl mx-auto">
         <div className="space-y-32">
           {scenes.map((scene, index) => {
             const SceneComponent = scene.component;
+            const [sceneRef, sceneVisible] = useScrollAnimation();
             return (
-              <div key={index} className="grid md:grid-cols-2 gap-12 items-center">
+              <div 
+                key={index} 
+                ref={sceneRef}
+                className={`grid md:grid-cols-2 gap-12 items-center transition-all duration-700 delay-${index * 100} ${
+                  sceneVisible 
+                    ? 'opacity-100 translate-y-0' 
+                    : 'opacity-0 translate-y-8'
+                }`}
+              >
                 <div>
                   <h3 className="text-h3 mb-6">{scene.title}</h3>
                   <p className="text-body text-gray-600 dark:text-gray-400 mb-4">{scene.description}</p>
@@ -633,21 +718,26 @@ function ProductStory() {
                   {/* Subtle glow effect */}
                   <div className="absolute -inset-0.5 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 rounded-2xl opacity-10 blur-lg"></div>
                   
-                  <div className="relative bg-white dark:bg-gray-800 rounded-2xl border-2 border-gray-200 dark:border-gray-700 shadow-[0_15px_50px_-10px_rgba(0,0,0,0.08)] dark:shadow-[0_15px_50px_-10px_rgba(0,0,0,0.25)] overflow-hidden">
-                    {/* Browser Chrome */}
+                  <div className="relative bg-white dark:bg-gray-800 rounded-2xl border-2 border-gray-200 dark:border-gray-700 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] overflow-hidden">
+                    {/* Browser Chrome - More realistic */}
                     <div className="bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center gap-2">
                       <div className="flex gap-1.5">
-                        <div className="w-2.5 h-2.5 rounded-full bg-red-400"></div>
-                        <div className="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
-                        <div className="w-2.5 h-2.5 rounded-full bg-green-400"></div>
+                        <div className="w-2.5 h-2.5 rounded-full bg-red-400 shadow-sm"></div>
+                        <div className="w-2.5 h-2.5 rounded-full bg-yellow-400 shadow-sm"></div>
+                        <div className="w-2.5 h-2.5 rounded-full bg-green-400 shadow-sm"></div>
                       </div>
-                      <div className="flex-1 bg-white dark:bg-gray-800 rounded px-3 py-1 text-[10px] text-gray-500 dark:text-gray-400 ml-3 border border-gray-200 dark:border-gray-700">
+                      <div className="flex-1 bg-white dark:bg-gray-800 rounded px-3 py-1 text-[10px] text-gray-500 dark:text-gray-400 ml-3 border border-gray-200 dark:border-gray-700 flex items-center gap-1.5">
+                        <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
                         wemanageall.in
                       </div>
                     </div>
-                    {/* Preview Content */}
-                    <div className="bg-white dark:bg-gray-800 p-6">
-                      <SceneComponent />
+                    {/* Preview Content - Properly contained */}
+                    <div className="bg-white dark:bg-gray-800 p-5 max-h-[500px] overflow-y-auto">
+                      <div className="max-w-full">
+                        <SceneComponent />
+                      </div>
                     </div>
                   </div>
         </div>
@@ -662,8 +752,18 @@ function ProductStory() {
 
 // Trust & Privacy Section
 function TrustPrivacy() {
+  const [ref, isVisible] = useScrollAnimation();
+  
   return (
-    <section className="py-24 md:py-32 px-6 lg:px-12 bg-white dark:bg-gray-900 transition-colors" id="trust">
+    <section 
+      ref={ref}
+      className={`py-24 md:py-32 px-6 lg:px-12 bg-white dark:bg-gray-900 transition-all duration-700 ${
+        isVisible 
+          ? 'opacity-100 translate-y-0' 
+          : 'opacity-0 translate-y-8'
+      }`}
+      id="trust"
+    >
       <div className="max-w-4xl mx-auto text-center">
         <h2 className="text-h2 mb-8">
           Private by design.
@@ -715,7 +815,7 @@ function HowItWorks() {
   return (
     <section className="py-24 md:py-32 px-6 lg:px-12 bg-gray-50 dark:bg-gray-950 transition-colors">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-16">
+        <div className="text-center mb-20">
           <h2 className="text-h2 mb-6">
             How it works
           </h2>
@@ -724,24 +824,42 @@ function HowItWorks() {
           </p>
         </div>
 
-        <div className="space-y-12">
-            {steps.map((step, index) => (
-            <div key={index} className="grid md:grid-cols-3 gap-8 items-start">
-              <div className="md:col-span-1">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-16 h-16 rounded-xl bg-black dark:bg-white text-white dark:text-black flex items-center justify-center font-display text-2xl font-bold">
-                    {step.number}
+        <div className="space-y-16">
+            {steps.map((step, index) => {
+              const [ref, isVisible] = useScrollAnimation();
+              return (
+              <div 
+                key={index} 
+                ref={ref}
+                className={`grid md:grid-cols-2 gap-12 items-center transition-all duration-700 ${
+                  isVisible 
+                    ? 'opacity-100 translate-y-0' 
+                    : 'opacity-0 translate-y-8'
+                }`}
+              >
+                <div className={`${index % 2 === 1 ? 'md:order-2' : ''}`}>
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-20 h-20 rounded-2xl bg-black dark:bg-white text-white dark:text-black flex items-center justify-center font-display text-3xl font-bold shadow-lg">
+                      {step.number}
                     </div>
-                  <div className="flex-1 h-px bg-gray-200 dark:bg-gray-800"></div>
-                    </div>
-                <h3 className="text-h4 mb-3">{step.title}</h3>
-                <p className="text-body-sm text-gray-600 dark:text-gray-400 mb-4">{step.description}</p>
+                    <div className="flex-1 h-px bg-gradient-to-r from-gray-200 to-transparent dark:from-gray-800"></div>
                   </div>
-              <div className="md:col-span-2">
-                <p className="text-body text-gray-700 dark:text-gray-300 leading-relaxed">{step.detail}</p>
+                  <h3 className="text-h3 mb-4">{step.title}</h3>
+                  <p className="text-body-lg text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">{step.description}</p>
+                  <p className="text-body text-gray-700 dark:text-gray-300 leading-relaxed">{step.detail}</p>
+                </div>
+                <div className={`${index % 2 === 1 ? 'md:order-1' : ''}`}>
+                  <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 shadow-lg h-full flex items-center justify-center">
+                    <div className="text-6xl opacity-20">
+                      {index === 0 && '🎯'}
+                      {index === 1 && '📝'}
+                      {index === 2 && '🔗'}
+                      {index === 3 && '📊'}
+                    </div>
+                  </div>
                 </div>
               </div>
-            ))}
+            )})}
         </div>
       </div>
     </section>
