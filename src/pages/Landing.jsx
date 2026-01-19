@@ -50,18 +50,238 @@ function Navbar() {
   );
 }
 
+// UI Preview Components
+function DashboardPreview() {
+  return (
+    <div className="p-6 space-y-4 bg-white dark:bg-gray-800">
+      <div>
+        <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">PERSONAL LIFE OS</div>
+        <h3 className="text-lg font-display text-black dark:text-white mb-1">Good afternoon, vishnu.</h3>
+        <p className="text-xs text-gray-500 dark:text-gray-400 italic">"The present moment is the only time over which we have dominion."</p>
+      </div>
+      
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+        <div className="text-xs uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-3">TODAY'S INTENTION</div>
+        <input 
+          type="text" 
+          placeholder="Focus on high-fidelity architectural time management"
+          className="w-full px-2 py-1 border-b border-gray-200 dark:border-gray-700 text-sm bg-transparent focus:outline-none focus:border-gray-900 dark:focus:border-white"
+          readOnly
+        />
+      </div>
+      
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+        <div className="text-xs uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-3">DAILY OBJECTIVES</div>
+        <p className="text-sm text-gray-500 dark:text-gray-400">No objectives yet</p>
+        <button className="mt-2 text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white">+ ADD OBJECTIVE</button>
+      </div>
+      
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+        <div className="text-xs uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-3">TIME ALLOCATION</div>
+        <div className="flex items-center justify-center">
+          <div className="relative w-24 h-24">
+            <svg className="transform -rotate-90 w-24 h-24">
+              <circle cx="48" cy="48" r="40" stroke="#e5e7eb" strokeWidth="4" fill="none" />
+              <circle cx="48" cy="48" r="40" stroke="#000000" dark:stroke="#ffffff" strokeWidth="4" fill="none" strokeDasharray={251} strokeDashoffset={251 * 0.7} />
+            </svg>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-xs text-gray-600 dark:text-gray-400">0%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ProjectsPreview() {
+  return (
+    <div className="p-6 bg-white dark:bg-gray-800">
+      <div className="mb-4">
+        <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">PERSONAL LIFE OS</div>
+        <h3 className="text-lg font-display text-black dark:text-white">Project Selection Hub</h3>
+        <p className="text-xs text-gray-500 dark:text-gray-400">Choose a focus area for your current session.</p>
+      </div>
+      
+      <div className="grid grid-cols-2 gap-3">
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 flex flex-col items-center justify-center min-h-[120px]">
+          <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center mb-2">
+            <span className="text-lg">+</span>
+          </div>
+          <p className="text-xs text-black dark:text-white font-medium">Create New Project</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Start from scratch</p>
+        </div>
+        
+        <div className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700" style={{ borderLeftWidth: '4px', borderLeftColor: '#000000' }}>
+          <div className="h-16 bg-black dark:bg-white flex items-center justify-center">
+            <span className="text-xl">📋</span>
+          </div>
+          <div className="p-3">
+            <p className="text-xs font-medium text-black dark:text-white">Sample Project</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">0% complete</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ListsPreview() {
+  return (
+    <div className="p-6 bg-white dark:bg-gray-800">
+      <div className="mb-4">
+        <h3 className="text-lg font-display text-black dark:text-white mb-1">My Lists</h3>
+        <p className="text-xs text-gray-500 dark:text-gray-400">Manage your personal intentions and collections.</p>
+      </div>
+      
+      <div className="flex items-center gap-2 mb-4 text-xs text-gray-500 dark:text-gray-400">
+        <span className="border-b border-black dark:border-white pb-1">All Lists</span>
+        <span>Recent</span>
+        <span>Pinned</span>
+      </div>
+      
+      <div className="text-center py-12">
+        <div className="text-4xl mb-3">⭐</div>
+        <p className="text-sm font-medium text-black dark:text-white mb-1">Start a new collection</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400">Organize your thoughts, plans, and inspirations</p>
+      </div>
+    </div>
+  );
+}
+
+function CalendarPreview() {
+  return (
+    <div className="p-6 bg-white dark:bg-gray-800">
+      <div className="mb-4">
+        <h3 className="text-lg font-display text-black dark:text-white">Calendar</h3>
+      </div>
+      
+      <div className="flex gap-2 mb-4 text-xs">
+        <span className="px-2 py-1 bg-black dark:bg-white text-white dark:text-black rounded">Week</span>
+        <span className="px-2 py-1 text-gray-500 dark:text-gray-400">Day</span>
+        <span className="px-2 py-1 text-gray-500 dark:text-gray-400">Month</span>
+      </div>
+      
+      <div className="grid grid-cols-7 gap-1 text-xs">
+        {['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'].map((day, i) => (
+          <div key={i} className="text-center py-2">
+            <div className="text-gray-500 dark:text-gray-400 mb-1">{day}</div>
+            <div className="text-gray-900 dark:text-white">{19 + i}</div>
+          </div>
+        ))}
+      </div>
+      
+      <div className="mt-4 space-y-1">
+        {['12 AM', '1 AM', '2 AM', '3 AM'].map((time, i) => (
+          <div key={i} className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 py-1 border-b border-gray-100 dark:border-gray-800">
+            <span className="w-12">{time}</span>
+            <div className="flex-1 h-4"></div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function MoneyPreview() {
+  return (
+    <div className="p-6 bg-white dark:bg-gray-800">
+      <div className="mb-4">
+        <h3 className="text-lg font-display text-black dark:text-white mb-1">Money</h3>
+        <p className="text-xs text-gray-500 dark:text-gray-400">Track your income and expenses</p>
+      </div>
+      
+      <div className="grid grid-cols-3 gap-3 mb-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
+          <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">TOTAL INCOME</div>
+          <div className="text-lg font-semibold text-green-600 dark:text-green-400">$0.00</div>
+        </div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
+          <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">TOTAL EXPENSES</div>
+          <div className="text-lg font-semibold text-red-600 dark:text-red-400">$0.00</div>
+        </div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
+          <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">NET BALANCE</div>
+          <div className="text-lg font-semibold text-green-600 dark:text-green-400">$0.00</div>
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-2 gap-3">
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+          <div className="text-xs uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2">INCOME</div>
+          <p className="text-xs text-gray-500 dark:text-gray-400">No income entries yet</p>
+        </div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+          <div className="text-xs uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2">EXPENSES</div>
+          <p className="text-xs text-gray-500 dark:text-gray-400">No expense entries yet</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LibraryPreview() {
+  return (
+    <div className="p-6 bg-white dark:bg-gray-800">
+      <div className="mb-4">
+        <h3 className="text-lg font-display text-black dark:text-white mb-1">Resource Library</h3>
+        <p className="text-xs text-gray-500 dark:text-gray-400">Curated intellectual assets and reading logs.</p>
+      </div>
+      
+      <div className="text-xs text-gray-500 dark:text-gray-400 mb-4 border-b border-black dark:border-white pb-1 inline-block">All Resources</div>
+      
+      <div className="text-center py-12">
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">No resources yet.</p>
+        <button className="px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded text-xs">Add Your First Resource</button>
+      </div>
+    </div>
+  );
+}
+
+function EmotionsPreview() {
+  return (
+    <div className="p-6 bg-white dark:bg-gray-800">
+      <div className="text-center mb-6">
+        <h3 className="text-lg font-display text-black dark:text-white mb-2">You don't need to be <span className="italic text-[#3B6E5C]">okay</span> here.</h3>
+        <p className="text-xs text-gray-500 dark:text-gray-400">This is your private space to let things out. No judgment, no audience.</p>
+      </div>
+      
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 mb-4">
+        <textarea 
+          placeholder="What's on your mind? Let it out here..."
+          className="w-full min-h-[120px] bg-transparent text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none resize-none"
+          readOnly
+        />
+        <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+            </svg>
+            <span>Private by design</span>
+          </div>
+          <div className="text-xs text-gray-500 dark:text-gray-400">Nothing here is shared or analyzed</div>
+        </div>
+      </div>
+      
+      <div className="text-center py-8">
+        <div className="text-3xl mb-2">📝</div>
+        <p className="text-xs text-gray-500 dark:text-gray-400">No entries yet</p>
+      </div>
+    </div>
+  );
+}
+
 // Hero Section
 function Hero() {
   const [currentView, setCurrentView] = useState(0);
   const views = [
-    { name: 'Dashboard', caption: 'Everything you manage, finally in one place.' },
-    { name: 'Projects', caption: 'Every meaningful outcome starts as a project.' },
-    { name: 'Lists', caption: 'Structure your thoughts into action.' },
-    { name: 'Calendar', caption: 'Your time and your tasks finally live together.' },
-    { name: 'Upload', caption: 'Every file. Exactly where it belongs.' },
-    { name: 'Money', caption: 'Know where your money goes. Quietly.' },
-    { name: 'Library', caption: 'Your second brain, built into your workflow.' },
-    { name: 'Thinking Space', caption: 'You don\'t need to be okay here.' },
+    { name: 'Dashboard', caption: 'Everything you manage, finally in one place.', component: DashboardPreview },
+    { name: 'Projects', caption: 'Every meaningful outcome starts as a project.', component: ProjectsPreview },
+    { name: 'Lists', caption: 'Structure your thoughts into action.', component: ListsPreview },
+    { name: 'Calendar', caption: 'Your time and your tasks finally live together.', component: CalendarPreview },
+    { name: 'Money', caption: 'Know where your money goes. Quietly.', component: MoneyPreview },
+    { name: 'Library', caption: 'Your second brain, built into your workflow.', component: LibraryPreview },
+    { name: 'Thinking Space', caption: 'You don\'t need to be okay here.', component: EmotionsPreview },
   ];
 
   useEffect(() => {
@@ -70,6 +290,8 @@ function Hero() {
     }, 4000);
     return () => clearInterval(interval);
   }, []);
+
+  const CurrentPreview = views[currentView].component;
 
   return (
     <section className="min-h-screen flex items-center px-6 lg:px-12 pt-24 pb-20 bg-white dark:bg-gray-900 transition-colors">
@@ -122,15 +344,9 @@ function Hero() {
                 </div>
               </div>
 
-              {/* Content Preview */}
-              <div className="bg-white dark:bg-gray-800 p-8 min-h-[400px] flex items-center justify-center">
-                <div className="text-center">
-                  <div className="w-16 h-16 rounded-xl bg-gray-100 dark:bg-gray-700 mx-auto mb-4 flex items-center justify-center">
-                    <span className="text-2xl">📊</span>
-                  </div>
-                  <h3 className="text-h4 mb-2">{views[currentView].name}</h3>
-                  <p className="text-body-sm text-gray-500 dark:text-gray-400">{views[currentView].caption}</p>
-                </div>
+              {/* Content Preview - Actual UI */}
+              <div className="bg-gray-50 dark:bg-gray-900 min-h-[500px] max-h-[600px] overflow-y-auto">
+                <CurrentPreview />
               </div>
             </div>
             
@@ -246,41 +462,43 @@ function ProductStory() {
       title: 'Start your day with clarity, not chaos.',
       view: 'Dashboard',
       description: 'Today\'s intention, daily objectives, time allocation, and schedule in one view.',
+      component: DashboardPreview,
     },
     {
       title: 'Every meaningful outcome starts as a project.',
       view: 'Projects',
       description: 'From idea to completion. Structure your work, track progress, see everything.',
+      component: ProjectsPreview,
     },
     {
       title: 'Structure your thoughts into action.',
       view: 'Lists',
       description: 'Capture everything. Organize later. Never lose an idea or task.',
+      component: ListsPreview,
     },
     {
       title: 'Your time and your tasks finally live together.',
       view: 'Calendar',
       description: 'See your schedule, tasks, and priorities in one unified timeline.',
-    },
-    {
-      title: 'Every file. Exactly where it belongs.',
-      view: 'Upload',
-      description: 'Store documents, images, and resources linked to your projects and lists.',
+      component: CalendarPreview,
     },
     {
       title: 'Know where your money goes. Quietly.',
       view: 'Money',
       description: 'Track income, expenses, and financial clarity without the noise.',
+      component: MoneyPreview,
     },
     {
       title: 'Your second brain, built into your workflow.',
       view: 'Library',
       description: 'Resources, reading logs, notes, and knowledge all in one place.',
+      component: LibraryPreview,
     },
     {
       title: 'You don\'t need to be okay here.',
       view: 'Thinking Space',
       description: 'A private place to process your thoughts. No judgment. No audience.',
+      component: EmotionsPreview,
     },
   ];
 
@@ -288,25 +506,25 @@ function ProductStory() {
     <section className="py-24 md:py-32 px-6 lg:px-12 bg-gray-50 dark:bg-gray-950 transition-colors">
       <div className="max-w-6xl mx-auto">
         <div className="space-y-32">
-          {scenes.map((scene, index) => (
-            <div key={index} className="grid md:grid-cols-2 gap-12 items-center">
-              <div>
-                <h3 className="text-h3 mb-6">{scene.title}</h3>
-                <p className="text-body text-gray-600 dark:text-gray-400 mb-4">{scene.description}</p>
-                <div className="text-caption text-gray-500 dark:text-gray-500">
-                  {scene.view}
-                </div>
-              </div>
-              <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-8 min-h-[300px] flex items-center justify-center">
-                <div className="text-center">
-                  <div className="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-700 mx-auto mb-4 flex items-center justify-center">
-                    <span className="text-xl">📊</span>
+          {scenes.map((scene, index) => {
+            const SceneComponent = scene.component;
+            return (
+              <div key={index} className="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                  <h3 className="text-h3 mb-6">{scene.title}</h3>
+                  <p className="text-body text-gray-600 dark:text-gray-400 mb-4">{scene.description}</p>
+                  <div className="text-caption text-gray-500 dark:text-gray-500">
+                    {scene.view}
                   </div>
-                  <p className="text-body-sm text-gray-500 dark:text-gray-400">{scene.view}</p>
+                </div>
+                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg overflow-hidden">
+                  <div className="bg-gray-50 dark:bg-gray-900 p-6">
+                    <SceneComponent />
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
