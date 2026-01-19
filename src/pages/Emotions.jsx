@@ -29,6 +29,7 @@ export default function Emotions() {
   const [transcript, setTranscript] = useState(null);
   const [speechRecognition, setSpeechRecognition] = useState(null);
   const [usingFreeTranscription, setUsingFreeTranscription] = useState(false);
+  const [quotaExceeded, setQuotaExceeded] = useState(false);
   const [realTimeTranscript, setRealTimeTranscript] = useState('');
   const [processedTranscript, setProcessedTranscript] = useState(null);
   const [processingTranscript, setProcessingTranscript] = useState(false);
@@ -222,6 +223,7 @@ export default function Emotions() {
         // Handle quota errors gracefully
         if (response.status === 429 || errorCode === 'quota_exceeded') {
           console.warn('OpenAI quota exceeded - using free browser transcription if available');
+          setQuotaExceeded(true);
           return null; // Will use real-time transcript if available
         }
         
@@ -382,6 +384,7 @@ export default function Emotions() {
 
   const handleStartRecording = async () => {
     try {
+      setQuotaExceeded(false); // Reset quota state for new recording
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const recorder = new MediaRecorder(stream);
       const chunks = [];
@@ -705,11 +708,13 @@ export default function Emotions() {
                       )}
                       
                       {/* Show message if transcription failed due to quota */}
-                      {!transcript && !transcribing && audioUrl && (
-                        <div className="mb-3 p-3 bg-gray-100 rounded-lg border border-gray-300">
-                          <p className="text-xs text-gray-600 mb-1 font-medium">Note:</p>
-                          <p className="text-sm text-gray-700">
-                            Transcription is temporarily unavailable. You can still save your recording.
+                      {(quotaExceeded || (!transcript && !transcribing && audioUrl)) && (
+                        <div className="mb-3 p-3 bg-amber-50 rounded-lg border border-amber-200">
+                          <p className="text-xs text-amber-800 mb-1 font-medium">ℹ️ Transcription Note:</p>
+                          <p className="text-sm text-amber-700">
+                            {quotaExceeded 
+                              ? "OpenAI transcription quota exceeded. Using browser-based transcription. You can still save your recording with or without transcription."
+                              : "Transcription is temporarily unavailable. You can still save your recording."}
                           </p>
                         </div>
                       )}

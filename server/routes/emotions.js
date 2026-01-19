@@ -336,17 +336,29 @@ router.post('/transcribe', requireAuth, async (req, res) => {
     }
   } catch (error) {
     console.error('❌ Transcription error:', error);
+    console.error('Error details:', {
+      status: error.status || error.statusCode,
+      code: error.code || error.error?.code,
+      type: error.type || error.error?.type,
+      message: error.message || error.error?.message,
+      response: error.response?.data
+    });
     
-    // Handle specific OpenAI errors
-    if (error.status === 429 || error.code === 'insufficient_quota') {
+    // Handle specific OpenAI errors - check multiple possible error structures
+    const errorCode = error.code || error.error?.code || error.response?.data?.code;
+    const errorType = error.type || error.error?.type || error.response?.data?.type;
+    const errorStatus = error.status || error.statusCode || error.response?.status;
+    
+    if (errorStatus === 429 || errorCode === 'insufficient_quota' || errorType === 'insufficient_quota') {
+      console.warn('⚠️ OpenAI quota exceeded - transcription unavailable');
       return res.status(429).json({ 
-        error: 'OpenAI API quota exceeded. Please check your OpenAI account billing or try again later.',
+        error: 'OpenAI API quota exceeded. Transcription is temporarily unavailable. You can still save your recording.',
         code: 'quota_exceeded',
-        details: 'Your OpenAI API quota has been exceeded. Please add credits to your account or wait for quota reset.'
+        details: 'Your OpenAI API quota has been exceeded. Please add credits to your account or wait for quota reset. The app will use browser-based transcription as a fallback.'
       });
     }
     
-    if (error.status === 401 || error.code === 'invalid_api_key') {
+    if (errorStatus === 401 || errorCode === 'invalid_api_key') {
       return res.status(500).json({ 
         error: 'OpenAI API key is invalid or not configured.',
         code: 'api_key_error'
