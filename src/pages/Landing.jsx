@@ -148,33 +148,97 @@ function DashboardPreview() {
 
 function ProjectsPreview() {
   return (
-    <div className="space-y-4 max-w-full">
-      <div className="pb-2 border-b border-gray-100 dark:border-gray-800">
-        <div className="text-[10px] uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1.5 font-semibold">PERSONAL LIFE OS</div>
-        <h3 className="text-xl font-display text-black dark:text-white mb-1.5 leading-tight">Project Selection Hub</h3>
-        <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Choose a focus area for your current session.</p>
+    <div className="space-y-6 max-w-full">
+      <div>
+        <div className="text-[10px] uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-2 font-semibold">
+          Personal life OS
+        </div>
+        <h3 className="text-2xl font-display text-black dark:text-white leading-tight mb-2">
+          Project Selection Hub
+        </h3>
+        <p className="text-xs text-gray-500 dark:text-gray-400">
+          Choose a focus area for your current session.
+        </p>
         </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 flex flex-col items-center justify-center min-h-[140px] hover:border-gray-400 dark:hover:border-gray-600 transition-colors">
-          <div className="w-10 h-10 rounded-xl bg-gray-200 dark:bg-gray-800 flex items-center justify-center mb-3">
-            <span className="text-xl text-gray-600 dark:text-gray-400">+</span>
-        </div>
-          <p className="text-xs text-black dark:text-white font-semibold mb-1">Create New Project</p>
-          <p className="text-[11px] text-gray-500 dark:text-gray-400 text-center">Start from scratch</p>
+      <div className="grid md:grid-cols-4 gap-4">
+        {/* Create New Project */}
+        <div className="col-span-1 bg-gray-50 dark:bg-gray-900/40 rounded-3xl border-2 border-dashed border-gray-300 dark:border-gray-700 flex flex-col items-center justify-center py-10 px-4 hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
+          <div className="w-14 h-14 rounded-full bg-white dark:bg-gray-800 shadow-sm flex items-center justify-center mb-4">
+            <span className="text-2xl text-gray-700 dark:text-gray-300">+</span>
+          </div>
+          <p className="text-sm font-semibold text-black dark:text-white mb-1">Create New Project</p>
+          <p className="text-[11px] tracking-wide uppercase text-gray-500 dark:text-gray-400">
+            Start from scratch
+          </p>
       </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden border-2 border-gray-200 dark:border-gray-700 shadow-sm" style={{ borderLeftWidth: '5px', borderLeftColor: '#000000' }}>
-          <div className="h-18 bg-black dark:bg-white flex items-center justify-between px-5 py-4">
-            <div className="flex items-center gap-2.5">
-              <span className="text-xl">📚</span>
-              <span className="text-xs font-semibold text-white dark:text-black">Deep Work: Q1 Focus</span>
+        {/* Project cards */}
+        <div className="col-span-3 grid sm:grid-cols-3 gap-4">
+          {/* Project 1 */}
+          <div className="bg-white dark:bg-gray-900/50 rounded-3xl overflow-hidden border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col">
+            <div className="h-28 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-full bg-gray-800 flex items-center justify-center shadow-lg">
+                <span className="text-xs text-white tracking-[0.15em] uppercase">OS</span>
+              </div>
             </div>
-            <span className="text-[10px] text-white/90 dark:text-black/90 font-medium bg-white/10 dark:bg-black/10 px-2 py-1 rounded">Active</span>
+            <div className="flex-1 px-5 pt-4 pb-5 space-y-4">
+            <div>
+                <p className="text-sm font-semibold text-black dark:text-white mb-1">Life OS Dev</p>
+                <p className="text-[11px] text-gray-500 dark:text-gray-400">Next task</p>
+                <p className="text-xs text-gray-700 dark:text-gray-200">
+                  Define North Star metrics
+                </p>
             </div>
-          <div className="p-4 space-y-2 bg-gray-50 dark:bg-gray-900/30">
-            <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">Next step: Outline execution plan for Week 3.</p>
-            <p className="text-[11px] text-gray-500 dark:text-gray-400">4 tasks today · 12 open · 8 completed</p>
+              <div className="flex items-center justify-between text-[11px] text-gray-500 dark:text-gray-400">
+                <span>8 tasks remaining</span>
+                <span>65% complete</span>
+            </div>
+          </div>
+        </div>
+
+          {/* Project 2 */}
+          <div className="bg-white dark:bg-gray-900/50 rounded-3xl overflow-hidden border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col">
+            <div className="h-28 bg-gradient-to-br from-gray-900 via-gray-700 to-gray-600 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-full bg-gray-800 flex items-center justify-center shadow-lg">
+                <span className="text-xs text-white tracking-[0.15em] uppercase">GT</span>
+                </div>
+              </div>
+            <div className="flex-1 px-5 pt-4 pb-5 space-y-4">
+              <div>
+                <p className="text-sm font-semibold text-black dark:text-white mb-1">Growth Strategy</p>
+                <p className="text-[11px] text-gray-500 dark:text-gray-400">Next task</p>
+                <p className="text-xs text-gray-700 dark:text-gray-200">
+                  Analyse competitor SEO
+                </p>
+              </div>
+              <div className="flex items-center justify-between text-[11px] text-gray-500 dark:text-gray-400">
+                <span>3 tasks remaining</span>
+                <span>85% complete</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Project 3 */}
+          <div className="bg-white dark:bg-gray-900/50 rounded-3xl overflow-hidden border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col">
+            <div className="h-28 bg-gradient-to-br from-gray-900 via-gray-700 to-gray-600 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-full bg-gray-800 flex items-center justify-center shadow-lg">
+                <span className="text-xs text-white tracking-[0.15em] uppercase">WS</span>
+              </div>
+            </div>
+            <div className="flex-1 px-5 pt-4 pb-5 space-y-4">
+              <div>
+                <p className="text-sm font-semibold text-black dark:text-white mb-1">Wellness Studio</p>
+                <p className="text-[11px] text-gray-500 dark:text-gray-400">Next task</p>
+                <p className="text-xs text-gray-700 dark:text-gray-200">
+                  Purchase gym equipment
+                </p>
+              </div>
+              <div className="flex items-center justify-between text-[11px] text-gray-500 dark:text-gray-400">
+                <span>14 tasks remaining</span>
+                <span>12% complete</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -184,36 +248,90 @@ function ProjectsPreview() {
 
 function ListsPreview() {
   return (
-    <div className="space-y-4 max-w-full">
-      <div className="pb-2 border-b border-gray-100 dark:border-gray-800">
-        <h3 className="text-xl font-display text-black dark:text-white mb-1.5 leading-tight">My Lists</h3>
-        <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Manage your personal intentions and collections.</p>
-                </div>
+    <div className="space-y-6 max-w-full">
+      <div>
+        <h3 className="text-2xl font-display text-black dark:text-white leading-tight mb-1">
+          My Lists
+        </h3>
+        <p className="text-xs text-gray-500 dark:text-gray-400">
+          Manage your personal intentions and collections.
+        </p>
+      </div>
 
-      <div className="flex items-center gap-3 mb-4 text-xs">
-        <span className="border-b-2 border-black dark:border-white pb-1.5 font-semibold text-black dark:text-white">All Lists</span>
-        <span className="text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors cursor-pointer">Recent</span>
-        <span className="text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors cursor-pointer">Pinned</span>
-              </div>
-
-      <div className="space-y-3">
-        <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-4 border border-gray-200 dark:border-gray-800 flex items-center justify-between hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
-              <div className="flex-1">
-            <p className="text-sm font-semibold text-black dark:text-white mb-1">Weekly Review Ritual</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Checklist for closing the week and planning the next.</p>
-              </div>
-          <span className="text-[11px] text-gray-500 dark:text-gray-400 ml-4 whitespace-nowrap">12 items · Pinned</span>
+      {/* Tabs and toolbar */}
+      <div className="flex items-center justify-between text-xs mb-3">
+        <div className="flex items-center gap-4">
+          <button className="pb-1.5 border-b-2 border-black dark:border-white font-semibold text-black dark:text-white">
+            All Lists
+          </button>
+          <button className="text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">
+            Recent
+          </button>
+          <button className="text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">
+            Pinned
+          </button>
         </div>
-        <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-4 border border-gray-200 dark:border-gray-800 flex items-center justify-between hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
-          <div className="flex-1">
-            <p className="text-sm font-semibold text-black dark:text-white mb-1">Reading Queue — 2026</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Books, articles, and papers to process.</p>
+        <div className="flex items-center gap-3 text-gray-500 dark:text-gray-400">
+          <button className="w-7 h-7 rounded-lg border border-gray-200 dark:border-gray-800 flex items-center justify-center">
+            <span className="text-[11px]">▤</span>
+          </button>
+          <button className="w-7 h-7 rounded-lg border border-gray-200 dark:border-gray-800 flex items-center justify-center">
+            <span className="text-[11px]">☷</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Cards */}
+      <div className="grid sm:grid-cols-2 gap-4">
+        <div className="bg-white dark:bg-gray-900/40 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden shadow-sm">
+          <div className="h-28 bg-gradient-to-tr from-gray-900 via-gray-800 to-gray-700 flex items-end justify-start p-4">
+            <span className="px-2 py-1 text-[10px] rounded-full bg-black/60 text-white uppercase tracking-[0.16em]">
+              Movies
+            </span>
           </div>
-          <span className="text-[11px] text-gray-500 dark:text-gray-400 ml-4 whitespace-nowrap">27 items</span>
+          <div className="p-4 space-y-2">
+            <p className="text-sm font-semibold text-black dark:text-white">Movies to Watch</p>
+            <div className="h-1.5 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
+              <div className="h-full w-1/3 bg-black dark:bg-white" />
+            </div>
+            <div className="flex items-center justify-between text-[11px] text-gray-500 dark:text-gray-400">
+              <span>Updated 2 hours ago</span>
+              <span>12 items</span>
+            </div>
+          </div>
         </div>
-        <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 text-center hover:border-gray-400 dark:hover:border-gray-600 transition-colors">
-          <p className="text-xs text-gray-600 dark:text-gray-400 mb-1 font-medium">Need a new structure?</p>
-          <p className="text-[11px] text-gray-500 dark:text-gray-400">Create a list for goals, errands, ideas, or anything else.</p>
+
+        <div className="bg-white dark:bg-gray-900/40 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden shadow-sm">
+          <div className="h-28 bg-gradient-to-tr from-gray-900 via-gray-800 to-gray-700 flex items-end justify-start p-4">
+            <span className="px-2 py-1 text-[10px] rounded-full bg-black/60 text-white uppercase tracking-[0.16em]">
+              Books
+            </span>
+          </div>
+          <div className="p-4 space-y-2">
+            <p className="text-sm font-semibold text-black dark:text-white">Books to Read</p>
+            <div className="h-1.5 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
+              <div className="h-full w-1/2 bg-black dark:bg-white" />
+            </div>
+            <div className="flex items-center justify-between text-[11px] text-gray-500 dark:text-gray-400">
+              <span>Updated yesterday</span>
+              <span>8 items</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom CTA */}
+      <div className="mt-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/40 py-6 px-5 text-center space-y-2">
+        <p className="text-sm font-semibold text-black dark:text-white">
+          Start a new collection
+        </p>
+        <p className="text-xs text-gray-500 dark:text-gray-400">
+          Organise thoughts, plans, and inspirations into beautifully structured lists.
+        </p>
+        <div className="mt-3 flex justify-center">
+          <button className="px-4 py-2 rounded-full bg-black dark:bg-white text-white dark:text-black text-xs font-medium hover:bg-gray-900 dark:hover:bg-gray-100 transition-colors">
+            Create new list
+          </button>
         </div>
       </div>
     </div>
@@ -335,35 +453,143 @@ function MoneyPreview() {
 
 function LibraryPreview() {
   return (
-    <div className="space-y-4 max-w-full">
-      <div className="pb-2 border-b border-gray-100 dark:border-gray-800">
-        <h3 className="text-xl font-display text-black dark:text-white mb-1.5 leading-tight">Resource Library</h3>
-        <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Curated intellectual assets and reading logs.</p>
+    <div className="space-y-6 max-w-full">
+      <div>
+        <h3 className="text-2xl font-display text-black dark:text-white leading-tight mb-1">
+          Resource Library
+        </h3>
+        <p className="text-xs text-gray-500 dark:text-gray-400">
+          Curated intellectual assets and reading logs.
+        </p>
       </div>
-      
-      <div className="text-xs text-gray-500 dark:text-gray-400 mb-4 border-b-2 border-black dark:border-white pb-1.5 inline-block font-semibold">All Resources</div>
-      
+
+      {/* Tabs */}
+      <div className="flex items-center gap-4 text-xs text-gray-600 dark:text-gray-400 border-b border-gray-100 dark:border-gray-800 pb-2">
+        <button className="pb-1.5 border-b-2 border-black dark:border-white font-semibold text-black dark:text-white">
+          All Resources
+        </button>
+        <button className="hover:text-black dark:hover:text-white transition-colors">
+          Programming
+        </button>
+        <button className="hover:text-black dark:hover:text-white transition-colors">
+          Design
+        </button>
+        <button className="hover:text-black dark:hover:text-white transition-colors">
+          Growth
+        </button>
+        <button className="hover:text-black dark:hover:text-white transition-colors">
+          Philosophy
+        </button>
+      </div>
+
+      {/* Programming section */}
       <div className="space-y-3">
-        <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-4 border border-gray-200 dark:border-gray-800 flex items-start justify-between hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
-          <div className="flex-1">
-            <p className="font-semibold text-black dark:text-white mb-1 text-sm">The Effective Executive</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Book · Notes linked to Projects: Q1 Focus</p>
+        <h4 className="text-sm font-display text-black dark:text-white">Programming</h4>
+        <div className="grid sm:grid-cols-3 gap-4">
+          {/* Card 1 */}
+          <div className="bg-white dark:bg-gray-900/40 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden shadow-sm flex flex-col">
+            <div className="h-32 bg-gray-800 flex items-center justify-center">
+              <span className="text-xs uppercase tracking-[0.15em] text-gray-200">
+                Clean Code
+              </span>
+            </div>
+            <div className="flex-1 p-4 space-y-2">
+              <p className="text-sm font-semibold text-black dark:text-white">
+                Clean Code: A Handbook of Agile Software…
+              </p>
+              <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                Robert C. Martin
+              </p>
+              <div className="mt-2">
+                <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-1">Progress</p>
+                <div className="h-1.5 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
+                  <div className="h-full w-1/3 bg-black dark:bg-white" />
+                </div>
+              </div>
+              <button className="mt-2 inline-flex items-center justify-center px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-700 text-[11px] text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800">
+                Resume reading
+              </button>
+            </div>
           </div>
-          <span className="text-[11px] text-gray-500 dark:text-gray-400 ml-4 whitespace-nowrap">3 highlights</span>
+
+          {/* Card 2 */}
+          <div className="bg-white dark:bg-gray-900/40 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden shadow-sm flex flex-col">
+            <div className="h-32 bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+              <span className="text-xs uppercase tracking-[0.15em] text-gray-500 dark:text-gray-300">
+                React Patterns
+              </span>
+            </div>
+            <div className="flex-1 p-4 space-y-2">
+              <p className="text-sm font-semibold text-black dark:text-white">
+                React Design Patterns &amp; Best Practices
+              </p>
+              <p className="text-[11px] text-gray-500 dark:text-gray-400">Lars Grammel</p>
+              <div className="mt-2">
+                <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-1">Progress</p>
+                <div className="h-1.5 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
+                  <div className="h-full w-1/6 bg-black dark:bg-white" />
+                </div>
+              </div>
+              <button className="mt-2 inline-flex items-center justify-center px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-700 text-[11px] text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800">
+                Resume reading
+              </button>
+            </div>
+          </div>
+
+          {/* Card 3 */}
+          <div className="bg-white dark:bg-gray-900/40 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden shadow-sm flex flex-col">
+            <div className="h-32 bg-gray-800 flex items-center justify-center">
+              <span className="text-xs uppercase tracking-[0.15em] text-gray-200">
+                Pragmatic
+              </span>
+            </div>
+            <div className="flex-1 p-4 space-y-2">
+              <p className="text-sm font-semibold text-black dark:text-white">
+                The Pragmatic Programmer: Your Journey…
+              </p>
+              <p className="text-[11px] text-gray-500 dark:text-gray-400">Andrew Hunt</p>
+              <div className="mt-2">
+                <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-1">Progress</p>
+                <div className="h-1.5 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
+                  <div className="h-full w-4/5 bg-black dark:bg-white" />
+                </div>
+              </div>
+              <button className="mt-2 inline-flex items-center justify-center px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-700 text-[11px] text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800">
+                Resume reading
+              </button>
+            </div>
+          </div>
         </div>
-        <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-4 border border-gray-200 dark:border-gray-800 flex items-start justify-between hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
-          <div className="flex-1">
-            <p className="font-semibold text-black dark:text-white mb-1 text-sm">Energy Management, Not Time Management</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Article · Tagged: Focus, Routines</p>
+      </div>
+
+      {/* Design section */}
+      <div className="space-y-3">
+        <h4 className="text-sm font-display text-black dark:text-white">Design</h4>
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div className="bg-white dark:bg-gray-900/40 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden shadow-sm flex flex-col">
+            <div className="h-32 bg-gray-800 flex items-center justify-center">
+              <span className="text-xs uppercase tracking-[0.15em] text-gray-200">
+                Grid Systems
+              </span>
+            </div>
+            <div className="flex-1 p-4 space-y-2">
+              <p className="text-sm font-semibold text-black dark:text-white">
+                Grid Systems in Graphic Design
+              </p>
+              <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                Josef Müller-Brockmann
+              </p>
+              <div className="mt-2">
+                <p className="text-[11px] text-gray-500 dark:text-gray-400 mb-1">Progress</p>
+                <div className="h-1.5 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
+                  <div className="h-full w-[5%] bg-black dark:bg-white" />
+                </div>
+              </div>
+              <button className="mt-2 inline-flex items-center justify-center px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-700 text-[11px] text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800">
+                Resume reading
+              </button>
+            </div>
           </div>
-          <span className="text-[11px] text-gray-500 dark:text-gray-400 ml-4 whitespace-nowrap">Read yesterday</span>
-        </div>
-        <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-4 border border-gray-200 dark:border-gray-800 flex items-start justify-between hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
-          <div className="flex-1">
-            <p className="font-semibold text-black dark:text-white mb-1 text-sm">Personal OS — Architecture Diagram</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">PDF · Linked to Dashboard & Money</p>
-          </div>
-          <span className="text-[11px] text-gray-500 dark:text-gray-400 ml-4 whitespace-nowrap">Pinned</span>
         </div>
       </div>
     </div>
