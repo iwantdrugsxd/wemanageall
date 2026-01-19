@@ -32,6 +32,7 @@ import insightsRoutes from './routes/insights.js';
 import resourcesRoutes from './routes/resources.js';
 import listsRoutes from './routes/lists.js';
 import subscriptionsRoutes from './routes/subscriptions.js';
+import uploadRoutes from './routes/upload.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -261,6 +262,7 @@ app.use('/api/insights', insightsRoutes);
 app.use('/api/resources', resourcesRoutes);
 app.use('/api/lists', listsRoutes);
 app.use('/api/subscriptions', subscriptionsRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // Waitlist endpoint
 app.post('/api/waitlist', async (req, res) => {

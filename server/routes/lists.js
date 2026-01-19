@@ -21,6 +21,7 @@ const initTables = async () => {
         name VARCHAR(255) NOT NULL,
         icon VARCHAR(10),
         description TEXT,
+        cover_image_url TEXT,
         is_pinned BOOLEAN DEFAULT FALSE,
         is_shared BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -41,6 +42,16 @@ const initTables = async () => {
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       )
+    `);
+
+    // Add cover_image_url column if it doesn't exist
+    await query(`
+      DO $$ 
+      BEGIN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'lists' AND column_name = 'cover_image_url') THEN
+          ALTER TABLE lists ADD COLUMN cover_image_url TEXT;
+        END IF;
+      END $$;
     `);
 
     // Create indexes
@@ -82,6 +93,7 @@ router.get('/', requireAuth, async (req, res) => {
         l.name,
         l.icon,
         l.description,
+        l.cover_image_url,
         l.is_pinned,
         l.is_shared,
         l.created_at,
@@ -110,7 +122,7 @@ router.get('/', requireAuth, async (req, res) => {
     }
 
     queryText += `
-      GROUP BY l.id, l.name, l.icon, l.description, l.is_pinned, l.is_shared, l.created_at, l.updated_at
+      GROUP BY l.id, l.name, l.icon, l.description, l.cover_image_url, l.is_pinned, l.is_shared, l.created_at, l.updated_at
       ORDER BY l.is_pinned DESC, l.updated_at DESC
     `;
 
@@ -134,7 +146,7 @@ router.get('/:id', requireAuth, async (req, res) => {
     await ensureTables();
 
     const listResult = await query(`
-      SELECT id, name, icon, description, is_pinned, is_shared, created_at, updated_at
+      SELECT id, name, icon, description, cover_image_url, is_pinned, is_shared, created_at, updated_at
       FROM lists
       WHERE id = $1 AND user_id = $2
     `, [req.params.id, req.user.id]);
@@ -175,10 +187,10 @@ router.post('/', requireAuth, async (req, res) => {
     }
 
     const result = await query(`
-      INSERT INTO lists (user_id, name, icon, description)
-      VALUES ($1, $2, $3, $4)
-      RETURNING id, name, icon, description, is_pinned, is_shared, created_at, updated_at
-    `, [req.user.id, name.trim(), icon || null, description || null]);
+      INSERT INTO lists (user_id, name, icon, description, cover_image_url)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING id, name, icon, description, cover_image_url, is_pinned, is_shared, created_at, updated_at
+    `, [req.user.id, name.trim(), icon || null, description || null, cover_image_url || null]);
 
     res.json({
       success: true,

@@ -16,8 +16,11 @@ export default function Projects() {
     start_date: new Date().toISOString().split('T')[0],
     color: '#000000',
     icon: '📋',
-    tags: []
+    tags: [],
+    cover_image_url: null
   });
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
   const [filterTag, setFilterTag] = useState('');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
@@ -192,7 +195,8 @@ export default function Projects() {
         
         // Close modal and reset form first
         setShowCreateModal(false);
-        setNewProject({ name: '', description: '', start_date: new Date().toISOString().split('T')[0], color: '#000000', icon: '📋', tags: [] });
+        setNewProject({ name: '', description: '', start_date: new Date().toISOString().split('T')[0], color: '#000000', icon: '📋', tags: [], cover_image_url: null });
+        setImagePreview(null);
         setError(null);
         
         // Refresh projects list FIRST to show the new project card
@@ -583,6 +587,83 @@ export default function Projects() {
                 />
               </div>
 
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-black mb-2">Cover Image (optional)</label>
+                <div className="space-y-3">
+                  {imagePreview ? (
+                    <div className="relative">
+                      <img 
+                        src={imagePreview} 
+                        alt="Preview" 
+                        className="w-full h-48 object-cover rounded-xl border border-gray-300"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setImagePreview(null);
+                          setNewProject({ ...newProject, cover_image_url: null });
+                        }}
+                        className="absolute top-2 right-2 p-2 bg-black/70 text-white rounded-lg hover:bg-black/90 transition-colors"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-gray-400 transition-colors">
+                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                        <svg className="w-8 h-8 mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <p className="text-sm text-gray-500">Click to upload image</p>
+                        <p className="text-xs text-gray-400 mt-1">PNG, JPG, GIF up to 5MB</p>
+                      </div>
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={async (e) => {
+                          const file = e.target.files[0];
+                          if (file) {
+                            setUploadingImage(true);
+                            try {
+                              const formData = new FormData();
+                              formData.append('image', file);
+                              
+                              const response = await fetch('/api/upload/image', {
+                                method: 'POST',
+                                credentials: 'include',
+                                body: formData,
+                              });
+                              
+                              if (response.ok) {
+                                const data = await response.json();
+                                setNewProject({ ...newProject, cover_image_url: data.url });
+                                setImagePreview(data.url);
+                              } else {
+                                alert('Failed to upload image');
+                              }
+                            } catch (error) {
+                              console.error('Upload error:', error);
+                              alert('Failed to upload image');
+                            } finally {
+                              setUploadingImage(false);
+                            }
+                          }
+                        }}
+                        disabled={uploadingImage}
+                      />
+                    </label>
+                  )}
+                  {uploadingImage && (
+                    <div className="text-center text-sm text-gray-500">
+                      Uploading image...
+                    </div>
+                  )}
+                </div>
+              </div>
+
               <div className="mb-6">
                 <label className="block text-sm font-medium text-black mb-2">Start Date (optional)</label>
                 <input
@@ -615,7 +696,8 @@ export default function Projects() {
                   type="button"
                   onClick={() => {
                     setShowCreateModal(false);
-                    setNewProject({ name: '', description: '', start_date: new Date().toISOString().split('T')[0], color: '#000000', icon: '📋', tags: [] });
+                    setNewProject({ name: '', description: '', start_date: new Date().toISOString().split('T')[0], color: '#000000', icon: '📋', tags: [], cover_image_url: null });
+                    setImagePreview(null);
                     setError(null);
                   }}
                   disabled={creating}
