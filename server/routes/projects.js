@@ -2003,3 +2003,4 @@ router.put('/:id/collaborators/:userId', requireAuth, async (req, res) => {
   }
 });
 
+export default router;

@@ -414,3 +414,4 @@ router.get('/check-feature/:feature', requireAuth, async (req, res) => {
   }
 });
 
+export default router;
