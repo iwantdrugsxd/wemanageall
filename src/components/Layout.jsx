@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 export default function Layout({ children }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [showQuickAction, setShowQuickAction] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -88,9 +90,9 @@ export default function Layout({ children }) {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
       {/* Top Navigation Bar */}
-      <header className="sticky top-0 z-50 bg-white border-b border-gray-300">
+      <header className="sticky top-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-300 dark:border-gray-700 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
@@ -98,7 +100,7 @@ export default function Layout({ children }) {
               <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center">
                 <span className="font-display text-white text-sm font-semibold">O</span>
               </div>
-              <span className="font-display text-lg font-semibold text-black">OFA</span>
+              <span className="font-display text-lg font-semibold text-black dark:text-white transition-colors">OFA</span>
             </Link>
 
             {/* Navigation Links */}
@@ -111,8 +113,8 @@ export default function Layout({ children }) {
                     to={item.path}
                     className={`text-sm font-medium transition-colors ${
                       isActive
-                        ? 'text-black'
-                        : 'text-gray-600 hover:text-black'
+                        ? 'text-black dark:text-white'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white'
                     }`}
                   >
                     {item.label}
@@ -123,9 +125,26 @@ export default function Layout({ children }) {
 
             {/* Right Side Actions */}
             <div className="flex items-center gap-4">
+              {/* Theme Toggle Button */}
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+                aria-label="Toggle theme"
+              >
+                {theme === 'light' ? (
+                  <svg className="w-6 h-6 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                  </svg>
+                ) : (
+                  <svg className="w-6 h-6 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+                )}
+              </button>
               {/* Date Display - shown on Money page */}
               {location.pathname === '/money' && (
-                <span className="text-sm text-gray-600 font-medium">
+                <span className="text-sm text-gray-600 dark:text-gray-400 font-medium transition-colors">
                   {new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).toUpperCase()}
                 </span>
               )}
@@ -133,10 +152,10 @@ export default function Layout({ children }) {
               {/* Notifications Icon */}
               <Link
                 to="/notifications"
-                className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="relative p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
               >
                 <svg
-                  className={`w-6 h-6 ${location.pathname === '/notifications' ? 'text-black' : 'text-gray-600'}`}
+                  className={`w-6 h-6 transition-colors ${location.pathname === '/notifications' ? 'text-black dark:text-white' : 'text-gray-600 dark:text-gray-400'}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -149,7 +168,7 @@ export default function Layout({ children }) {
                   />
                 </svg>
                 {unreadCount > 0 && (
-                  <span className="absolute top-1 right-1 w-5 h-5 bg-black text-white text-xs font-medium rounded-full flex items-center justify-center">
+                  <span className="absolute top-1 right-1 w-5 h-5 bg-black dark:bg-white text-white dark:text-black text-xs font-medium rounded-full flex items-center justify-center transition-colors">
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </span>
                 )}
@@ -157,7 +176,7 @@ export default function Layout({ children }) {
               
               <button
                 onClick={() => setShowQuickAction(true)}
-                className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors flex items-center gap-2"
+                className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
               >
                 <span>⌘K</span>
               </button>
@@ -165,16 +184,16 @@ export default function Layout({ children }) {
               <div className="relative">
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 transition-colors"
+                  className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
                 >
-                  <span className="text-black text-sm font-medium">{initial}</span>
+                  <span className="text-black dark:text-white text-sm font-medium transition-colors">{initial}</span>
                 </button>
 
                 {showUserMenu && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-300 py-2 z-50">
-                    <div className="px-4 py-2 border-b border-gray-300">
-                      <p className="text-sm font-medium text-black">{user?.name}</p>
-                      <p className="text-xs text-gray-500">{user?.email}</p>
+                  <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-300 dark:border-gray-700 py-2 z-50 transition-colors">
+                    <div className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
+                      <p className="text-sm font-medium text-black dark:text-white transition-colors">{user?.name}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 transition-colors">{user?.email}</p>
                     </div>
                     
                     <div className="py-2">
@@ -186,8 +205,8 @@ export default function Layout({ children }) {
                             onClick={() => handleNavClick(item.path)}
                             className={`w-full text-left px-4 py-2 text-sm transition-colors flex items-center gap-3 ${
                               isActive
-                                ? 'bg-black/10 text-black font-medium'
-                                : 'text-gray-600 hover:bg-gray-100'
+                                ? 'bg-black/10 dark:bg-white/10 text-black dark:text-white font-medium'
+                                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                             }`}
                           >
                             <span>{item.label}</span>
@@ -196,19 +215,19 @@ export default function Layout({ children }) {
                       })}
                     </div>
 
-                    <hr className="my-2 border-gray-300" />
+                    <hr className="my-2 border-gray-300 dark:border-gray-700" />
                     
                     <Link
                       to="/pricing"
                       onClick={() => setShowUserMenu(false)}
-                      className="block w-full text-left px-4 py-2 text-sm text-black hover:bg-gray-100 transition-colors"
+                      className="block w-full text-left px-4 py-2 text-sm text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                     >
                       Pricing & Plans
                     </Link>
                     
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 text-sm text-black hover:bg-gray-100 transition-colors"
+                      className="w-full text-left px-4 py-2 text-sm text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                     >
                       Log out
                     </button>
@@ -226,21 +245,21 @@ export default function Layout({ children }) {
       {/* Quick Action Modal */}
       {showQuickAction && (
         <div
-          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center"
+          className="fixed inset-0 bg-black/20 dark:bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center transition-colors"
           onClick={() => setShowQuickAction(false)}
         >
           <div
-            className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4 border border-gray-300"
+            className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4 border border-gray-300 dark:border-gray-700 transition-colors"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="font-display text-xl text-black mb-4">Quick Actions</h2>
+            <h2 className="font-display text-xl text-black dark:text-white mb-4 transition-colors">Quick Actions</h2>
             <div className="space-y-2">
               <button
                 onClick={() => {
                   navigate('/dashboard');
                   setShowQuickAction(false);
                 }}
-                className="w-full text-left px-4 py-3 rounded-xl hover:bg-gray-100 transition-colors text-black"
+                className="w-full text-left px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-black dark:text-white"
               >
                 Go to Dashboard
               </button>
@@ -249,14 +268,14 @@ export default function Layout({ children }) {
                   navigate('/money?action=add-expense');
                   setShowQuickAction(false);
                 }}
-                className="w-full text-left px-4 py-3 rounded-xl hover:bg-gray-100 transition-colors text-black"
+                className="w-full text-left px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-black dark:text-white"
               >
                 Log expense
               </button>
             </div>
             <button
               onClick={() => setShowQuickAction(false)}
-              className="mt-4 w-full px-4 py-2 text-sm text-gray-600 hover:text-black transition-colors"
+              className="mt-4 w-full px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
             >
               Press ESC to close
             </button>
