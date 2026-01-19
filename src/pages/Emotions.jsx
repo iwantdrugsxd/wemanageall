@@ -947,7 +947,10 @@ export default function Emotions() {
                             </button>
                           ) : entry.type === 'text' ? (
                             <button
-                              onClick={() => setSelectedEntry(entry)}
+                              onClick={() => {
+                                setSelectedEntry(entry);
+                                setView('read');
+                              }}
                               className="px-5 py-2 bg-[#F5F5F5] text-[#1F2933] rounded-full hover:bg-[#EEEEEE] hover:shadow-sm transition-all text-sm font-medium"
                             >
                               Read
@@ -1323,6 +1326,94 @@ export default function Emotions() {
     );
   }
 
+  // READ ENTRY VIEW (for text entries)
+  if (view === 'read' && selectedEntry && selectedEntry.type === 'text') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-ofa-ink/95 to-ofa-charcoal" style={{
+        backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0)`,
+        backgroundSize: '40px 40px'
+      }}>
+        <div className="max-w-4xl mx-auto px-6 lg:px-8 py-12">
+          {/* Header */}
+          <div className="mb-8">
+            <button
+              onClick={() => {
+                setSelectedEntry(null);
+                setView('home');
+              }}
+              className="text-white/80 hover:text-white transition-colors mb-4 text-sm flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Back
+            </button>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="font-display text-3xl text-white mb-2">Written Entry</h2>
+                <p className="text-white/60 text-sm">
+                  {formatDate(selectedEntry.created_at)} • {getWordCount(selectedEntry.content)} words
+                </p>
+              </div>
+              {selectedEntry.locked && (
+                <div className="flex items-center gap-2 text-white/60">
+                  <span>🔒</span>
+                  <span className="text-sm">Locked</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="bg-white/10 rounded-3xl p-8 border border-white/20 mb-6">
+            <div className="prose prose-invert max-w-none">
+              <p className="text-white/90 text-lg leading-relaxed whitespace-pre-wrap">
+                {selectedEntry.content}
+              </p>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              {!selectedEntry.locked && (
+                <button
+                  onClick={() => handleLockEntry(selectedEntry.id, true)}
+                  className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors text-sm flex items-center gap-2"
+                >
+                  <span>🔒</span>
+                  <span>Lock Entry</span>
+                </button>
+              )}
+              {selectedEntry.locked && (
+                <button
+                  onClick={() => handleLockEntry(selectedEntry.id, false)}
+                  className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors text-sm flex items-center gap-2"
+                >
+                  <span>🔓</span>
+                  <span>Unlock Entry</span>
+                </button>
+              )}
+            </div>
+            <button
+              onClick={() => {
+                if (confirm('Delete this entry?')) {
+                  handleDeleteEntry(selectedEntry.id);
+                  setSelectedEntry(null);
+                  setView('home');
+                }
+              }}
+              className="px-4 py-2 bg-red-500/20 text-red-300 rounded-xl hover:bg-red-500/30 transition-colors text-sm flex items-center gap-2"
+            >
+              <span>🗑️</span>
+              <span>Delete</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // HISTORY VIEW
   if (showHistory) {
     const filteredEntries = entries.filter(entry => {
@@ -1424,23 +1515,27 @@ export default function Emotions() {
                     </div>
                     <div className="flex items-center gap-2">
                       {entry.locked ? (
-                        <button
-                          onClick={() => {
-                            if (confirm('This entry is locked. Confirm to open.')) {
-                              setSelectedEntry(entry);
-                            }
-                          }}
-                          className="px-4 py-2 bg-black text-white rounded-xl hover:bg-black/90 transition-colors text-sm"
-                        >
-                          Unlock & View
-                        </button>
+                          <button
+                            onClick={() => {
+                              if (confirm('This entry is locked. Confirm to open.')) {
+                                setSelectedEntry(entry);
+                                setView(entry.type === 'text' ? 'read' : 'home');
+                              }
+                            }}
+                            className="px-4 py-2 bg-black text-white rounded-xl hover:bg-black/90 transition-colors text-sm"
+                          >
+                            Unlock & View
+                          </button>
                       ) : (
                         <>
                           <button
-                            onClick={() => setSelectedEntry(entry)}
+                            onClick={() => {
+                              setSelectedEntry(entry);
+                              setView(entry.type === 'text' ? 'read' : 'home');
+                            }}
                             className="px-4 py-2 bg-black text-white rounded-xl hover:bg-black/90 transition-colors text-sm"
                           >
-                            Open Entry
+                            {entry.type === 'text' ? 'Read Entry' : 'Open Entry'}
                           </button>
                           <button
                             onClick={() => handleLockEntry(entry.id, true)}
@@ -1473,9 +1568,20 @@ export default function Emotions() {
                   ) : (
                     <div className="mt-4">
                       {entry.type === 'text' ? (
-                        <p className="text-white/80 line-clamp-3">
-                          {entry.content}
-                        </p>
+                        <div>
+                          <p className="text-white/80 line-clamp-3 mb-2">
+                            {entry.content}
+                          </p>
+                          <button
+                            onClick={() => {
+                              setSelectedEntry(entry);
+                              setView('read');
+                            }}
+                            className="text-white/60 hover:text-white text-sm underline"
+                          >
+                            Read full entry →
+                          </button>
+                        </div>
                       ) : (
                         <div className="mt-2 space-y-3">
                           {entry.transcript && (
