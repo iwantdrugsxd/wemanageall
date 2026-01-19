@@ -1,9 +1,7 @@
 import { Router } from 'express';
 import multer from 'multer';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import { v2 as cloudinary } from 'cloudinary';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-import fs from 'fs';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -24,23 +22,17 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-// Configure multer for temporary file storage
-const uploadDir = join(__dirname, '../../uploads/temp');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadDir);
+// Configure multer with Cloudinary storage
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'ofa-uploads',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+    transformation: [
+      { width: 1200, height: 800, crop: 'limit' },
+      { quality: 'auto' }
+    ],
   },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, `${req.user.id}-${uniqueSuffix}-${file.originalname}`);
-  }
 });
 
 const upload = multer({
@@ -68,31 +60,14 @@ router.post('/image', requireAuth, upload.single('image'), async (req, res) => {
       return res.status(400).json({ error: 'No image file provided.' });
     }
 
-    // Upload to Cloudinary
-    const result = await cloudinary.uploader.upload(req.file.path, {
-      folder: 'ofa-uploads',
-      resource_type: 'image',
-      transformation: [
-        { width: 1200, height: 800, crop: 'limit' },
-        { quality: 'auto' }
-      ],
-    });
-
-    // Delete temporary file
-    fs.unlinkSync(req.file.path);
-
-    // Return the Cloudinary URL
+    // Return the Cloudinary URL (multer-storage-cloudinary provides it directly)
     res.json({
       success: true,
-      url: result.secure_url,
-      public_id: result.public_id,
+      url: req.file.path, // Cloudinary URL
+      public_id: req.file.filename,
     });
   } catch (error) {
     console.error('Upload error:', error);
-    // Clean up temp file if it exists
-    if (req.file && fs.existsSync(req.file.path)) {
-      fs.unlinkSync(req.file.path);
-    }
     res.status(500).json({ 
       error: error.message || 'Failed to upload image.' 
     });
