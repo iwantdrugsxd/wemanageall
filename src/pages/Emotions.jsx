@@ -29,7 +29,6 @@ export default function Emotions() {
   const [transcript, setTranscript] = useState(null);
   const [speechRecognition, setSpeechRecognition] = useState(null);
   const [usingFreeTranscription, setUsingFreeTranscription] = useState(false);
-  const [quotaExceeded, setQuotaExceeded] = useState(false);
   const [realTimeTranscript, setRealTimeTranscript] = useState('');
   const [processedTranscript, setProcessedTranscript] = useState(null);
   const [processingTranscript, setProcessingTranscript] = useState(false);
@@ -170,16 +169,27 @@ export default function Emotions() {
   const handleTranscribe = async (audioBlobToTranscribe) => {
     if (!audioBlobToTranscribe || !user?.id) return null;
     
-    // If we already have a transcript from real-time recognition, use it
+    // PRIORITY 1: Always use free browser transcription if available
     if (transcript && usingFreeTranscription) {
+      console.log('✅ Using free browser transcription (already available)');
       return transcript;
     }
     
+    // PRIORITY 2: Check if we have real-time transcript from recording
+    if (realTimeTranscript && realTimeTranscript.trim()) {
+      console.log('✅ Using real-time browser transcription');
+      setTranscript(realTimeTranscript);
+      setUsingFreeTranscription(true);
+      return realTimeTranscript;
+    }
+    
+    // PRIORITY 3: Only try OpenAI if free transcription didn't work
+    // Skip OpenAI entirely if we know quota is exceeded
+    console.log('⚠️ No free transcription available, trying OpenAI (may fail due to quota)');
     setTranscribing(true);
     setUsingFreeTranscription(false);
     
     try {
-      // Try OpenAI transcription (if available and not quota exceeded)
       // Upload audio temporarily for transcription
       const fileName = `${user.id}/temp-${Date.now()}.webm`;
       const { data: uploadData, error: uploadError } = await supabase.storage
@@ -220,10 +230,17 @@ export default function Emotions() {
           errorMessage = errorText || errorMessage;
         }
         
-        // Handle quota errors gracefully
-        if (response.status === 429 || errorCode === 'quota_exceeded') {
-          console.warn('OpenAI quota exceeded - using free browser transcription if available');
-          setQuotaExceeded(true);
+        // Handle quota errors gracefully - don't throw, just return null
+        if (response.status === 429 || errorCode === 'quota_exceeded' || errorCode === 'insufficient_quota') {
+          console.warn('⚠️ OpenAI quota exceeded - free browser transcription will be used if available');
+          // Clean up temp file
+          try {
+            await supabase.storage
+              .from('unload-recordings')
+              .remove([fileName]);
+          } catch (cleanupError) {
+            console.warn('Failed to cleanup temp file:', cleanupError);
+          }
           return null; // Will use real-time transcript if available
         }
         
@@ -244,6 +261,7 @@ export default function Emotions() {
       return data.transcript;
     } catch (error) {
       console.error('Failed to transcribe:', error);
+      // If OpenAI fails, return null - free transcription should be used
       return null;
     } finally {
       setTranscribing(false);
@@ -276,15 +294,38 @@ export default function Emotions() {
         .from('unload-recordings')
         .getPublicUrl(fileName);
 
-      // Use processed/edited transcript if available, otherwise use raw transcript
-      let finalTranscript = editableTranscript || processedTranscript || transcript;
-      if (!finalTranscript) {
+      // PRIORITY: Use free browser transcription first, then processed/edited, then try OpenAI
+      let finalTranscript = null;
+      
+      // 1. Check if we have free browser transcription (real-time)
+      if (realTimeTranscript && realTimeTranscript.trim()) {
+        finalTranscript = realTimeTranscript.trim();
+        setTranscript(finalTranscript);
+        setUsingFreeTranscription(true);
+        console.log('✅ Using real-time browser transcription for save');
+      }
+      // 2. Check if we have processed/edited transcript
+      else if (editableTranscript || processedTranscript || transcript) {
+        finalTranscript = editableTranscript || processedTranscript || transcript;
+        console.log('✅ Using existing transcript');
+      }
+      // 3. Only try OpenAI if we don't have free transcription
+      else {
+        console.log('⚠️ No free transcription available, attempting OpenAI (may fail)');
         finalTranscript = await handleTranscribe(audioBlob);
-        // Process it if we just got it
-        if (finalTranscript) {
+        // Process it if we just got it from OpenAI
+        if (finalTranscript && !usingFreeTranscription) {
           await processTranscript(finalTranscript);
           finalTranscript = editableTranscript || processedTranscript || finalTranscript;
         }
+      }
+      
+      // If still no transcript, check one more time for real-time transcript
+      if (!finalTranscript && realTimeTranscript && realTimeTranscript.trim()) {
+        finalTranscript = realTimeTranscript.trim();
+        setTranscript(finalTranscript);
+        setUsingFreeTranscription(true);
+        console.log('✅ Fallback: Using real-time browser transcription');
       }
 
       // Save entry to database via Express API
@@ -384,7 +425,6 @@ export default function Emotions() {
 
   const handleStartRecording = async () => {
     try {
-      setQuotaExceeded(false); // Reset quota state for new recording
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const recorder = new MediaRecorder(stream);
       const chunks = [];
@@ -468,25 +508,34 @@ export default function Emotions() {
         setAudioUrl(url);
         stream.getTracks().forEach(track => track.stop());
         
-        // If we got real-time transcript, use it; otherwise try server transcription
+        // PRIORITY: Always use free browser transcription if available
         let finalTranscript = null;
         if (accumulatedTranscript.trim()) {
           finalTranscript = accumulatedTranscript.trim();
           setTranscript(finalTranscript);
           setRealTimeTranscript(finalTranscript);
           setUsingFreeTranscription(true);
+          console.log('✅ Free browser transcription captured:', finalTranscript.length, 'characters');
+          
+          // Process the free transcription
+          await processTranscript(finalTranscript);
+        } else if (transcript && usingFreeTranscription) {
+          // Use existing free transcript if available
+          finalTranscript = transcript;
+          setRealTimeTranscript(transcript);
+          console.log('✅ Using existing free browser transcription');
+          await processTranscript(finalTranscript);
         } else {
-          // Fallback: try server transcription if free transcription didn't work
+          // Fallback: try OpenAI transcription only if free transcription didn't work
+          console.log('⚠️ No free transcription available, attempting OpenAI (may fail due to quota)');
           const transcribedText = await handleTranscribe(blob);
           if (transcribedText) {
             finalTranscript = transcribedText;
             setTranscript(transcribedText);
+            await processTranscript(finalTranscript);
+          } else {
+            console.warn('⚠️ No transcription available (OpenAI quota exceeded and no free transcription)');
           }
-        }
-        
-        // Process transcript after recording stops
-        if (finalTranscript) {
-          await processTranscript(finalTranscript);
         }
       };
 
@@ -708,13 +757,11 @@ export default function Emotions() {
                       )}
                       
                       {/* Show message if transcription failed due to quota */}
-                      {(quotaExceeded || (!transcript && !transcribing && audioUrl)) && (
-                        <div className="mb-3 p-3 bg-amber-50 rounded-lg border border-amber-200">
-                          <p className="text-xs text-amber-800 mb-1 font-medium">ℹ️ Transcription Note:</p>
-                          <p className="text-sm text-amber-700">
-                            {quotaExceeded 
-                              ? "OpenAI transcription quota exceeded. Using browser-based transcription. You can still save your recording with or without transcription."
-                              : "Transcription is temporarily unavailable. You can still save your recording."}
+                      {!transcript && !transcribing && audioUrl && (
+                        <div className="mb-3 p-3 bg-gray-100 rounded-lg border border-gray-300">
+                          <p className="text-xs text-gray-600 mb-1 font-medium">Note:</p>
+                          <p className="text-sm text-gray-700">
+                            Transcription is temporarily unavailable. You can still save your recording.
                           </p>
                         </div>
                       )}
