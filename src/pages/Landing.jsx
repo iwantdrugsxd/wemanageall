@@ -37,12 +37,11 @@ function Navbar() {
   
   return (
     <header className="fixed top-0 w-full z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 px-6 lg:px-12 py-4 flex items-center justify-between transition-colors">
-      <Link to="/" className="flex items-center gap-3">
+      <Link to="/" className="flex items-center">
         <div className="w-9 h-9 rounded-xl bg-black dark:bg-black flex items-center justify-center shadow-[0_8px_24px_rgba(0,0,0,0.6)] border border-gray-800/80">
           <span className="font-display text-white text-lg leading-none font-semibold">W</span>
-        </div>
-        <span className="font-display text-lg font-semibold text-black dark:text-white transition-colors">wemanageall</span>
-      </Link>
+            </div>
+          </Link>
           
       <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
         <a href="#philosophy" className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">Philosophy</a>
@@ -1443,11 +1442,10 @@ function Footer() {
         <div className="grid md:grid-cols-4 gap-12 mb-12">
           {/* Brand */}
           <div>
-            <div className="flex items-center gap-3 mb-4">
+            <div className="flex items-center mb-4">
               <div className="w-9 h-9 rounded-xl bg-black flex items-center justify-center shadow-[0_8px_24px_rgba(0,0,0,0.6)] border border-gray-800/80">
                 <span className="font-display text-white text-lg leading-none font-semibold">W</span>
-              </div>
-              <span className="font-display text-lg font-semibold text-black dark:text-white">wemanageall</span>
+            </div>
           </div>
             <p className="text-body-sm text-gray-600 dark:text-gray-400">
               Your personal life operating system.

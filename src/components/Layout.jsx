@@ -96,11 +96,10 @@ export default function Layout({ children }) {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <Link to="/dashboard" className="flex items-center gap-2">
+            <Link to="/dashboard" className="flex items-center">
               <div className="w-9 h-9 rounded-xl bg-black flex items-center justify-center shadow-[0_8px_24px_rgba(0,0,0,0.6)] border border-gray-800/80">
                 <span className="font-display text-white text-lg leading-none font-semibold">W</span>
               </div>
-              <span className="font-display text-lg font-semibold text-black dark:text-white transition-colors">wemanageall</span>
             </Link>
 
             {/* Navigation Links */}
