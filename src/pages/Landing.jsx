@@ -1280,16 +1280,7 @@ export default function Landing() {
   return (
     <div className="overflow-x-hidden bg-white dark:bg-gray-900 transition-colors">
       <Navbar />
-      <Hero />
-      <Philosophy />
-      <SystemOverview />
-      <ProductStory />
-      <TrustPrivacy />
       <HowItWorks />
-      <UseCases />
-      <Benefits />
-      <SocialProof />
-      <FinalCTA />
       <Footer />
     </div>
   );
