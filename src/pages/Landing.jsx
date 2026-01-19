@@ -53,64 +53,63 @@ function Navbar() {
 // UI Preview Components
 function DashboardPreview() {
   return (
-    <div className="p-6 space-y-4 bg-white dark:bg-gray-800">
-      <div>
-        <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">PERSONAL LIFE OS</div>
-        <h3 className="text-lg font-display text-black dark:text-white mb-1">Good afternoon, vishnu.</h3>
-        <p className="text-xs text-gray-500 dark:text-gray-400 italic">"The present moment is the only time over which we have dominion."</p>
+    <div className="space-y-5">
+      <div className="pb-2 border-b border-gray-100 dark:border-gray-800">
+        <div className="text-[10px] uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1.5 font-semibold">PERSONAL LIFE OS</div>
+        <h3 className="text-xl font-display text-black dark:text-white mb-1.5 leading-tight">Good afternoon, vishnu.</h3>
+        <p className="text-xs text-gray-500 dark:text-gray-400 italic leading-relaxed">"The present moment is the only time over which we have dominion."</p>
         </div>
       
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-        <div className="text-xs uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-3">TODAY'S INTENTION</div>
-        <p className="text-sm text-gray-800 dark:text-gray-100">
+      <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-5 border border-gray-200 dark:border-gray-800">
+        <div className="text-[10px] uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-3 font-semibold">TODAY'S INTENTION</div>
+        <p className="text-sm text-gray-800 dark:text-gray-100 leading-relaxed">
           Focus on designing a calm, high-fidelity operating system for my life.
         </p>
         </div>
       
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-        <div className="text-xs uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-3">DAILY OBJECTIVES</div>
-        <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-200">
-          <li className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-black dark:bg-white"></span>
-            Review this week’s projects and pick one focus area.
+      <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-5 border border-gray-200 dark:border-gray-800">
+        <div className="text-[10px] uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-3 font-semibold">DAILY OBJECTIVES</div>
+        <ul className="space-y-2.5 text-sm text-gray-700 dark:text-gray-200">
+          <li className="flex items-start gap-2.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-black dark:bg-white mt-1.5 flex-shrink-0"></span>
+            <span className="leading-relaxed">Review this week's projects and pick one focus area.</span>
           </li>
-          <li className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-black dark:bg-white"></span>
-            Block 2 hours for deep work on the Calendar.
+          <li className="flex items-start gap-2.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-black dark:bg-white mt-1.5 flex-shrink-0"></span>
+            <span className="leading-relaxed">Block 2 hours for deep work on the Calendar.</span>
           </li>
-          <li className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-black dark:bg-white"></span>
-            Log today’s expenses in Money and tag them by project.
+          <li className="flex items-start gap-2.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-black dark:bg-white mt-1.5 flex-shrink-0"></span>
+            <span className="leading-relaxed">Log today's expenses in Money and tag them by project.</span>
           </li>
         </ul>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-        <div className="text-xs uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-3">TIME ALLOCATION</div>
-        <div className="flex items-center justify-center">
-          <div className="relative w-24 h-24">
-            <svg className="transform -rotate-90 w-24 h-24">
-              <circle cx="48" cy="48" r="40" stroke="#e5e7eb" strokeWidth="4" fill="none" />
-              {/* 65% of planned time used */}
-              <circle cx="48" cy="48" r="40" stroke="#000000" strokeWidth="4" fill="none" strokeDasharray={251} strokeDashoffset={251 * 0.35} />
+      <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-5 border border-gray-200 dark:border-gray-800">
+        <div className="text-[10px] uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-4 font-semibold">TIME ALLOCATION</div>
+        <div className="flex items-center justify-center mb-4">
+          <div className="relative w-28 h-28">
+            <svg className="transform -rotate-90 w-28 h-28">
+              <circle cx="56" cy="56" r="48" stroke="#e5e7eb" dark:stroke="#374151" strokeWidth="5" fill="none" />
+              <circle cx="56" cy="56" r="48" stroke="#000000" dark:stroke="#ffffff" strokeWidth="5" fill="none" strokeDasharray={301} strokeDashoffset={301 * 0.35} />
             </svg>
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-xs text-gray-600 dark:text-gray-400">65%</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">65%</span>
             </div>
           </div>
         </div>
-        <div className="mt-4 grid grid-cols-3 gap-2 text-xs text-gray-600 dark:text-gray-300">
-            <div>
-            <div className="font-medium">Deep work</div>
-            <div>3h 00m</div>
+        <div className="grid grid-cols-3 gap-3 text-xs">
+            <div className="text-center">
+            <div className="font-semibold text-gray-900 dark:text-gray-100 mb-0.5">Deep work</div>
+            <div className="text-gray-600 dark:text-gray-400">3h 00m</div>
             </div>
-          <div>
-            <div className="font-medium">Admin</div>
-            <div>1h 15m</div>
+          <div className="text-center">
+            <div className="font-semibold text-gray-900 dark:text-gray-100 mb-0.5">Admin</div>
+            <div className="text-gray-600 dark:text-gray-400">1h 15m</div>
             </div>
-              <div>
-            <div className="font-medium">Personal</div>
-            <div>45m</div>
+              <div className="text-center">
+            <div className="font-semibold text-gray-900 dark:text-gray-100 mb-0.5">Personal</div>
+            <div className="text-gray-600 dark:text-gray-400">45m</div>
           </div>
         </div>
       </div>
@@ -120,32 +119,32 @@ function DashboardPreview() {
 
 function ProjectsPreview() {
   return (
-    <div className="p-6 bg-white dark:bg-gray-800">
-      <div className="mb-4">
-        <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">PERSONAL LIFE OS</div>
-        <h3 className="text-lg font-display text-black dark:text-white">Project Selection Hub</h3>
-        <p className="text-xs text-gray-500 dark:text-gray-400">Choose a focus area for your current session.</p>
+    <div className="space-y-5">
+      <div className="pb-2 border-b border-gray-100 dark:border-gray-800">
+        <div className="text-[10px] uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1.5 font-semibold">PERSONAL LIFE OS</div>
+        <h3 className="text-xl font-display text-black dark:text-white mb-1.5 leading-tight">Project Selection Hub</h3>
+        <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Choose a focus area for your current session.</p>
                 </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 flex flex-col items-center justify-center min-h-[120px]">
-          <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center mb-2">
-            <span className="text-lg">+</span>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 flex flex-col items-center justify-center min-h-[140px] hover:border-gray-400 dark:hover:border-gray-600 transition-colors">
+          <div className="w-10 h-10 rounded-xl bg-gray-200 dark:bg-gray-800 flex items-center justify-center mb-3">
+            <span className="text-xl text-gray-600 dark:text-gray-400">+</span>
               </div>
-          <p className="text-xs text-black dark:text-white font-medium">Create New Project</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Start from scratch</p>
+          <p className="text-xs text-black dark:text-white font-semibold mb-1">Create New Project</p>
+          <p className="text-[11px] text-gray-500 dark:text-gray-400 text-center">Start from scratch</p>
         </div>
         
-        <div className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700" style={{ borderLeftWidth: '4px', borderLeftColor: '#000000' }}>
-          <div className="h-16 bg-black dark:bg-white flex items-center justify-between px-4">
-            <div className="flex items-center gap-2">
+        <div className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden border-2 border-gray-200 dark:border-gray-700 shadow-sm" style={{ borderLeftWidth: '5px', borderLeftColor: '#000000' }}>
+          <div className="h-18 bg-black dark:bg-white flex items-center justify-between px-5 py-4">
+            <div className="flex items-center gap-2.5">
               <span className="text-xl">📚</span>
-              <span className="text-xs font-medium text-white dark:text-black">Deep Work: Q1 Focus</span>
+              <span className="text-xs font-semibold text-white dark:text-black">Deep Work: Q1 Focus</span>
             </div>
-            <span className="text-[10px] text-white/80 dark:text-black/80">Active</span>
+            <span className="text-[10px] text-white/90 dark:text-black/90 font-medium bg-white/10 dark:bg-black/10 px-2 py-1 rounded">Active</span>
           </div>
-          <div className="p-3 space-y-1">
-            <p className="text-xs text-gray-500 dark:text-gray-400">Next step: Outline execution plan for Week 3.</p>
+          <div className="p-4 space-y-2 bg-gray-50 dark:bg-gray-900/30">
+            <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">Next step: Outline execution plan for Week 3.</p>
             <p className="text-[11px] text-gray-500 dark:text-gray-400">4 tasks today · 12 open · 8 completed</p>
           </div>
         </div>
@@ -156,36 +155,36 @@ function ProjectsPreview() {
 
 function ListsPreview() {
   return (
-    <div className="p-6 bg-white dark:bg-gray-800">
-      <div className="mb-4">
-        <h3 className="text-lg font-display text-black dark:text-white mb-1">My Lists</h3>
-        <p className="text-xs text-gray-500 dark:text-gray-400">Manage your personal intentions and collections.</p>
+    <div className="space-y-5">
+      <div className="pb-2 border-b border-gray-100 dark:border-gray-800">
+        <h3 className="text-xl font-display text-black dark:text-white mb-1.5 leading-tight">My Lists</h3>
+        <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Manage your personal intentions and collections.</p>
         </div>
 
-      <div className="flex items-center gap-2 mb-4 text-xs text-gray-500 dark:text-gray-400">
-        <span className="border-b border-black dark:border-white pb-1">All Lists</span>
-        <span>Recent</span>
-        <span>Pinned</span>
+      <div className="flex items-center gap-3 mb-4 text-xs">
+        <span className="border-b-2 border-black dark:border-white pb-1.5 font-semibold text-black dark:text-white">All Lists</span>
+        <span className="text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors cursor-pointer">Recent</span>
+        <span className="text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors cursor-pointer">Pinned</span>
         </div>
 
       <div className="space-y-3">
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 flex items-center justify-between">
-              <div>
-            <p className="text-sm font-medium text-black dark:text-white">Weekly Review Ritual</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Checklist for closing the week and planning the next.</p>
+        <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-4 border border-gray-200 dark:border-gray-800 flex items-center justify-between hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
+              <div className="flex-1">
+            <p className="text-sm font-semibold text-black dark:text-white mb-1">Weekly Review Ritual</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Checklist for closing the week and planning the next.</p>
               </div>
-          <span className="text-[11px] text-gray-500 dark:text-gray-400">12 items · Pinned</span>
+          <span className="text-[11px] text-gray-500 dark:text-gray-400 ml-4 whitespace-nowrap">12 items · Pinned</span>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-black dark:text-white">Reading Queue — 2026</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Books, articles, and papers to process.</p>
+        <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-4 border border-gray-200 dark:border-gray-800 flex items-center justify-between hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-black dark:text-white mb-1">Reading Queue — 2026</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Books, articles, and papers to process.</p>
           </div>
-          <span className="text-[11px] text-gray-500 dark:text-gray-400">27 items</span>
+          <span className="text-[11px] text-gray-500 dark:text-gray-400 ml-4 whitespace-nowrap">27 items</span>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-dashed border-gray-300 dark:border-gray-700 text-center">
-          <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Need a new structure?</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">Create a list for goals, errands, ideas, or anything else.</p>
+        <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 text-center hover:border-gray-400 dark:hover:border-gray-600 transition-colors">
+          <p className="text-xs text-gray-600 dark:text-gray-400 mb-1 font-medium">Need a new structure?</p>
+          <p className="text-[11px] text-gray-500 dark:text-gray-400">Create a list for goals, errands, ideas, or anything else.</p>
         </div>
       </div>
     </div>
@@ -194,46 +193,46 @@ function ListsPreview() {
 
 function CalendarPreview() {
   return (
-    <div className="p-6 bg-white dark:bg-gray-800">
-      <div className="mb-4">
-        <h3 className="text-lg font-display text-black dark:text-white">Calendar</h3>
-        <p className="text-xs text-gray-500 dark:text-gray-400">Week view of your deep work and life blocks.</p>
+    <div className="space-y-5">
+      <div className="pb-2 border-b border-gray-100 dark:border-gray-800">
+        <h3 className="text-xl font-display text-black dark:text-white mb-1.5 leading-tight">Calendar</h3>
+        <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Week view of your deep work and life blocks.</p>
         </div>
 
-      <div className="flex gap-2 mb-4 text-xs">
-        <span className="px-2 py-1 bg-black dark:bg-white text-white dark:text-black rounded">Week</span>
-        <span className="px-2 py-1 text-gray-500 dark:text-gray-400">Day</span>
-        <span className="px-2 py-1 text-gray-500 dark:text-gray-400">Month</span>
+      <div className="flex gap-2 mb-5 text-xs">
+        <span className="px-3 py-1.5 bg-black dark:bg-white text-white dark:text-black rounded-lg font-semibold shadow-sm">Week</span>
+        <span className="px-3 py-1.5 text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors cursor-pointer">Day</span>
+        <span className="px-3 py-1.5 text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors cursor-pointer">Month</span>
                 </div>
       
-      <div className="grid grid-cols-7 gap-1 text-xs">
+      <div className="grid grid-cols-7 gap-2 mb-5 text-xs border-b border-gray-100 dark:border-gray-800 pb-3">
         {['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'].map((day, i) => (
           <div key={i} className="text-center py-2">
-            <div className="text-gray-500 dark:text-gray-400 mb-1">{day}</div>
-            <div className="text-gray-900 dark:text-white">{19 + i}</div>
+            <div className="text-gray-500 dark:text-gray-400 mb-1.5 font-semibold text-[10px] uppercase tracking-wider">{day}</div>
+            <div className="text-gray-900 dark:text-white font-semibold">{19 + i}</div>
             </div>
           ))}
         </div>
 
-      <div className="mt-4 space-y-1">
-        <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 py-1 border-b border-gray-100 dark:border-gray-800">
-          <span className="w-16">7:00 AM</span>
-          <div className="flex-1 h-6 bg-gray-50 dark:bg-gray-900 rounded-lg px-2 flex items-center justify-between border border-gray-200 dark:border-gray-800">
-            <span className="text-[11px] text-gray-700 dark:text-gray-200">Morning planning</span>
+      <div className="space-y-2.5">
+        <div className="flex items-center gap-3 text-xs py-2 border-b border-gray-100 dark:border-gray-800">
+          <span className="w-16 text-gray-500 dark:text-gray-400 font-medium">7:00 AM</span>
+          <div className="flex-1 h-7 bg-gray-50 dark:bg-gray-900 rounded-lg px-3 flex items-center justify-between border border-gray-200 dark:border-gray-800 shadow-sm">
+            <span className="text-[11px] text-gray-700 dark:text-gray-200 font-medium">Morning planning</span>
             <span className="text-[10px] text-gray-500 dark:text-gray-400">30m</span>
           </div>
         </div>
-        <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 py-1 border-b border-gray-100 dark:border-gray-800">
-          <span className="w-16">9:00 AM</span>
-          <div className="flex-1 h-6 bg-black/5 dark:bg-white/5 rounded-lg px-2 flex items-center justify-between border border-gray-200 dark:border-gray-700">
-            <span className="text-[11px] text-gray-800 dark:text-gray-100">Deep work — Q1 Strategy</span>
+        <div className="flex items-center gap-3 text-xs py-2 border-b border-gray-100 dark:border-gray-800">
+          <span className="w-16 text-gray-500 dark:text-gray-400 font-medium">9:00 AM</span>
+          <div className="flex-1 h-7 bg-black/5 dark:bg-white/5 rounded-lg px-3 flex items-center justify-between border-2 border-black/10 dark:border-white/10 shadow-sm">
+            <span className="text-[11px] text-gray-800 dark:text-gray-100 font-semibold">Deep work — Q1 Strategy</span>
             <span className="text-[10px] text-gray-500 dark:text-gray-400">2h</span>
           </div>
         </div>
-        <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 py-1 border-b border-gray-100 dark:border-gray-800">
-          <span className="w-16">2:00 PM</span>
-          <div className="flex-1 h-6 bg-gray-50 dark:bg-gray-900 rounded-lg px-2 flex items-center justify-between border border-gray-200 dark:border-gray-800">
-            <span className="text-[11px] text-gray-700 dark:text-gray-200">Review Money and Lists</span>
+        <div className="flex items-center gap-3 text-xs py-2 border-b border-gray-100 dark:border-gray-800">
+          <span className="w-16 text-gray-500 dark:text-gray-400 font-medium">2:00 PM</span>
+          <div className="flex-1 h-7 bg-gray-50 dark:bg-gray-900 rounded-lg px-3 flex items-center justify-between border border-gray-200 dark:border-gray-800 shadow-sm">
+            <span className="text-[11px] text-gray-700 dark:text-gray-200 font-medium">Review Money and Lists</span>
             <span className="text-[10px] text-gray-500 dark:text-gray-400">45m</span>
           </div>
         </div>
@@ -244,98 +243,98 @@ function CalendarPreview() {
 
 function MoneyPreview() {
   return (
-    <div className="p-6 bg-white dark:bg-gray-800">
-      <div className="mb-4">
-        <h3 className="text-lg font-display text-black dark:text-white mb-1">Money</h3>
-        <p className="text-xs text-gray-500 dark:text-gray-400">Track your income and expenses</p>
+    <div className="space-y-5">
+      <div className="pb-2 border-b border-gray-100 dark:border-gray-800">
+        <h3 className="text-xl font-display text-black dark:text-white mb-1.5 leading-tight">Money</h3>
+        <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Track your income and expenses</p>
       </div>
       
         <div className="grid grid-cols-3 gap-3 mb-6">
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
-          <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">TOTAL INCOME</div>
-          <div className="text-lg font-semibold text-green-600 dark:text-green-400">$8,450</div>
+        <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-4 border border-gray-200 dark:border-gray-800">
+          <div className="text-[10px] uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2 font-semibold">TOTAL INCOME</div>
+          <div className="text-xl font-bold text-green-600 dark:text-green-400">$8,450</div>
           </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
-          <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">TOTAL EXPENSES</div>
-          <div className="text-lg font-semibold text-red-600 dark:text-red-400">$3,120</div>
+        <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-4 border border-gray-200 dark:border-gray-800">
+          <div className="text-[10px] uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2 font-semibold">TOTAL EXPENSES</div>
+          <div className="text-xl font-bold text-red-600 dark:text-red-400">$3,120</div>
           </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
-          <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">NET BALANCE</div>
-          <div className="text-lg font-semibold text-green-600 dark:text-green-400">$5,330</div>
+        <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-4 border border-gray-200 dark:border-gray-800">
+          <div className="text-[10px] uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2 font-semibold">NET BALANCE</div>
+          <div className="text-xl font-bold text-green-600 dark:text-green-400">$5,330</div>
           </div>
         </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-          <div className="text-xs uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2">INCOME</div>
-          <ul className="space-y-1 text-xs text-gray-700 dark:text-gray-300">
-            <li className="flex justify-between">
-              <span>Client retainer — Q1</span>
-              <span className="text-green-600 dark:text-green-400">+$4,000</span>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-4 border border-gray-200 dark:border-gray-800">
+          <div className="text-[10px] uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-3 font-semibold">INCOME</div>
+          <ul className="space-y-2 text-xs text-gray-700 dark:text-gray-300">
+            <li className="flex justify-between items-center">
+              <span className="leading-relaxed">Client retainer — Q1</span>
+              <span className="text-green-600 dark:text-green-400 font-semibold ml-2">+$4,000</span>
             </li>
-            <li className="flex justify-between">
-              <span>Freelance sprint — Design</span>
-              <span className="text-green-600 dark:text-green-400">+$2,250</span>
+            <li className="flex justify-between items-center">
+              <span className="leading-relaxed">Freelance sprint — Design</span>
+              <span className="text-green-600 dark:text-green-400 font-semibold ml-2">+$2,250</span>
             </li>
-            <li className="flex justify-between">
-              <span>Salary</span>
-              <span className="text-green-600 dark:text-green-400">+$2,200</span>
+            <li className="flex justify-between items-center">
+              <span className="leading-relaxed">Salary</span>
+              <span className="text-green-600 dark:text-green-400 font-semibold ml-2">+$2,200</span>
             </li>
           </ul>
                 </div>
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-          <div className="text-xs uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2">EXPENSES</div>
-          <ul className="space-y-1 text-xs text-gray-700 dark:text-gray-300">
-            <li className="flex justify-between">
-              <span>Workspace rent</span>
-              <span className="text-red-600 dark:text-red-400">- $1,200</span>
+        <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-4 border border-gray-200 dark:border-gray-800">
+          <div className="text-[10px] uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-3 font-semibold">EXPENSES</div>
+          <ul className="space-y-2 text-xs text-gray-700 dark:text-gray-300">
+            <li className="flex justify-between items-center">
+              <span className="leading-relaxed">Workspace rent</span>
+              <span className="text-red-600 dark:text-red-400 font-semibold ml-2">- $1,200</span>
             </li>
-            <li className="flex justify-between">
-              <span>Tools & subscriptions</span>
-              <span className="text-red-600 dark:text-red-400">- $420</span>
+            <li className="flex justify-between items-center">
+              <span className="leading-relaxed">Tools & subscriptions</span>
+              <span className="text-red-600 dark:text-red-400 font-semibold ml-2">- $420</span>
             </li>
-            <li className="flex justify-between">
-              <span>Savings transfer</span>
-              <span className="text-red-600 dark:text-red-400">- $1,500</span>
+            <li className="flex justify-between items-center">
+              <span className="leading-relaxed">Savings transfer</span>
+              <span className="text-red-600 dark:text-red-400 font-semibold ml-2">- $1,500</span>
             </li>
           </ul>
-              </div>
-          </div>
         </div>
+      </div>
+    </div>
   );
 }
 
 function LibraryPreview() {
   return (
-    <div className="p-6 bg-white dark:bg-gray-800">
-      <div className="mb-4">
-        <h3 className="text-lg font-display text-black dark:text-white mb-1">Resource Library</h3>
-        <p className="text-xs text-gray-500 dark:text-gray-400">Curated intellectual assets and reading logs.</p>
+    <div className="space-y-5">
+      <div className="pb-2 border-b border-gray-100 dark:border-gray-800">
+        <h3 className="text-xl font-display text-black dark:text-white mb-1.5 leading-tight">Resource Library</h3>
+        <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Curated intellectual assets and reading logs.</p>
       </div>
       
-      <div className="text-xs text-gray-500 dark:text-gray-400 mb-4 border-b border-black dark:border-white pb-1 inline-block">All Resources</div>
+      <div className="text-xs text-gray-500 dark:text-gray-400 mb-4 border-b-2 border-black dark:border-white pb-1.5 inline-block font-semibold">All Resources</div>
       
-      <div className="space-y-3 text-xs text-gray-700 dark:text-gray-300">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="font-medium text-black dark:text-white">The Effective Executive</p>
-            <p className="text-gray-500 dark:text-gray-400">Book · Notes linked to Projects: Q1 Focus</p>
+      <div className="space-y-3">
+        <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-4 border border-gray-200 dark:border-gray-800 flex items-start justify-between hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
+          <div className="flex-1">
+            <p className="font-semibold text-black dark:text-white mb-1 text-sm">The Effective Executive</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Book · Notes linked to Projects: Q1 Focus</p>
           </div>
-          <span className="text-gray-500 dark:text-gray-400">3 highlights</span>
+          <span className="text-[11px] text-gray-500 dark:text-gray-400 ml-4 whitespace-nowrap">3 highlights</span>
         </div>
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="font-medium text-black dark:text-white">Energy Management, Not Time Management</p>
-            <p className="text-gray-500 dark:text-gray-400">Article · Tagged: Focus, Routines</p>
+        <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-4 border border-gray-200 dark:border-gray-800 flex items-start justify-between hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
+          <div className="flex-1">
+            <p className="font-semibold text-black dark:text-white mb-1 text-sm">Energy Management, Not Time Management</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Article · Tagged: Focus, Routines</p>
           </div>
-          <span className="text-gray-500 dark:text-gray-400">Read yesterday</span>
+          <span className="text-[11px] text-gray-500 dark:text-gray-400 ml-4 whitespace-nowrap">Read yesterday</span>
         </div>
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="font-medium text-black dark:text-white">Personal OS — Architecture Diagram</p>
-            <p className="text-gray-500 dark:text-gray-400">PDF · Linked to Dashboard & Money</p>
+        <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-4 border border-gray-200 dark:border-gray-800 flex items-start justify-between hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
+          <div className="flex-1">
+            <p className="font-semibold text-black dark:text-white mb-1 text-sm">Personal OS — Architecture Diagram</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">PDF · Linked to Dashboard & Money</p>
           </div>
-          <span className="text-gray-500 dark:text-gray-400">Pinned</span>
+          <span className="text-[11px] text-gray-500 dark:text-gray-400 ml-4 whitespace-nowrap">Pinned</span>
         </div>
       </div>
     </div>
@@ -344,34 +343,40 @@ function LibraryPreview() {
 
 function EmotionsPreview() {
   return (
-    <div className="p-6 bg-white dark:bg-gray-800">
-      <div className="text-center mb-6">
-        <h3 className="text-lg font-display text-black dark:text-white mb-2">You don't need to be <span className="italic text-[#3B6E5C]">okay</span> here.</h3>
-        <p className="text-xs text-gray-500 dark:text-gray-400">This is your private space to let things out. No judgment, no audience.</p>
+    <div className="space-y-5">
+      <div className="text-center pb-2 border-b border-gray-100 dark:border-gray-800">
+        <h3 className="text-xl font-display text-black dark:text-white mb-2 leading-tight">You don't need to be <span className="italic text-[#3B6E5C] dark:text-[#4ade80]">okay</span> here.</h3>
+        <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">This is your private space to let things out. No judgment, no audience.</p>
       </div>
       
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 mb-4">
+      <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl border-2 border-gray-200 dark:border-gray-800 p-5">
         <textarea 
-          defaultValue={"I don’t feel like I’m moving fast enough, even though I’m doing my best. I want a calmer way to track progress without feeling behind all the time."}
-          className="w-full min-h-[120px] bg-transparent text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none resize-none"
+          defaultValue={"I don't feel like I'm moving fast enough, even though I'm doing my best. I want a calmer way to track progress without feeling behind all the time."}
+          className="w-full min-h-[120px] bg-transparent text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none resize-none leading-relaxed"
           readOnly
         />
-        <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200 dark:border-gray-800">
           <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
             </svg>
-            <span>Private by design</span>
+            <span className="font-medium">Private by design</span>
           </div>
           <div className="text-xs text-gray-500 dark:text-gray-400">Nothing here is shared or analyzed</div>
         </div>
       </div>
       
-      <div className="py-4 border-t border-gray-200 dark:border-gray-700 mt-2">
-        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Recent unloads</p>
-        <div className="flex flex-col gap-1 text-xs text-gray-700 dark:text-gray-300">
-          <span>• Written entry — “Feeling scattered this week”</span>
-          <span>• Voice note — 3m reflection after planning session</span>
+      <div className="py-4 border-t border-gray-100 dark:border-gray-800">
+        <p className="text-[10px] uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-3 font-semibold">Recent unloads</p>
+        <div className="flex flex-col gap-2 text-xs text-gray-700 dark:text-gray-300">
+          <div className="flex items-start gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 mt-1.5 flex-shrink-0"></span>
+            <span className="leading-relaxed">Written entry — "Feeling scattered this week"</span>
+          </div>
+          <div className="flex items-start gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 mt-1.5 flex-shrink-0"></span>
+            <span className="leading-relaxed">Voice note — 3m reflection after planning session</span>
+          </div>
         </div>
       </div>
     </div>
@@ -624,9 +629,26 @@ function ProductStory() {
                     {scene.view}
         </div>
             </div>
-                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg overflow-hidden">
-                  <div className="bg-gray-50 dark:bg-gray-900 p-6">
-                    <SceneComponent />
+                <div className="relative">
+                  {/* Subtle glow effect */}
+                  <div className="absolute -inset-0.5 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 rounded-2xl opacity-10 blur-lg"></div>
+                  
+                  <div className="relative bg-white dark:bg-gray-800 rounded-2xl border-2 border-gray-200 dark:border-gray-700 shadow-[0_15px_50px_-10px_rgba(0,0,0,0.08)] dark:shadow-[0_15px_50px_-10px_rgba(0,0,0,0.25)] overflow-hidden">
+                    {/* Browser Chrome */}
+                    <div className="bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center gap-2">
+                      <div className="flex gap-1.5">
+                        <div className="w-2.5 h-2.5 rounded-full bg-red-400"></div>
+                        <div className="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
+                        <div className="w-2.5 h-2.5 rounded-full bg-green-400"></div>
+                      </div>
+                      <div className="flex-1 bg-white dark:bg-gray-800 rounded px-3 py-1 text-[10px] text-gray-500 dark:text-gray-400 ml-3 border border-gray-200 dark:border-gray-700">
+                        wemanageall.in
+                      </div>
+                    </div>
+                    {/* Preview Content */}
+                    <div className="bg-white dark:bg-gray-800 p-6">
+                      <SceneComponent />
+                    </div>
                   </div>
         </div>
             </div>
@@ -717,9 +739,9 @@ function HowItWorks() {
                   </div>
               <div className="md:col-span-2">
                 <p className="text-body text-gray-700 dark:text-gray-300 leading-relaxed">{step.detail}</p>
-                    </div>
-        </div>
-          ))}
+                </div>
+              </div>
+            ))}
         </div>
       </div>
     </section>
@@ -765,7 +787,7 @@ function UseCases() {
           <p className="text-body text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             Different roles, one system. OFA adapts to how you actually work and live.
           </p>
-        </div>
+                </div>
         
         <div className="space-y-8">
           {useCases.map((useCase, index) => (
@@ -778,7 +800,7 @@ function UseCases() {
                 <div>
                   <p className="text-label text-gray-500 dark:text-gray-400 mb-2">The Challenge</p>
                   <p className="text-body text-gray-700 dark:text-gray-300">{useCase.scenario}</p>
-                      </div>
+                </div>
                 <div>
                   <p className="text-label text-gray-500 dark:text-gray-400 mb-2">How OFA Helps</p>
                   <p className="text-body text-gray-700 dark:text-gray-300">{useCase.solution}</p>
@@ -796,53 +818,6 @@ function UseCases() {
                     </span>
             ))}
           </div>
-        </div>
-          </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// Feature Highlights Section
-function FeatureHighlights() {
-  const features = [
-    {
-      icon: '🎯',
-      title: 'Stay focused',
-      description: 'Daily intentions keep you aligned. Time allocation shows where your energy goes.',
-    },
-    {
-      icon: '📅',
-      title: 'Plan your time',
-      description: 'Calendar integrates tasks, events, and projects. See your week at a glance.',
-    },
-    {
-      icon: '💰',
-      title: 'Track your money',
-      description: 'Income and expenses in one place. Financial clarity without complexity.',
-    },
-    {
-      icon: '💭',
-      title: 'Capture your thoughts',
-      description: 'Voice or text entries. Private space to process. Nothing gets lost.',
-    },
-  ];
-
-  return (
-    <section className="py-24 md:py-32 px-6 lg:px-12 bg-white dark:bg-gray-900 transition-colors">
-      <div className="max-w-5xl mx-auto">
-        <div className="space-y-6">
-          {features.map((feature, index) => (
-            <div 
-              key={index}
-              className="flex items-start gap-6 p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-all"
-            >
-              <div className="text-3xl flex-shrink-0">{feature.icon}</div>
-              <div className="flex-1">
-                <h3 className="text-h5 mb-2">{feature.title}</h3>
-                <p className="text-body-sm text-gray-600 dark:text-gray-400">{feature.description}</p>
               </div>
             </div>
           ))}
@@ -1097,7 +1072,6 @@ export default function Landing() {
       <TrustPrivacy />
       <HowItWorks />
       <UseCases />
-      <FeatureHighlights />
       <Benefits />
       <SocialProof />
       <FinalCTA />
