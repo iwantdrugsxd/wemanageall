@@ -746,7 +746,7 @@ export default function Emotions() {
                       value={content}
                       onChange={(e) => setContent(e.target.value)}
                       placeholder="What's on your mind? Let it out here..."
-                      className="w-full px-6 py-5 pr-16 min-h-[200px] max-h-[400px] resize-none border-0 focus:outline-none focus:ring-0 text-[#1F2933] placeholder:text-gray-600 text-base leading-relaxed font-sans"
+                      className="w-full px-6 py-5 pr-16 min-h-[200px] max-h-[400px] resize-none border-0 focus:outline-none focus:ring-0 text-gray-900 placeholder:text-gray-400 text-lg leading-relaxed font-sans"
                       style={{
                         fontFamily: 'inherit'
                       }}
@@ -778,7 +778,7 @@ export default function Emotions() {
                             <button
                               onClick={handleSaveText}
                               disabled={saving || !content.trim()}
-                              className="px-5 py-2.5 bg-[#1F2933] text-white rounded-lg hover:bg-[#2d3d4d] disabled:opacity-50 disabled:cursor-not-allowed transition-all text-sm font-medium shadow-sm"
+                              className="px-6 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all text-sm font-semibold shadow-md"
                             >
                               {saving ? 'Saving...' : 'Save'}
                             </button>
@@ -819,17 +819,20 @@ export default function Emotions() {
 
           {/* Recent Unloads Section */}
           {entries.length > 0 && (
-            <div className="mt-8">
-              <div className="flex items-center justify-between mb-8">
-                <h2 className="font-display text-2xl text-[#1F2933]">Recent Unloads</h2>
+            <div className="mt-12">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="font-display text-3xl font-bold text-gray-900">Recent Unloads</h2>
                 <button
                   onClick={() => {
                     setShowHistory(true);
                     setView('home');
                   }}
-                  className="text-black hover:text-black/80 transition-colors text-sm flex items-center gap-1"
+                  className="px-4 py-2 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 transition-colors text-sm font-semibold flex items-center gap-2"
                 >
-                  View all →
+                  View all
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
                 </button>
               </div>
 
@@ -981,7 +984,7 @@ export default function Emotions() {
                       setShowHistory(true);
                       setView('home');
                     }}
-                    className="text-black hover:text-black/80 transition-colors text-sm"
+                    className="px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm font-semibold shadow-md"
                   >
                     View all {entries.length} entries →
                   </button>
@@ -992,8 +995,13 @@ export default function Emotions() {
 
           {/* Empty State */}
           {entries.length === 0 && (
-            <div className="mt-16 text-center">
-              <p className="text-gray-600 text-lg">No entries yet. Start by writing or recording your thoughts.</p>
+            <div className="mt-16 text-center max-w-2xl mx-auto">
+              <div className="bg-white rounded-2xl p-12 border border-gray-200 shadow-sm">
+                <div className="text-6xl mb-6">📝</div>
+                <h3 className="text-2xl font-medium text-gray-900 mb-3">No entries yet</h3>
+                <p className="text-gray-600 text-lg mb-6">Start by writing or recording your thoughts.</p>
+                <p className="text-sm text-gray-500">Your entries will appear here once you save them.</p>
+              </div>
             </div>
           )}
 
