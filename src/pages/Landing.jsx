@@ -153,17 +153,17 @@ function ProjectsPreview() {
         <div className="text-[10px] uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1.5 font-semibold">PERSONAL LIFE OS</div>
         <h3 className="text-xl font-display text-black dark:text-white mb-1.5 leading-tight">Project Selection Hub</h3>
         <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Choose a focus area for your current session.</p>
-                </div>
+        </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 flex flex-col items-center justify-center min-h-[140px] hover:border-gray-400 dark:hover:border-gray-600 transition-colors">
           <div className="w-10 h-10 rounded-xl bg-gray-200 dark:bg-gray-800 flex items-center justify-center mb-3">
             <span className="text-xl text-gray-600 dark:text-gray-400">+</span>
-              </div>
+        </div>
           <p className="text-xs text-black dark:text-white font-semibold mb-1">Create New Project</p>
           <p className="text-[11px] text-gray-500 dark:text-gray-400 text-center">Start from scratch</p>
-        </div>
-        
+      </div>
+
         <div className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden border-2 border-gray-200 dark:border-gray-700 shadow-sm" style={{ borderLeftWidth: '5px', borderLeftColor: '#000000' }}>
           <div className="h-18 bg-black dark:bg-white flex items-center justify-between px-5 py-4">
             <div className="flex items-center gap-2.5">
@@ -171,7 +171,7 @@ function ProjectsPreview() {
               <span className="text-xs font-semibold text-white dark:text-black">Deep Work: Q1 Focus</span>
             </div>
             <span className="text-[10px] text-white/90 dark:text-black/90 font-medium bg-white/10 dark:bg-black/10 px-2 py-1 rounded">Active</span>
-          </div>
+            </div>
           <div className="p-4 space-y-2 bg-gray-50 dark:bg-gray-900/30">
             <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">Next step: Outline execution plan for Week 3.</p>
             <p className="text-[11px] text-gray-500 dark:text-gray-400">4 tasks today · 12 open · 8 completed</p>
@@ -188,13 +188,13 @@ function ListsPreview() {
       <div className="pb-2 border-b border-gray-100 dark:border-gray-800">
         <h3 className="text-xl font-display text-black dark:text-white mb-1.5 leading-tight">My Lists</h3>
         <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Manage your personal intentions and collections.</p>
-        </div>
+                </div>
 
       <div className="flex items-center gap-3 mb-4 text-xs">
         <span className="border-b-2 border-black dark:border-white pb-1.5 font-semibold text-black dark:text-white">All Lists</span>
         <span className="text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors cursor-pointer">Recent</span>
         <span className="text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors cursor-pointer">Pinned</span>
-        </div>
+              </div>
 
       <div className="space-y-3">
         <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-4 border border-gray-200 dark:border-gray-800 flex items-center justify-between hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
@@ -327,9 +327,9 @@ function MoneyPreview() {
               <span className="text-red-600 dark:text-red-400 font-semibold ml-2">- $1,500</span>
             </li>
           </ul>
+              </div>
+          </div>
         </div>
-      </div>
-    </div>
   );
 }
 
@@ -497,8 +497,8 @@ function Hero() {
               </div>
 
               {/* Content Preview - Actual UI with proper padding and containment */}
-              <div className="bg-white dark:bg-gray-800 p-6 max-h-[600px] overflow-y-auto">
-                <div className="transition-opacity duration-500 max-w-full">
+              <div className="bg-white dark:bg-gray-800 p-8 min-h-[600px] max-h-[700px] overflow-y-auto">
+                <div className="transition-opacity duration-500 max-w-full h-full">
                   <CurrentPreview />
                 </div>
               </div>
@@ -533,7 +533,7 @@ function Hero() {
 // Philosophy Section
 function Philosophy() {
   const [ref, isVisible] = useScrollAnimation();
-  
+
   return (
     <section 
       ref={ref}
@@ -733,9 +733,9 @@ function ProductStory() {
                         wemanageall.in
                       </div>
                     </div>
-                    {/* Preview Content - Properly contained */}
-                    <div className="bg-white dark:bg-gray-800 p-5 max-h-[500px] overflow-y-auto">
-                      <div className="max-w-full">
+                    {/* Preview Content - Properly contained and filled */}
+                    <div className="bg-white dark:bg-gray-800 p-6 min-h-[500px] max-h-[600px] overflow-y-auto">
+                      <div className="max-w-full h-full">
                         <SceneComponent />
                       </div>
                     </div>
@@ -783,83 +783,180 @@ function TrustPrivacy() {
   );
 }
 
-// How It Works Section
+// How It Works Section - Redesigned with actual UI previews
 function HowItWorks() {
-  const steps = [
+  const flows = [
     {
-      number: '01',
-      title: 'Set your intention',
-      description: 'Start each day by defining what matters. Your intention becomes the filter for everything else.',
-      detail: 'Every morning, you set a clear intention. This isn\'t a to-do list—it\'s your north star for the day. All your tasks, projects, and decisions align with this single focus.',
+      module: 'Dashboard',
+      outcome: 'Start each day with clarity, not chaos.',
+      benefit: 'Your intention, objectives, and time allocation in one view. No switching between apps.',
+      component: DashboardPreview,
     },
     {
-      number: '02',
-      title: 'Capture everything',
-      description: 'Tasks, thoughts, files, expenses. Everything goes into the system. Nothing gets lost.',
-      detail: 'Whether it\'s a voice note, a receipt, a project idea, or a random thought—capture it instantly. The system organizes it later. Your job is just to get it out of your head.',
+      module: 'Projects',
+      outcome: 'Every meaningful outcome starts as a project.',
+      benefit: 'Break down complex work into actionable steps. See progress at a glance. Link tasks to deadlines.',
+      component: ProjectsPreview,
     },
     {
-      number: '03',
-      title: 'See the connections',
-      description: 'Your calendar shows your tasks. Your projects link to your files. Your expenses connect to your goals.',
-      detail: 'Everything in OFA is connected. A project task appears in your calendar. An expense links to a project. Your thoughts connect to your objectives. You see the full picture.',
+      module: 'Lists',
+      outcome: 'Capture everything. Structure later.',
+      benefit: 'Quick capture for ideas, errands, goals. Organize when you\'re ready. Nothing gets forgotten.',
+      component: ListsPreview,
     },
     {
-      number: '04',
-      title: 'Reflect and refine',
-      description: 'Weekly reviews show patterns. What worked? What didn\'t? The system learns with you.',
-      detail: 'Every week, you see what actually happened versus what you planned. Patterns emerge. You adjust. The system gets smarter about how you work and live.',
+      module: 'Calendar',
+      outcome: 'Your time and your tasks finally live together.',
+      benefit: 'Tasks appear in your calendar. Time blocks protect deep work. See your week at a glance.',
+      component: CalendarPreview,
+    },
+    {
+      module: 'Upload',
+      outcome: 'Every file. Exactly where it belongs.',
+      benefit: 'Store documents, receipts, resources. Link them to projects. Find them instantly.',
+      component: null, // We'll create a simple upload preview
+    },
+    {
+      module: 'Money',
+      outcome: 'Know where your money goes. Quietly.',
+      benefit: 'Track income and expenses in one place. Link expenses to projects. See patterns over time.',
+      component: MoneyPreview,
+    },
+    {
+      module: 'Library',
+      outcome: 'Your second brain, built into your workflow.',
+      benefit: 'Store articles, books, notes. Link to projects. Build knowledge over time.',
+      component: LibraryPreview,
+    },
+    {
+      module: 'Thinking Space',
+      outcome: 'You don\'t need to be okay here.',
+      benefit: 'Private space for thoughts, emotions, reflections. No judgment. No audience. Just clarity.',
+      component: EmotionsPreview,
     },
   ];
 
+  // Simple Upload Preview Component
+  function UploadPreview() {
+  return (
+      <div className="space-y-4 max-w-full">
+        <div className="pb-2 border-b border-gray-100 dark:border-gray-800">
+          <h3 className="text-xl font-display text-black dark:text-white mb-1.5 leading-tight">Upload</h3>
+          <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">Store files exactly where they belong.</p>
+      </div>
+      
+        <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 text-center">
+          <svg className="w-12 h-12 mx-auto mb-3 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+          </svg>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 font-medium">Drop files here or click to upload</p>
+          <p className="text-xs text-gray-500 dark:text-gray-500">PDF, images, documents</p>
+        </div>
+
+        <div className="space-y-2">
+          <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3 border border-gray-200 dark:border-gray-800 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                <span className="text-xs">PDF</span>
+                    </div>
+              <div>
+                <p className="text-xs font-medium text-black dark:text-white">Q1_Strategy_Doc.pdf</p>
+                <p className="text-[10px] text-gray-500 dark:text-gray-400">Linked to: Deep Work project</p>
+                    </div>
+                  </div>
+            <span className="text-[10px] text-gray-500 dark:text-gray-400">2.4 MB</span>
+          </div>
+          <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3 border border-gray-200 dark:border-gray-800 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                <span className="text-xs">IMG</span>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-black dark:text-white">Receipt_March_15.jpg</p>
+                <p className="text-[10px] text-gray-500 dark:text-gray-400">Linked to: Money</p>
+              </div>
+            </div>
+            <span className="text-[10px] text-gray-500 dark:text-gray-400">156 KB</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <section className="py-24 md:py-32 px-6 lg:px-12 bg-gray-50 dark:bg-gray-950 transition-colors">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <div className="text-center mb-20">
           <h2 className="text-h2 mb-6">
             How it works
           </h2>
           <p className="text-body text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            A simple system that grows more powerful the longer you use it.
+            Eight core spaces. One system. Everything connected.
           </p>
         </div>
 
-        <div className="space-y-16">
-            {steps.map((step, index) => {
-              const [ref, isVisible] = useScrollAnimation();
-              return (
+        <div className="space-y-24">
+          {flows.map((flow, index) => {
+            const [ref, isVisible] = useScrollAnimation();
+            const PreviewComponent = flow.component || UploadPreview;
+            const isEven = index % 2 === 0;
+            
+            return (
               <div 
                 key={index} 
                 ref={ref}
-                className={`grid md:grid-cols-2 gap-12 items-center transition-all duration-700 ${
+                className={`grid md:grid-cols-2 gap-16 items-center transition-all duration-700 ${
                   isVisible 
                     ? 'opacity-100 translate-y-0' 
                     : 'opacity-0 translate-y-8'
                 }`}
               >
-                <div className={`${index % 2 === 1 ? 'md:order-2' : ''}`}>
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="w-20 h-20 rounded-2xl bg-black dark:bg-white text-white dark:text-black flex items-center justify-center font-display text-3xl font-bold shadow-lg">
-                      {step.number}
+                {/* Text Content */}
+                <div className={isEven ? '' : 'md:order-2'}>
+                    <div className="mb-4">
+                    <span className="text-label text-gray-500 dark:text-gray-400">{flow.module}</span>
                     </div>
-                    <div className="flex-1 h-px bg-gradient-to-r from-gray-200 to-transparent dark:from-gray-800"></div>
-                  </div>
-                  <h3 className="text-h3 mb-4">{step.title}</h3>
-                  <p className="text-body-lg text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">{step.description}</p>
-                  <p className="text-body text-gray-700 dark:text-gray-300 leading-relaxed">{step.detail}</p>
+                  <h3 className="text-h3 mb-6 leading-tight">
+                    {flow.outcome}
+                  </h3>
+                  <p className="text-body-lg text-gray-700 dark:text-gray-300 leading-relaxed">
+                    {flow.benefit}
+                  </p>
                 </div>
-                <div className={`${index % 2 === 1 ? 'md:order-1' : ''}`}>
-                  <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 shadow-lg h-full flex items-center justify-center">
-                    <div className="text-6xl opacity-20">
-                      {index === 0 && '🎯'}
-                      {index === 1 && '📝'}
-                      {index === 2 && '🔗'}
-                      {index === 3 && '📊'}
-                    </div>
+
+                {/* UI Preview */}
+                <div className={isEven ? '' : 'md:order-1'}>
+                  <div className="relative">
+                    {/* Subtle glow effect */}
+                    <div className="absolute -inset-0.5 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 rounded-2xl opacity-10 blur-lg"></div>
+                    
+                    <div className="relative bg-white dark:bg-gray-800 rounded-2xl border-2 border-gray-200 dark:border-gray-700 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] overflow-hidden">
+                      {/* Browser Chrome */}
+                      <div className="bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center gap-2">
+                        <div className="flex gap-1.5">
+                          <div className="w-2.5 h-2.5 rounded-full bg-red-400 shadow-sm"></div>
+                          <div className="w-2.5 h-2.5 rounded-full bg-yellow-400 shadow-sm"></div>
+                          <div className="w-2.5 h-2.5 rounded-full bg-green-400 shadow-sm"></div>
+                      </div>
+                        <div className="flex-1 bg-white dark:bg-gray-800 rounded px-3 py-1 text-[10px] text-gray-500 dark:text-gray-400 ml-3 border border-gray-200 dark:border-gray-700 flex items-center gap-1.5">
+                          <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                          </svg>
+                          wemanageall.in/{flow.module.toLowerCase()}
                   </div>
+                </div>
+                      {/* Preview Content - Filled */}
+                      <div className="bg-white dark:bg-gray-800 p-6 min-h-[500px] max-h-[600px] overflow-y-auto">
+                        <div className="max-w-full h-full">
+                          <PreviewComponent />
+              </div>
+          </div>
+        </div>
+          </div>
                 </div>
               </div>
-            )})}
+            );
+          })}
         </div>
       </div>
     </section>
