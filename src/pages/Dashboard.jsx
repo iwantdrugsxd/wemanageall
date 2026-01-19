@@ -23,6 +23,7 @@ export default function Dashboard() {
   const [showRecentIntentions, setShowRecentIntentions] = useState(false);
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState('');
+  const [newTaskTimeEstimate, setNewTaskTimeEstimate] = useState('');
   const [showTaskInput, setShowTaskInput] = useState(false);
   const [loading, setLoading] = useState(true);
   
@@ -206,12 +207,15 @@ export default function Dashboard() {
         body: JSON.stringify({ 
           title: taskTitle.trim(), 
           dueDate: new Date().toISOString().split('T')[0],
-          time_estimate: timeEstimate ? timeEstimate * 60 : null // Convert hours to minutes
+          time_estimate: timeEstimate ? parseFloat(timeEstimate) * 60 : null // Convert hours to minutes
         }),
       });
       
       if (response.ok) {
         fetchToday();
+        setNewTask('');
+        setNewTaskTimeEstimate('');
+        setShowTaskInput(false);
       }
     } catch (error) {
       console.error('Failed to add task:', error);
@@ -560,12 +564,26 @@ export default function Dashboard() {
   const totalTasks = tasks.length;
   const progressPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
-  // Calculate time allocation
+  // Calculate time allocation for pie chart
+  const tasksWithTime = tasks.filter(task => task.time_estimate && task.time_estimate > 0);
+  const totalTimeEstimated = tasksWithTime.reduce((sum, task) => sum + (task.time_estimate || 0), 0);
   const totalTimeSpent = tasks.reduce((sum, task) => sum + (task.time_spent || 0), 0);
-  const totalTimeEstimated = tasks.reduce((sum, task) => sum + (task.time_estimate || 0), 0);
+  
+  // Prepare data for pie chart - group by task
+  const pieChartData = tasksWithTime.map((task, index) => {
+    const hours = Math.round((task.time_estimate || 0) / 60 * 10) / 10; // Round to 1 decimal
+    const colors = ['#000000', '#4B5563', '#6B7280', '#9CA3AF', '#D1D5DB', '#E5E7EB', '#F3F4F6'];
+    return {
+      name: task.title.length > 20 ? task.title.substring(0, 20) + '...' : task.title,
+      value: hours,
+      minutes: task.time_estimate || 0,
+      color: colors[index % colors.length],
+      fullName: task.title
+    };
+  }).sort((a, b) => b.value - a.value); // Sort by time descending
+  
+  // Calculate percentages for display
   const timeAllocationPercentage = totalTimeEstimated > 0 ? Math.round((totalTimeSpent / totalTimeEstimated) * 100) : 0;
-  const deepWorkTime = Math.round(totalTimeSpent * 0.75 / 60); // Assume 75% is deep work
-  const adminTime = Math.round(totalTimeSpent * 0.25 / 60); // 25% is admin
 
   // Get active and upcoming events
   const now = new Date();
@@ -823,11 +841,10 @@ export default function Dashboard() {
                 onSubmit={(e) => {
                 e.preventDefault();
                 if (newTask.trim()) {
-                    handleAddTask(newTask);
-                  setNewTask('');
-                  setShowTaskInput(false);
+                    handleAddTask(newTask, newTaskTimeEstimate || null);
                 }
               }}
+              className="space-y-2"
             >
               <input
                 type="text"
@@ -836,14 +853,38 @@ export default function Dashboard() {
                   placeholder="Type an objective..."
                   className="w-full px-3 py-2 border-b border-gray-300 focus:outline-none focus:border-gray-900 text-sm"
                 autoFocus
-                onBlur={() => {
-                  if (newTask.trim()) {
-                    handleAddTask(newTask);
-                    setNewTask('');
-                  }
-                  setShowTaskInput(false);
-                }}
+                required
               />
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  value={newTaskTimeEstimate}
+                  onChange={(e) => setNewTaskTimeEstimate(e.target.value)}
+                  placeholder="Time (hours)"
+                  min="0"
+                  step="0.5"
+                  className="w-24 px-3 py-2 border-b border-gray-300 focus:outline-none focus:border-gray-900 text-sm"
+                />
+                <span className="text-xs text-gray-500">hours</span>
+                <div className="flex-1"></div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowTaskInput(false);
+                    setNewTask('');
+                    setNewTaskTimeEstimate('');
+                  }}
+                  className="text-xs text-gray-500 hover:text-gray-700 px-2"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="text-xs bg-gray-900 text-white px-3 py-1.5 rounded hover:bg-gray-800"
+                >
+                  Add
+                </button>
+              </div>
             </form>
           ) : (
             <button
@@ -859,44 +900,102 @@ export default function Dashboard() {
           {/* Time Allocation */}
           <div className="bg-white rounded-lg p-6 border border-gray-200">
             <h2 className="text-xs uppercase tracking-wider text-gray-700 font-medium mb-4">TIME ALLOCATION</h2>
-            <div className="flex items-center gap-6">
-              <div className="relative w-24 h-24">
-                <svg className="w-24 h-24 transform -rotate-90">
-                  <circle
-                    cx="48"
-                    cy="48"
-                    r="40"
-                    fill="none"
-                    stroke="#e5e7eb"
-                    strokeWidth="6"
-                  />
-                  <circle
-                    cx="48"
-                    cy="48"
-                    r="40"
-                    fill="none"
-                    stroke="#000000"
-                    strokeWidth="6"
-                    strokeDasharray={`${2 * Math.PI * 40}`}
-                    strokeDashoffset={`${2 * Math.PI * 40 * (1 - timeAllocationPercentage / 100)}`}
-                    strokeLinecap="round"
-                  />
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-sm font-medium text-gray-900">{timeAllocationPercentage}%</span>
+            {pieChartData.length > 0 ? (
+              <div className="space-y-4">
+                {/* Pie Chart */}
+                <div className="flex items-center justify-center">
+                  <div className="relative w-48 h-48">
+                    <svg className="w-48 h-48 transform -rotate-90" viewBox="0 0 192 192">
+                      <circle
+                        cx="96"
+                        cy="96"
+                        r="80"
+                        fill="none"
+                        stroke="#e5e7eb"
+                        strokeWidth="12"
+                      />
+                      {(() => {
+                        let currentOffset = 0;
+                        const circumference = 2 * Math.PI * 80;
+                        return pieChartData.map((item, index) => {
+                          const percentage = (item.minutes / totalTimeEstimated) * 100;
+                          const dashArray = circumference;
+                          const dashLength = (circumference * percentage / 100);
+                          const gapLength = circumference - dashLength;
+                          const offset = currentOffset;
+                          currentOffset += dashLength;
+                          return (
+                            <circle
+                              key={index}
+                              cx="96"
+                              cy="96"
+                              r="80"
+                              fill="none"
+                              stroke={item.color}
+                              strokeWidth="12"
+                              strokeDasharray={`${dashLength} ${gapLength}`}
+                              strokeDashoffset={-offset}
+                              strokeLinecap="round"
+                            />
+                          );
+                        });
+                      })()}
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="text-2xl font-medium text-gray-900">
+                          {Math.round(totalTimeEstimated / 60 * 10) / 10}h
+                        </div>
+                        <div className="text-xs text-gray-500">Total</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Legend */}
+                <div className="space-y-2 max-h-48 overflow-y-auto">
+                  {pieChartData.map((item, index) => {
+                    const percentage = ((item.minutes / totalTimeEstimated) * 100).toFixed(1);
+                    return (
+                      <div key={index} className="flex items-center justify-between gap-2 text-xs">
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                          <div 
+                            className="w-3 h-3 rounded-full flex-shrink-0" 
+                            style={{ backgroundColor: item.color }}
+                          ></div>
+                          <span className="text-gray-700 truncate" title={item.fullName}>
+                            {item.name}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <span className="text-gray-600">{item.value}h</span>
+                          <span className="text-gray-400">({percentage}%)</span>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-black"></div>
-                  <span className="text-xs text-gray-600">DEEP WORK</span>
+            ) : (
+              <div className="text-center py-8">
+                <div className="relative w-32 h-32 mx-auto mb-4">
+                  <svg className="w-32 h-32 transform -rotate-90">
+                    <circle
+                      cx="64"
+                      cy="64"
+                      r="56"
+                      fill="none"
+                      stroke="#e5e7eb"
+                      strokeWidth="8"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-sm text-gray-400">0%</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-gray-300"></div>
-                  <span className="text-xs text-gray-600">ADMINISTRATION</span>
-                </div>
+                <p className="text-xs text-gray-500">Add time estimates to tasks to see allocation</p>
               </div>
-            </div>
+            )}
           </div>
         </div>
 
