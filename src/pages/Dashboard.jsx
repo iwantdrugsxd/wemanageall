@@ -572,7 +572,21 @@ export default function Dashboard() {
   // Prepare data for pie chart - group by task
   const pieChartData = tasksWithTime.map((task, index) => {
     const hours = Math.round((task.time_estimate || 0) / 60 * 10) / 10; // Round to 1 decimal
-    const colors = ['#000000', '#4B5563', '#6B7280', '#9CA3AF', '#D1D5DB', '#E5E7EB', '#F3F4F6'];
+    // Vibrant contrasting colors for better visibility
+    const colors = [
+      '#000000', // Black
+      '#FCD34D', // Yellow
+      '#3B82F6', // Blue
+      '#10B981', // Green
+      '#F59E0B', // Orange
+      '#8B5CF6', // Purple
+      '#EF4444', // Red
+      '#06B6D4', // Cyan
+      '#EC4899', // Pink
+      '#84CC16', // Lime
+      '#6366F1', // Indigo
+      '#F97316', // Amber
+    ];
     return {
       name: task.title.length > 20 ? task.title.substring(0, 20) + '...' : task.title,
       value: hours,
