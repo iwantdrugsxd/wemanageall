@@ -223,11 +223,13 @@
   }
 
   .text-h2 {
-    @apply font-display text-3xl md:text-4xl lg:text-5xl text-black dark:text-white leading-tight tracking-tight transition-colors;
+    color: var(--text-primary);
+    @apply font-display text-3xl md:text-4xl lg:text-5xl leading-tight tracking-tight transition-colors;
   }
 
   .text-h3 {
-    @apply font-display text-2xl md:text-3xl lg:text-4xl text-black dark:text-white leading-tight tracking-tight transition-colors;
+    color: var(--text-primary);
+    @apply font-display text-2xl md:text-3xl lg:text-4xl leading-tight tracking-tight transition-colors;
   }
 
   .text-h4 {
@@ -235,31 +237,87 @@
   }
 
   .text-h5 {
-    @apply font-display text-lg md:text-xl lg:text-2xl text-black dark:text-white leading-snug transition-colors;
+    color: var(--text-primary);
+    @apply font-display text-lg md:text-xl lg:text-2xl leading-snug transition-colors;
   }
 
   .text-h6 {
-    @apply font-display text-base md:text-lg lg:text-xl text-black dark:text-white leading-snug transition-colors;
+    color: var(--text-primary);
+    @apply font-display text-base md:text-lg lg:text-xl leading-snug transition-colors;
   }
 
   .text-body-lg {
-    @apply text-lg md:text-xl text-gray-900 dark:text-gray-100 leading-relaxed transition-colors;
+    color: var(--text-secondary);
+    @apply text-lg md:text-xl leading-relaxed transition-colors;
   }
 
   .text-body {
-    @apply text-base md:text-lg text-gray-900 dark:text-gray-100 leading-relaxed transition-colors;
+    color: var(--text-secondary);
+    @apply text-base md:text-lg leading-relaxed transition-colors;
   }
 
   .text-body-sm {
-    @apply text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed transition-colors;
+    color: var(--text-secondary);
+    @apply text-sm md:text-base leading-relaxed transition-colors;
   }
 
   .text-caption {
-    @apply text-xs md:text-sm text-gray-600 dark:text-gray-400 leading-normal transition-colors;
+    color: var(--text-muted);
+    @apply text-xs md:text-sm leading-normal transition-colors;
   }
 
   .text-label {
-    @apply text-xs md:text-sm text-gray-600 dark:text-gray-400 font-semibold uppercase tracking-wider transition-colors;
+    color: var(--text-muted);
+    @apply text-xs md:text-sm font-semibold uppercase tracking-wider transition-colors;
+  }
+  
+  /* Utility classes for common dark mode patterns */
+  .bg-surface {
+    background-color: var(--bg-surface);
+  }
+  
+  .bg-card {
+    background-color: var(--bg-card);
+  }
+  
+  .bg-modal {
+    background-color: var(--bg-modal);
+  }
+  
+  .text-primary {
+    color: var(--text-primary);
+  }
+  
+  .text-secondary {
+    color: var(--text-secondary);
+  }
+  
+  .text-muted {
+    color: var(--text-muted);
+  }
+  
+  .border-subtle {
+    border-color: var(--border-subtle);
+  }
+  
+  .border-mid {
+    border-color: var(--border-mid);
+  }
+  
+  .error-text {
+    color: var(--error);
+  }
+  
+  .error-bg {
+    background-color: var(--error-bg);
+  }
+  
+  .success-text {
+    color: var(--success);
+  }
+  
+  .success-bg {
+    background-color: var(--success-bg);
   }
 }
 
