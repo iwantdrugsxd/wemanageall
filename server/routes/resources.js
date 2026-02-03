@@ -186,6 +186,13 @@ router.get('/:id', requireAuth, async (req, res) => {
   try {
     await ensureTables();
 
+    // Update last_opened_at when resource is accessed
+    await query(`
+      UPDATE resources
+      SET last_opened_at = CURRENT_TIMESTAMP
+      WHERE id = $1 AND user_id = $2
+    `, [req.params.id, req.user.id]);
+
     const result = await query(`
       SELECT 
         id,

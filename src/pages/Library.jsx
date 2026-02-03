@@ -10,14 +10,28 @@ export default function Library() {
   const [resources, setResources] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedFolder, setSelectedFolder] = useState('all');
+  const [selectedPriority, setSelectedPriority] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [editingResource, setEditingResource] = useState(null);
+  const [editForm, setEditForm] = useState({
+    title: '',
+    category: 'Uncategorized',
+    folder: '',
+    notes: '',
+    author: '',
+    priority: 'normal'
+  });
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState(null);
   
   // Upload form state
   const [uploadFile, setUploadFile] = useState(null);
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('Uncategorized');
+  const [folder, setFolder] = useState('');
   const [author, setAuthor] = useState('');
   const [priority, setPriority] = useState('normal');
   const [notes, setNotes] = useState('');
@@ -26,18 +40,29 @@ export default function Library() {
   useEffect(() => {
     fetchResources();
     fetchCategories();
-  }, [selectedCategory]);
+  }, [selectedCategory, selectedFolder, selectedPriority, searchQuery]);
 
   const fetchResources = async () => {
     try {
-      const categoryParam = selectedCategory === 'all' ? '' : selectedCategory;
-      const response = await fetch(`/api/resources?category=${categoryParam}`, {
+      const params = new URLSearchParams();
+      if (selectedCategory !== 'all') params.append('category', selectedCategory);
+      if (selectedFolder !== 'all' && selectedFolder) params.append('folder', selectedFolder);
+      if (searchQuery) params.append('search', searchQuery);
+      
+      const response = await fetch(`/api/resources?${params.toString()}`, {
         credentials: 'include',
       });
       
       if (response.ok) {
         const data = await response.json();
-        setResources(data.resources || []);
+        let filtered = data.resources || [];
+        
+        // Client-side priority filter
+        if (selectedPriority !== 'all') {
+          filtered = filtered.filter(r => r.priority === selectedPriority);
+        }
+        
+        setResources(filtered);
       }
     } catch (error) {
       console.error('Failed to fetch resources:', error);
@@ -101,16 +126,18 @@ export default function Library() {
 
   const handleUpload = async () => {
     if (!uploadFile) {
-      alert('Please select a PDF file');
+      setUploadError('Please select a PDF file');
       return;
     }
 
     setUploading(true);
+    setUploadError(null);
     try {
       const formData = new FormData();
       formData.append('file', uploadFile);
       formData.append('title', title || uploadFile.name);
       formData.append('category', category);
+      formData.append('folder', folder || null);
       formData.append('author', author);
       formData.append('priority', priority);
       formData.append('notes', notes);
@@ -125,16 +152,17 @@ export default function Library() {
         const data = await response.json();
         setShowAddModal(false);
         resetForm();
+        setUploadError(null);
         // Refresh the resources list
         await fetchResources();
         await fetchCategories();
       } else {
         const error = await response.json();
-        alert(error.error || 'Failed to upload resource');
+        setUploadError(error.error || 'Failed to upload resource');
       }
     } catch (error) {
       console.error('Upload error:', error);
-      alert('Failed to upload resource. Please try again.');
+      setUploadError('Network error. Please check your connection and try again.');
     } finally {
       setUploading(false);
     }
@@ -144,10 +172,66 @@ export default function Library() {
     setUploadFile(null);
     setTitle('');
     setCategory('Uncategorized');
+    setFolder('');
     setAuthor('');
     setPriority('normal');
     setNotes('');
+    setUploadError(null);
+    setDragActive(false);
   };
+
+  const handleEditResource = (resource) => {
+    setEditingResource(resource);
+    setEditForm({
+      title: resource.title || '',
+      category: resource.category || 'Uncategorized',
+      folder: resource.folder || '',
+      notes: resource.notes || '',
+      author: resource.author || '',
+      priority: resource.priority || 'normal'
+    });
+  };
+
+  const handleUpdateResource = async () => {
+    if (!editingResource) return;
+
+    try {
+      const response = await fetch(`/api/resources/${editingResource.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(editForm),
+      });
+
+      if (response.ok) {
+        setEditingResource(null);
+        setEditForm({
+          title: '',
+          category: 'Uncategorized',
+          folder: '',
+          notes: '',
+          author: '',
+          priority: 'normal'
+        });
+        await fetchResources();
+      } else {
+        const data = await response.json();
+        alert(data.error || 'Failed to update resource');
+      }
+    } catch (error) {
+      console.error('Update resource error:', error);
+      alert('Failed to update resource');
+    }
+  };
+
+  // Get unique folders from resources
+  const folders = Array.from(new Set(resources.map(r => r.folder).filter(Boolean))).sort();
+  
+  // Get continue reading resources (sorted by last_opened_at, with progress > 0)
+  const continueReading = resources
+    .filter(r => r.last_opened_at && r.progress > 0 && r.progress < 100)
+    .sort((a, b) => new Date(b.last_opened_at) - new Date(a.last_opened_at))
+    .slice(0, 6);
 
   const handleOpenResource = (resourceId) => {
     navigate(`/library/${resourceId}`);
@@ -212,6 +296,39 @@ export default function Library() {
         </button>
       </div>
 
+      {/* Search and Filters */}
+      <div className="mb-6 space-y-4">
+        <div className="flex items-center gap-4">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search by title, author, or notes..."
+            className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-ofa-ink"
+          />
+          <select
+            value={selectedFolder}
+            onChange={(e) => setSelectedFolder(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-ofa-ink"
+          >
+            <option value="all">All Folders</option>
+            {folders.map(folder => (
+              <option key={folder} value={folder}>{folder}</option>
+            ))}
+          </select>
+          <select
+            value={selectedPriority}
+            onChange={(e) => setSelectedPriority(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-ofa-ink"
+          >
+            <option value="all">All Priorities</option>
+            <option value="low">Low</option>
+            <option value="normal">Normal</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+      </div>
+
       {/* Category Navigation */}
       <div className="flex items-center gap-6 mb-8 border-b border-gray-300 pb-4">
         {allCategories.map((cat) => {
@@ -233,18 +350,37 @@ export default function Library() {
         })}
       </div>
 
+      {/* Continue Reading Section */}
+      {continueReading.length > 0 && (
+        <div className="mb-12">
+          <h2 className="font-display text-2xl text-black mb-4">Continue Reading</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {continueReading.map((resource) => (
+              <ResourceCard
+                key={resource.id}
+                resource={resource}
+                onOpen={handleOpenResource}
+                onDelete={handleDeleteResource}
+                onEdit={handleEditResource}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Resources by Category */}
       {selectedCategory === 'all' ? (
         Object.keys(groupedResources).map((category) => (
           <div key={category} className="mb-12">
             <h2 className="font-display text-3xl text-black mb-6">{category}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {groupedResources[category].map((resource) => (
+              {groupedResources[category].filter(r => !continueReading.find(cr => cr.id === r.id)).map((resource) => (
                 <ResourceCard
                   key={resource.id}
                   resource={resource}
                   onOpen={handleOpenResource}
                   onDelete={handleDeleteResource}
+                  onEdit={handleEditResource}
                 />
               ))}
             </div>
@@ -254,14 +390,15 @@ export default function Library() {
         <div className="mb-12">
           <h2 className="font-display text-3xl text-black mb-6">{selectedCategory}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {resources.map((resource) => (
-              <ResourceCard
-                key={resource.id}
-                resource={resource}
-                onOpen={handleOpenResource}
-                onDelete={handleDeleteResource}
-              />
-            ))}
+              {resources.filter(r => !continueReading.find(cr => cr.id === r.id)).map((resource) => (
+                <ResourceCard
+                  key={resource.id}
+                  resource={resource}
+                  onOpen={handleOpenResource}
+                  onDelete={handleDeleteResource}
+                  onEdit={handleEditResource}
+                />
+              ))}
           </div>
         </div>
       )}
@@ -339,8 +476,11 @@ export default function Library() {
                   <div>
                     <div className="text-black text-4xl mb-4">📄</div>
                     <p className="text-black font-medium mb-2">Upload PDF</p>
-                    <p className="text-gray-600 text-sm mb-4">
-                      Drag and drop your document here or click to browse files
+                    <p className="text-gray-600 text-sm mb-2">
+                      Drag and drop your PDF here
+                    </p>
+                    <p className="text-gray-500 text-xs mb-4">
+                      or click to browse files (PDF only, max 50MB)
                     </p>
                     <label className="inline-block px-6 py-2 bg-black/10 text-black rounded-xl hover:bg-black/20 transition-colors cursor-pointer">
                       Select File
@@ -407,6 +547,25 @@ export default function Library() {
                 </div>
 
                 <div>
+                  <label className="block text-sm font-medium text-black mb-2">Folder (Optional)</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={folder}
+                      onChange={(e) => setFolder(e.target.value)}
+                      list="folder-list"
+                      placeholder="Type or select a folder"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-ofa-ink"
+                    />
+                    <datalist id="folder-list">
+                      {folders.map(f => (
+                        <option key={f} value={f}>{f}</option>
+                      ))}
+                    </datalist>
+                  </div>
+                </div>
+
+                <div>
                   <label className="block text-sm font-medium text-black mb-2">Priority Level</label>
                   <div className="flex gap-2">
                     {['low', 'normal', 'high'].map((p) => (
@@ -438,6 +597,13 @@ export default function Library() {
                 </div>
               </div>
 
+              {/* Error Message */}
+              {uploadError && (
+                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl">
+                  <p className="text-sm text-red-600">{uploadError}</p>
+                </div>
+              )}
+
               {/* Actions */}
               <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-300">
                 <button
@@ -462,12 +628,175 @@ export default function Library() {
           </div>
         </div>
       )}
+
+      {/* Edit Resource Modal */}
+      {editingResource && (
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => {
+            setEditingResource(null);
+            setEditForm({
+              title: '',
+              category: 'Uncategorized',
+              folder: '',
+              notes: '',
+              author: '',
+              priority: 'normal'
+            });
+          }}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-8">
+              <div className="flex items-start justify-between mb-6">
+                <div>
+                  <h2 className="font-display text-2xl text-black mb-2">Edit Resource</h2>
+                  <p className="text-gray-600 text-sm">Update resource metadata</p>
+                </div>
+                <button
+                  onClick={() => {
+                    setEditingResource(null);
+                    setEditForm({
+                      title: '',
+                      category: 'Uncategorized',
+                      folder: '',
+                      notes: '',
+                      author: '',
+                      priority: 'normal'
+                    });
+                  }}
+                  className="text-gray-600 hover:text-black transition-colors text-2xl"
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-black mb-2">Title</label>
+                  <input
+                    type="text"
+                    value={editForm.title}
+                    onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-ofa-ink"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-black mb-2">Author</label>
+                  <input
+                    type="text"
+                    value={editForm.author}
+                    onChange={(e) => setEditForm({ ...editForm, author: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-ofa-ink"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-black mb-2">Category</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={editForm.category}
+                      onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
+                      list="edit-category-list"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-ofa-ink"
+                    />
+                    <datalist id="edit-category-list">
+                      <option value="Uncategorized">Uncategorized</option>
+                      {categories.map(c => (
+                        <option key={c.category} value={c.category}>{c.category}</option>
+                      ))}
+                    </datalist>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-black mb-2">Folder</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={editForm.folder}
+                      onChange={(e) => setEditForm({ ...editForm, folder: e.target.value })}
+                      list="edit-folder-list"
+                      placeholder="Optional folder name"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-ofa-ink"
+                    />
+                    <datalist id="edit-folder-list">
+                      {folders.map(f => (
+                        <option key={f} value={f}>{f}</option>
+                      ))}
+                    </datalist>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-black mb-2">Priority</label>
+                  <div className="flex gap-2">
+                    {['low', 'normal', 'high'].map((p) => (
+                      <button
+                        key={p}
+                        type="button"
+                        onClick={() => setEditForm({ ...editForm, priority: p })}
+                        className={`flex-1 px-4 py-2 rounded-xl transition-colors ${
+                          editForm.priority === p
+                            ? 'bg-black text-white'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        }`}
+                      >
+                        {p.charAt(0).toUpperCase() + p.slice(1)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-black mb-2">Notes</label>
+                  <textarea
+                    value={editForm.notes}
+                    onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
+                    rows={4}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-ofa-ink resize-none"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-300">
+                <button
+                  onClick={() => {
+                    setEditingResource(null);
+                    setEditForm({
+                      title: '',
+                      category: 'Uncategorized',
+                      folder: '',
+                      notes: '',
+                      author: '',
+                      priority: 'normal'
+                    });
+                  }}
+                  className="text-gray-600 hover:text-black transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleUpdateResource}
+                  className="px-6 py-3 bg-black text-white rounded-xl hover:bg-black/90 transition-colors"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 // Resource Card Component
-function ResourceCard({ resource, onOpen, onDelete }) {
+function ResourceCard({ resource, onOpen, onDelete, onEdit }) {
   return (
     <div
       className="bg-white rounded-xl border border-gray-300 overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
@@ -509,17 +838,31 @@ function ResourceCard({ resource, onOpen, onDelete }) {
             className="px-4 py-2 bg-black/10 text-black rounded-xl hover:bg-black/20 transition-colors flex items-center gap-2 text-sm font-medium"
           >
             <span>▶</span>
-            <span>Resume Reading</span>
+            <span>{resource.progress > 0 ? 'Resume Reading' : 'Start Reading'}</span>
           </button>
-          <button
-            onClick={(e) => onDelete(resource.id, e)}
-            className="opacity-0 group-hover:opacity-100 p-2 text-gray-600 hover:text-black transition-all"
-            title="Delete"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
-          </button>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit(resource);
+              }}
+              className="opacity-0 group-hover:opacity-100 p-2 text-gray-600 hover:text-black transition-all"
+              title="Edit"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+            </button>
+            <button
+              onClick={(e) => onDelete(resource.id, e)}
+              className="opacity-0 group-hover:opacity-100 p-2 text-gray-600 hover:text-red-600 transition-all"
+              title="Delete"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     </div>
