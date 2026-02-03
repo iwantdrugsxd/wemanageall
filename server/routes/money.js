@@ -163,11 +163,11 @@ router.get('/overview', requireAuth, async (req, res) => {
       }
     });
 
-    // Get active subscriptions
+    // Get all subscriptions (for overview, we'll filter active ones for recurring obligations)
     const subscriptionsResult = await query(
       `SELECT id, name, amount, billing_cycle, next_billing_date, status
        FROM subscriptions
-       WHERE user_id = $1 AND status = 'active'
+       WHERE user_id = $1
        ORDER BY next_billing_date ASC`,
       [req.user.id]
     );
@@ -275,6 +275,15 @@ router.get('/', requireAuth, async (req, res) => {
       [req.user.id]
     );
 
+    // Get all subscriptions
+    const subscriptionsResult = await query(
+      `SELECT id, name, amount, billing_cycle, next_billing_date, status, created_at
+       FROM subscriptions
+       WHERE user_id = $1
+       ORDER BY next_billing_date ASC`,
+      [req.user.id]
+    );
+
     // Calculate totals
     const totalIncomeResult = await query(
       `SELECT COALESCE(SUM(amount), 0) as total
@@ -296,6 +305,7 @@ router.get('/', requireAuth, async (req, res) => {
     res.json({
       income: incomeResult.rows,
       expenses: expensesResult.rows,
+      subscriptions: subscriptionsResult.rows,
       totalIncome: totalIncome,
       totalExpenses: totalExpenses,
     });
