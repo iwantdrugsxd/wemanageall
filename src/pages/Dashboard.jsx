@@ -26,6 +26,21 @@ export default function Dashboard() {
   const [newTaskTimeEstimate, setNewTaskTimeEstimate] = useState('');
   const [showTaskInput, setShowTaskInput] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [editingTaskId, setEditingTaskId] = useState(null);
+  const [editingTaskTitle, setEditingTaskTitle] = useState('');
+  const [editingTaskDueDate, setEditingTaskDueDate] = useState('');
+  const [editingTaskTimeEstimate, setEditingTaskTimeEstimate] = useState('');
+  const [editingTaskTimeSpent, setEditingTaskTimeSpent] = useState('');
+  const [taskFilter, setTaskFilter] = useState('all'); // 'all', 'pending', 'completed', 'overdue'
+  const [taskSort, setTaskSort] = useState('due-date'); // 'due-date', 'created'
+  
+  // Reflection
+  const [reflection, setReflection] = useState('');
+  const [reflectionMood, setReflectionMood] = useState(null);
+  const [reflectionSaved, setReflectionSaved] = useState(false);
+  const [reflectionError, setReflectionError] = useState('');
+  const [savingReflection, setSavingReflection] = useState(false);
+  const [reflectionLastSaved, setReflectionLastSaved] = useState(null);
   
   // Calendar Events
   const [calendarEvents, setCalendarEvents] = useState([]);
@@ -120,11 +135,11 @@ export default function Dashboard() {
   }, [thoughtContent]);
 
   useEffect(() => {
-    // Auto-save thoughts every 30 seconds
-    if (!thoughtContent.trim()) return;
+    // Auto-save thoughts every 30 seconds (only if not editing an existing thought)
+    if (!thoughtContent.trim() || editingThoughtId) return;
     
     const interval = setInterval(async () => {
-      if (thoughtContent.trim()) {
+      if (thoughtContent.trim() && !editingThoughtId) {
         try {
           const response = await fetch('/api/thoughts', {
             method: 'POST',
@@ -134,7 +149,7 @@ export default function Dashboard() {
           });
           
           if (response.ok) {
-          setLastSaved(new Date());
+            setLastSaved(new Date());
             const data = await response.json();
             if (data.entry) {
               fetchToday();
@@ -147,7 +162,7 @@ export default function Dashboard() {
     }, 30000);
 
     return () => clearInterval(interval);
-  }, [thoughtContent, thoughtMode]);
+  }, [thoughtContent, thoughtMode, editingThoughtId]);
 
   const fetchToday = async () => {
     try {
@@ -166,6 +181,8 @@ export default function Dashboard() {
       setIntentions(intentionsData);
       setTodayThoughts(data.thinkingSpace || []);
       setCalendarEvents(data.calendarEvents || []);
+      setReflection(data.reflection || '');
+      setReflectionMood(data.mood ?? null);
       
       if (data.thinkingSpace && data.thinkingSpace.length > 0) {
         const latestThought = data.thinkingSpace[0];
@@ -255,6 +272,127 @@ export default function Dashboard() {
       fetchToday();
     } catch (error) {
       console.error('Failed to update task time:', error);
+    }
+  };
+
+  const handleDeleteTask = async (taskId) => {
+    if (!confirm('Are you sure you want to delete this task?')) return;
+    
+    try {
+      const response = await fetch(`/api/tasks/${taskId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      
+      if (response.ok) {
+        fetchToday();
+      } else {
+        const errorData = await response.json();
+        alert(errorData.error || 'Failed to delete task');
+      }
+    } catch (error) {
+      console.error('Failed to delete task:', error);
+      alert('Network error. Please check your connection.');
+    }
+  };
+
+  const handleEditTask = (task) => {
+    setEditingTaskId(task.id);
+    setEditingTaskTitle(task.title || '');
+    setEditingTaskDueDate(task.due_date || new Date().toISOString().split('T')[0]);
+    setEditingTaskTimeEstimate(task.time_estimate ? Math.round(task.time_estimate / 60) : '');
+    setEditingTaskTimeSpent(task.time_spent ? Math.round(task.time_spent / 60) : '');
+  };
+
+  const handleUpdateTask = async () => {
+    if (!editingTaskTitle.trim()) {
+      alert('Task title cannot be empty');
+      return;
+    }
+    
+    try {
+      const response = await fetch(`/api/tasks/${editingTaskId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          title: editingTaskTitle.trim(),
+          due_date: editingTaskDueDate,
+          time_estimate: editingTaskTimeEstimate ? parseFloat(editingTaskTimeEstimate) * 60 : null,
+          time_spent: editingTaskTimeSpent ? parseFloat(editingTaskTimeSpent) * 60 : null,
+        }),
+      });
+      
+      if (response.ok) {
+        setEditingTaskId(null);
+        setEditingTaskTitle('');
+        setEditingTaskDueDate('');
+        setEditingTaskTimeEstimate('');
+        setEditingTaskTimeSpent('');
+        fetchToday();
+      } else {
+        const errorData = await response.json();
+        alert(errorData.error || 'Failed to update task');
+      }
+    } catch (error) {
+      console.error('Failed to update task:', error);
+      alert('Network error. Please check your connection.');
+    }
+  };
+
+  const handleSaveReflection = async () => {
+    setSavingReflection(true);
+    setReflectionError('');
+    
+    try {
+      // Check if reflection exists (we'll use POST which handles upsert via ON CONFLICT)
+      const response = await fetch('/api/today/reflection', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ reflection, mood: reflectionMood }),
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        setReflectionSaved(true);
+        setReflectionLastSaved(new Date());
+        setTimeout(() => setReflectionSaved(false), 3000);
+        await fetchToday();
+      } else {
+        setReflectionError(data.error || 'Failed to save reflection');
+        setTimeout(() => setReflectionError(''), 5000);
+      }
+    } catch (error) {
+      console.error('Failed to save reflection:', error);
+      setReflectionError('Network error. Please check your connection.');
+      setTimeout(() => setReflectionError(''), 5000);
+    } finally {
+      setSavingReflection(false);
+    }
+  };
+
+  const handleDeleteReflection = async () => {
+    if (!confirm('Are you sure you want to delete this reflection?')) return;
+    
+    try {
+      const response = await fetch('/api/today/reflection', {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      
+      if (response.ok) {
+        setReflection('');
+        setReflectionMood(null);
+        await fetchToday();
+      } else {
+        const errorData = await response.json();
+        alert(errorData.error || 'Failed to delete reflection');
+      }
+    } catch (error) {
+      console.error('Failed to delete reflection:', error);
+      alert('Network error. Please check your connection.');
     }
   };
 
@@ -559,8 +697,44 @@ export default function Dashboard() {
     }
   };
 
+  // Task filtering and sorting
+  const getFilteredAndSortedTasks = () => {
+    let filtered = [...tasks];
+    
+    // Apply filter
+    if (taskFilter === 'pending') {
+      filtered = filtered.filter(t => t.status === 'pending' || t.status === 'todo');
+    } else if (taskFilter === 'completed') {
+      filtered = filtered.filter(t => t.status === 'completed' || t.status === 'done');
+    } else if (taskFilter === 'overdue') {
+      const today = new Date().toISOString().split('T')[0];
+      filtered = filtered.filter(t => {
+        const isPending = t.status === 'pending' || t.status === 'todo';
+        const isOverdue = t.due_date && t.due_date < today;
+        return isPending && isOverdue;
+      });
+    }
+    
+    // Apply sorting
+    if (taskSort === 'due-date') {
+      filtered.sort((a, b) => {
+        if (!a.due_date && !b.due_date) return new Date(a.created_at) - new Date(b.created_at);
+        if (!a.due_date) return 1;
+        if (!b.due_date) return -1;
+        if (a.due_date !== b.due_date) return a.due_date.localeCompare(b.due_date);
+        return new Date(a.created_at) - new Date(b.created_at);
+      });
+    } else {
+      filtered.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+    }
+    
+    return filtered;
+  };
+
+  const filteredTasks = getFilteredAndSortedTasks();
+
   const firstName = user?.name?.split(' ')[0] || 'there';
-  const completedTasks = tasks.filter(t => t.status === 'completed').length;
+  const completedTasks = tasks.filter(t => t.status === 'completed' || t.status === 'done').length;
   const totalTasks = tasks.length;
   const progressPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
@@ -771,6 +945,12 @@ export default function Dashboard() {
                         >
                           EDIT
                         </button>
+                        <button
+                          onClick={() => handleDeleteIntention(intention.id)}
+                          className="px-3 py-1 text-xs text-gray-500 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          DELETE
+                        </button>
                     </>
                   )}
                 </div>
@@ -819,32 +999,134 @@ export default function Dashboard() {
               <h2 className="text-label text-gray-700">DAILY OBJECTIVES</h2>
               <span className="text-xs text-gray-600">{progressPercentage}%</span>
             </div>
+
+            {/* Filters and Sort */}
+            <div className="flex items-center gap-2 mb-4">
+              <select
+                value={taskFilter}
+                onChange={(e) => setTaskFilter(e.target.value)}
+                className="text-xs px-2 py-1 border border-gray-300 rounded bg-white text-gray-700 focus:outline-none focus:border-gray-900"
+              >
+                <option value="all">All</option>
+                <option value="pending">Pending</option>
+                <option value="completed">Completed</option>
+                <option value="overdue">Overdue</option>
+              </select>
+              <select
+                value={taskSort}
+                onChange={(e) => setTaskSort(e.target.value)}
+                className="text-xs px-2 py-1 border border-gray-300 rounded bg-white text-gray-700 focus:outline-none focus:border-gray-900"
+              >
+                <option value="due-date">Due Date</option>
+                <option value="created">Created</option>
+              </select>
+            </div>
             
           <div className="space-y-3 mb-4">
-            {tasks.length === 0 ? (
-                <p className="text-sm text-gray-400 text-center py-4">No objectives yet</p>
+            {filteredTasks.length === 0 ? (
+                <p className="text-sm text-gray-400 text-center py-4">
+                  {taskFilter === 'all' ? 'No objectives yet' : `No ${taskFilter} objectives`}
+                </p>
               ) : (
-                tasks.map((task) => {
+                filteredTasks.map((task) => {
                   const timeSpent = task.time_spent ? Math.round(task.time_spent / 60) : 0;
                   const timeEstimate = task.time_estimate ? Math.round(task.time_estimate / 60) : null;
+                  const isCompleted = task.status === 'completed' || task.status === 'done';
                   
-                  return (
-                <div key={task.id} className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    checked={task.status === 'completed'}
-                    onChange={(e) => handleToggleTask(task.id, e.target.checked)}
+                  return editingTaskId === task.id ? (
+                    <div key={task.id} className="p-3 bg-gray-50 rounded border border-gray-200 space-y-2">
+                      <input
+                        type="text"
+                        value={editingTaskTitle}
+                        onChange={(e) => setEditingTaskTitle(e.target.value)}
+                        placeholder="Task title"
+                        className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-gray-900"
+                        autoFocus
+                      />
+                      <div className="grid grid-cols-2 gap-2">
+                        <input
+                          type="date"
+                          value={editingTaskDueDate}
+                          onChange={(e) => setEditingTaskDueDate(e.target.value)}
+                          className="px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-gray-900"
+                        />
+                        <input
+                          type="number"
+                          value={editingTaskTimeEstimate}
+                          onChange={(e) => setEditingTaskTimeEstimate(e.target.value)}
+                          placeholder="Est. (hours)"
+                          min="0"
+                          step="0.5"
+                          className="px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-gray-900"
+                        />
+                      </div>
+                      <input
+                        type="number"
+                        value={editingTaskTimeSpent}
+                        onChange={(e) => setEditingTaskTimeSpent(e.target.value)}
+                        placeholder="Time spent (hours)"
+                        min="0"
+                        step="0.5"
+                        className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-gray-900"
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          onClick={handleUpdateTask}
+                          className="px-3 py-1.5 text-xs bg-gray-900 text-white rounded hover:bg-gray-800"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={() => {
+                            setEditingTaskId(null);
+                            setEditingTaskTitle('');
+                            setEditingTaskDueDate('');
+                            setEditingTaskTimeEstimate('');
+                            setEditingTaskTimeSpent('');
+                          }}
+                          className="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div key={task.id} className="group flex items-center gap-3">
+                      <input
+                        type="checkbox"
+                        checked={isCompleted}
+                        onChange={(e) => handleToggleTask(task.id, e.target.checked)}
                         className="w-4 h-4 rounded border-gray-300"
-                  />
-                      <span className={`flex-1 text-sm ${task.status === 'completed' ? 'line-through text-gray-400' : 'text-gray-700'}`}>
-                    {task.title}
-                  </span>
+                      />
+                      <span className={`flex-1 text-sm ${isCompleted ? 'line-through text-gray-400' : 'text-gray-700'}`}>
+                        {task.title}
+                      </span>
                       {timeEstimate && (
                         <span className="text-xs text-gray-500">
                           {timeSpent}h / {timeEstimate}h
                         </span>
                       )}
-                </div>
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
+                          onClick={() => handleEditTask(task)}
+                          className="text-gray-400 hover:text-gray-600 p-1"
+                          title="Edit task"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => handleDeleteTask(task.id)}
+                          className="text-gray-400 hover:text-red-600 p-1"
+                          title="Delete task"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
                   );
                 })
             )}
@@ -910,6 +1192,73 @@ export default function Dashboard() {
             </button>
           )}
                   </div>
+
+          {/* Reflection Section */}
+          <div className="bg-white rounded-lg p-6 border border-gray-200">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-label text-gray-700">REFLECTION</h2>
+              {reflectionSaved && (
+                <div className="flex items-center gap-2 text-xs text-gray-500">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  {reflectionLastSaved && (
+                    <span>Saved {new Date(reflectionLastSaved).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</span>
+                  )}
+                </div>
+              )}
+            </div>
+            
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs text-gray-600 mb-2">Mood (optional)</label>
+                <select
+                  value={reflectionMood || ''}
+                  onChange={(e) => setReflectionMood(e.target.value || null)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-gray-900"
+                >
+                  <option value="">Select mood</option>
+                  <option value="excited">😊 Excited</option>
+                  <option value="grateful">🙏 Grateful</option>
+                  <option value="calm">😌 Calm</option>
+                  <option value="focused">🎯 Focused</option>
+                  <option value="tired">😴 Tired</option>
+                  <option value="anxious">😰 Anxious</option>
+                  <option value="frustrated">😤 Frustrated</option>
+                  <option value="content">😊 Content</option>
+                </select>
+              </div>
+              
+              <textarea
+                value={reflection}
+                onChange={(e) => setReflection(e.target.value)}
+                placeholder="How did today go? What did you learn? What would you do differently?"
+                className="w-full h-32 px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-gray-900 resize-none"
+              />
+              
+              {reflectionError && (
+                <div className="text-xs text-red-600">{reflectionError}</div>
+              )}
+              
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleSaveReflection}
+                  disabled={savingReflection}
+                  className="px-4 py-1.5 text-xs bg-gray-900 text-white rounded hover:bg-gray-800 disabled:opacity-50 transition-colors"
+                >
+                  {savingReflection ? 'Saving...' : 'Save Reflection'}
+                </button>
+                {reflection && (
+                  <button
+                    onClick={handleDeleteReflection}
+                    className="px-4 py-1.5 text-xs text-gray-500 hover:text-red-600 transition-colors"
+                  >
+                    Delete
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
 
           {/* Time Allocation */}
           <div className="bg-white rounded-lg p-6 border border-gray-200">
