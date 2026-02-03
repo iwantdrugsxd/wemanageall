@@ -209,7 +209,7 @@ router.patch('/:id', requireAuth, async (req, res) => {
   try {
     await ensureTables();
 
-    const { name, icon, description, is_pinned } = req.body;
+    const { name, icon, description, is_pinned, is_shared, cover_image_url } = req.body;
     const listId = req.params.id;
 
     const updates = [];
@@ -236,6 +236,16 @@ router.patch('/:id', requireAuth, async (req, res) => {
       params.push(is_pinned);
     }
 
+    if (is_shared !== undefined) {
+      updates.push(`is_shared = $${paramIndex++}`);
+      params.push(is_shared);
+    }
+
+    if (cover_image_url !== undefined) {
+      updates.push(`cover_image_url = $${paramIndex++}`);
+      params.push(cover_image_url);
+    }
+
     if (updates.length === 0) {
       return res.status(400).json({ error: 'No fields to update.' });
     }
@@ -247,7 +257,7 @@ router.patch('/:id', requireAuth, async (req, res) => {
       UPDATE lists
       SET ${updates.join(', ')}
       WHERE id = $${paramIndex} AND user_id = $${paramIndex + 1}
-      RETURNING id, name, icon, description, is_pinned, is_shared, created_at, updated_at
+      RETURNING id, name, icon, description, cover_image_url, is_pinned, is_shared, created_at, updated_at
     `, params);
 
     if (result.rows.length === 0) {

@@ -898,52 +898,143 @@ export default function ProjectWorkspace() {
 
       {/* Notes View */}
       {activeView === 'notes' && (
-        <div className="bg-white rounded-xl border border-gray-300">
-          <div className="p-6 border-b border-gray-300 flex items-center justify-between">
-            <div>
-              <h3 className="font-display text-lg font-semibold text-black mb-1">Project Notes</h3>
-              <div className="flex items-center gap-2">
-                {noteSaved ? (
-                  <>
-                    <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span className="text-xs text-black">Saved to cloud</span>
-                  </>
-                ) : savingNote ? (
-                  <span className="text-xs text-gray-500">Saving...</span>
-                ) : (
-                  <span className="text-xs text-gray-500">Not saved</span>
-                )}
-              </div>
-            </div>
-            <button
-              onClick={handleSaveNote}
-              disabled={savingNote || !currentNote.trim()}
-              className="px-4 py-2 bg-black text-white rounded-xl hover:bg-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-            >
-              {savingNote ? 'Saving...' : 'Save Note'}
-            </button>
-          </div>
-          
-          <div className="p-6">
-            <div className="mb-6">
-              <input
-                type="text"
-                value={noteTitle}
-                onChange={(e) => setNoteTitle(e.target.value)}
-                placeholder="Note title (optional)"
-                className="w-full px-4 py-2 border-0 border-b-2 border-gray-300 focus:border-black focus:outline-none text-xl font-display font-semibold text-black bg-transparent"
-              />
+        <div className="space-y-4">
+          <div className="bg-white rounded-xl border border-gray-300 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-display text-lg font-semibold text-black">Project Notes</h3>
+              <button
+                onClick={() => {
+                  setNewNote({ title: '', content: '' });
+                  setEditingNoteId(null);
+                }}
+                className="px-4 py-2 bg-black text-white rounded-xl hover:bg-gray-900 transition-colors text-sm"
+              >
+                + New Note
+              </button>
             </div>
             
-            <textarea
-              value={currentNote}
-              onChange={(e) => setCurrentNote(e.target.value)}
-              placeholder="Start writing your thoughts here..."
-              className="w-full min-h-[500px] px-4 py-2 border-0 focus:outline-none resize-none text-gray-600 leading-relaxed"
-              style={{ fontFamily: 'serif' }}
-            />
+            {/* New/Edit Note Form */}
+            {(editingNoteId || (!editingNoteId && (newNote.title || newNote.content))) && (
+              <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                <input
+                  type="text"
+                  value={editingNoteId ? notes.find(n => n.id === editingNoteId)?.title || '' : newNote.title}
+                  onChange={(e) => {
+                    if (editingNoteId) {
+                      const note = notes.find(n => n.id === editingNoteId);
+                      handleUpdateNote(editingNoteId, { ...note, title: e.target.value });
+                    } else {
+                      setNewNote({ ...newNote, title: e.target.value });
+                    }
+                  }}
+                  placeholder="Note title (optional)"
+                  className="w-full px-3 py-2 mb-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black text-sm"
+                />
+                <textarea
+                  value={editingNoteId ? notes.find(n => n.id === editingNoteId)?.content || '' : newNote.content}
+                  onChange={(e) => {
+                    if (editingNoteId) {
+                      const note = notes.find(n => n.id === editingNoteId);
+                      handleUpdateNote(editingNoteId, { ...note, content: e.target.value });
+                    } else {
+                      setNewNote({ ...newNote, content: e.target.value });
+                    }
+                  }}
+                  placeholder="Start writing your thoughts here..."
+                  className="w-full min-h-[200px] px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black resize-none text-sm"
+                />
+                <div className="flex gap-2 mt-2">
+                  {!editingNoteId && (
+                    <button
+                      onClick={handleCreateNote}
+                      disabled={!newNote.content.trim()}
+                      className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-900 transition-colors disabled:opacity-50 text-sm"
+                    >
+                      Save Note
+                    </button>
+                  )}
+                  <button
+                    onClick={() => {
+                      setNewNote({ title: '', content: '' });
+                      setEditingNoteId(null);
+                    }}
+                    className="px-4 py-2 bg-white border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors text-sm"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+            
+            {/* Notes List */}
+            <div className="space-y-3">
+              {notes.length === 0 ? (
+                <p className="text-sm text-gray-500 text-center py-8">No notes yet. Create your first note above.</p>
+              ) : (
+                notes.map((note) => (
+                  <div key={note.id} className="p-4 bg-white border border-gray-300 rounded-lg hover:shadow-md transition-all">
+                    {editingNoteId === note.id ? (
+                      <div className="space-y-2">
+                        <input
+                          type="text"
+                          value={note.title || ''}
+                          onChange={(e) => handleUpdateNote(note.id, { ...note, title: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black text-sm font-medium"
+                        />
+                        <textarea
+                          value={note.content}
+                          onChange={(e) => handleUpdateNote(note.id, { ...note, content: e.target.value })}
+                          className="w-full min-h-[150px] px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black resize-none text-sm"
+                        />
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => setEditingNoteId(null)}
+                            className="px-3 py-1.5 bg-black text-white rounded-lg hover:bg-gray-900 transition-colors text-xs"
+                          >
+                            Done
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex-1">
+                            {note.title && (
+                              <h4 className="font-medium text-black mb-1">{note.title}</h4>
+                            )}
+                            <p className="text-sm text-gray-600 whitespace-pre-wrap">{note.content}</p>
+                            <p className="text-xs text-gray-500 mt-2">
+                              {new Date(note.updated_at || note.created_at).toLocaleString()}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => setEditingNoteId(note.id)}
+                              className="p-1.5 text-gray-400 hover:text-black transition-colors"
+                              title="Edit note"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                              </svg>
+                            </button>
+                            <button
+                              onClick={() => handleDeleteNote(note.id)}
+                              className="p-1.5 text-gray-400 hover:text-red-600 transition-colors"
+                              title="Delete note"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
             
             {/* Formatting Toolbar (appears on focus) */}
             <div className="mt-4 flex items-center gap-2 p-2 bg-gray-100 rounded-lg">
