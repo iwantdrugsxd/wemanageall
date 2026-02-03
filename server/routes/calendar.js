@@ -1,7 +1,21 @@
 import { Router } from 'express';
 import { query } from '../db/config.js';
+import { migrateCalendarEnhancements } from '../db/migrate_calendar_enhancements.js';
 
 const router = Router();
+
+// Ensure migration runs on first request
+let migrationRun = false;
+const ensureMigration = async () => {
+  if (!migrationRun) {
+    try {
+      await migrateCalendarEnhancements();
+      migrationRun = true;
+    } catch (error) {
+      console.error('Migration error (non-fatal):', error);
+    }
+  }
+};
 
 const requireAuth = (req, res, next) => {
   if (req.isAuthenticated()) {
@@ -13,11 +27,14 @@ const requireAuth = (req, res, next) => {
 // GET /api/calendar/events - Get events in date range
 router.get('/events', requireAuth, async (req, res) => {
   try {
+    await ensureMigration();
     const { start_date, end_date, type } = req.query;
     const userId = req.user.id;
     
     let sql = `
-      SELECT id, title, description, type, start_time, end_time, all_day, timezone, color, created_at, updated_at
+      SELECT id, title, description, type, start_time, end_time, all_day, timezone, color, 
+             recurrence_rule, recurrence_end_date, recurrence_count, reminder_minutes,
+             created_at, updated_at
       FROM calendar_events
       WHERE user_id = $1
     `;
@@ -55,6 +72,7 @@ router.get('/events', requireAuth, async (req, res) => {
 // POST /api/calendar/events - Create new event
 router.post('/events', requireAuth, async (req, res) => {
   try {
+    await ensureMigration();
     const {
       title,
       description,
@@ -64,6 +82,10 @@ router.post('/events', requireAuth, async (req, res) => {
       color = '#3B6E5C',
       all_day = false,
       timezone = 'UTC',
+      recurrence_rule,
+      recurrence_end_date,
+      recurrence_count,
+      reminder_minutes,
     } = req.body;
     
     if (!title || !start_time || !end_time) {
@@ -76,10 +98,15 @@ router.post('/events', requireAuth, async (req, res) => {
     }
     
     const result = await query(
-      `INSERT INTO calendar_events (user_id, title, description, type, start_time, end_time, all_day, timezone, color)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-       RETURNING id, title, description, type, start_time, end_time, all_day, timezone, color, created_at, updated_at`,
-      [req.user.id, title, description || null, type, start_time, end_time, all_day, timezone, color]
+      `INSERT INTO calendar_events (user_id, title, description, type, start_time, end_time, all_day, timezone, color, 
+                                    recurrence_rule, recurrence_end_date, recurrence_count, reminder_minutes)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+       RETURNING id, title, description, type, start_time, end_time, all_day, timezone, color, 
+                 recurrence_rule, recurrence_end_date, recurrence_count, reminder_minutes,
+                 created_at, updated_at`,
+      [req.user.id, title, description || null, type, start_time, end_time, all_day, timezone, color,
+       recurrence_rule ? JSON.stringify(recurrence_rule) : null, recurrence_end_date || null, 
+       recurrence_count || null, reminder_minutes || null]
     );
     
     res.json({
@@ -98,7 +125,9 @@ router.get('/events/:id', requireAuth, async (req, res) => {
     const { id } = req.params;
     
     const result = await query(
-      `SELECT id, title, description, type, start_time, end_time, all_day, timezone, color, created_at, updated_at
+      `SELECT id, title, description, type, start_time, end_time, all_day, timezone, color,
+              recurrence_rule, recurrence_end_date, recurrence_count, reminder_minutes,
+              created_at, updated_at
        FROM calendar_events
        WHERE id = $1 AND user_id = $2`,
       [id, req.user.id]
@@ -130,6 +159,10 @@ router.patch('/events/:id', requireAuth, async (req, res) => {
       color,
       all_day,
       timezone,
+      recurrence_rule,
+      recurrence_end_date,
+      recurrence_count,
+      reminder_minutes,
     } = req.body;
     
     // Build update query dynamically
@@ -169,6 +202,22 @@ router.patch('/events/:id', requireAuth, async (req, res) => {
       updates.push(`timezone = $${paramIndex++}`);
       params.push(timezone);
     }
+    if (recurrence_rule !== undefined) {
+      updates.push(`recurrence_rule = $${paramIndex++}`);
+      params.push(recurrence_rule ? JSON.stringify(recurrence_rule) : null);
+    }
+    if (recurrence_end_date !== undefined) {
+      updates.push(`recurrence_end_date = $${paramIndex++}`);
+      params.push(recurrence_end_date || null);
+    }
+    if (recurrence_count !== undefined) {
+      updates.push(`recurrence_count = $${paramIndex++}`);
+      params.push(recurrence_count || null);
+    }
+    if (reminder_minutes !== undefined) {
+      updates.push(`reminder_minutes = $${paramIndex++}`);
+      params.push(reminder_minutes || null);
+    }
     
     if (updates.length === 0) {
       return res.status(400).json({ error: 'No fields to update.' });
@@ -188,7 +237,9 @@ router.patch('/events/:id', requireAuth, async (req, res) => {
       `UPDATE calendar_events
        SET ${updates.join(', ')}
        WHERE id = $${paramIndex++} AND user_id = $${paramIndex++}
-       RETURNING id, title, description, type, start_time, end_time, all_day, timezone, color, created_at, updated_at`,
+       RETURNING id, title, description, type, start_time, end_time, all_day, timezone, color,
+                 recurrence_rule, recurrence_end_date, recurrence_count, reminder_minutes,
+                 created_at, updated_at`,
       params
     );
     
@@ -224,7 +275,9 @@ router.patch('/events/:id/move', requireAuth, async (req, res) => {
       `UPDATE calendar_events
        SET start_time = $1, end_time = $2, updated_at = CURRENT_TIMESTAMP
        WHERE id = $3 AND user_id = $4
-       RETURNING id, title, description, type, start_time, end_time, all_day, timezone, color, created_at, updated_at`,
+       RETURNING id, title, description, type, start_time, end_time, all_day, timezone, color,
+                 recurrence_rule, recurrence_end_date, recurrence_count, reminder_minutes,
+                 created_at, updated_at`,
       [start_time, end_time, id, req.user.id]
     );
     
@@ -266,6 +319,8 @@ router.delete('/events/:id', requireAuth, async (req, res) => {
 });
 
 export default router;
+
+
 
 
 

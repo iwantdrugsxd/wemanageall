@@ -26,10 +26,16 @@ export default function Calendar() {
     description: '',
     color: '#3B6E5C',
     startTime: '',
-    endTime: ''
+    endTime: '',
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    reminder_minutes: null,
+    recurrence_freq: 'none',
+    recurrence_end_date: '',
+    recurrence_count: ''
   });
   const [loading, setLoading] = useState(true);
   const [editFormData, setEditFormData] = useState({});
+  const [showEventDetail, setShowEventDetail] = useState(false);
 
   // Time slots (full day - 24 hours)
   const timeSlots = Array.from({ length: 24 }, (_, i) => i);
@@ -71,7 +77,10 @@ export default function Calendar() {
       
       if (response.ok) {
         const data = await response.json();
-        setEvents(data.events || []);
+        const baseEvents = data.events || [];
+        // Expand recurring events for display
+        const expanded = expandRecurringEvents(baseEvents, start, end);
+        setEvents(expanded);
       }
     } catch (error) {
       console.error('Failed to fetch events:', error);
@@ -293,7 +302,15 @@ export default function Calendar() {
           start_time: startTime.toISOString(),
           end_time: endTime.toISOString(),
           type: newEventData.type,
-          color: newEventData.color
+          color: newEventData.color,
+          timezone: newEventData.timezone,
+          reminder_minutes: newEventData.reminder_minutes || null,
+          recurrence_rule: newEventData.recurrence_freq !== 'none' ? {
+            freq: newEventData.recurrence_freq,
+            interval: 1
+          } : null,
+          recurrence_end_date: newEventData.recurrence_end_date || null,
+          recurrence_count: newEventData.recurrence_count ? parseInt(newEventData.recurrence_count) : null
         }),
       });
       
@@ -307,7 +324,12 @@ export default function Calendar() {
           description: '', 
           color: typeColors.event,
           startTime: '',
-          endTime: ''
+          endTime: '',
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          reminder_minutes: null,
+          recurrence_freq: 'none',
+          recurrence_end_date: '',
+          recurrence_count: ''
         });
         setCreatingRange(null);
         setRangeStart(null);
@@ -332,10 +354,11 @@ export default function Calendar() {
       
       if (response.ok) {
         const data = await response.json();
-        setEvents(events.map(e => e.id === editingEvent.id ? data.event : e));
+        fetchEvents(); // Refresh to get updated events
         setEditingEvent(null);
         setEditFormData({});
         setSelectedEvent(null);
+        setShowEventDetail(false);
       }
     } catch (error) {
       console.error('Failed to update event:', error);
@@ -345,22 +368,115 @@ export default function Calendar() {
 
   // Delete event
   const handleDeleteEvent = async (eventId) => {
+    // If it's a recurring instance, get the original event ID
+    const event = events.find(e => e.id === eventId);
+    const actualEventId = event?.originalEventId || eventId;
+    
     if (!confirm('Delete this event?')) return;
     
     try {
-      const response = await fetch(`/api/calendar/events/${eventId}`, {
+      const response = await fetch(`/api/calendar/events/${actualEventId}`, {
         method: 'DELETE',
         credentials: 'include',
       });
       
       if (response.ok) {
-        setEvents(events.filter(e => e.id !== eventId));
+        setEvents(events.filter(e => e.id !== actualEventId && e.originalEventId !== actualEventId));
         setSelectedEvent(null);
         setEditingEvent(null);
+        setShowEventDetail(false);
+        fetchEvents();
       }
     } catch (error) {
       console.error('Failed to delete event:', error);
       alert('Failed to delete event');
+    }
+  };
+
+  // Duplicate event
+  const handleDuplicateEvent = async (event) => {
+    try {
+      const start = new Date(event.start_time);
+      const end = new Date(event.end_time);
+      const duration = end - start;
+      const newStart = addDays(start, 1);
+      const newEnd = new Date(newStart.getTime() + duration);
+      
+      const response = await fetch('/api/calendar/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          title: `${event.title} (Copy)`,
+          description: event.description || null,
+          start_time: newStart.toISOString(),
+          end_time: newEnd.toISOString(),
+          type: event.type,
+          color: event.color,
+          timezone: event.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
+          reminder_minutes: event.reminder_minutes || null,
+          recurrence_rule: event.recurrence_rule ? (typeof event.recurrence_rule === 'string' ? JSON.parse(event.recurrence_rule) : event.recurrence_rule) : null,
+          recurrence_end_date: event.recurrence_end_date || null,
+          recurrence_count: event.recurrence_count || null
+        }),
+      });
+      
+      if (response.ok) {
+        fetchEvents();
+        setShowEventDetail(false);
+        setSelectedEvent(null);
+      }
+    } catch (error) {
+      console.error('Failed to duplicate event:', error);
+      alert('Failed to duplicate event');
+    }
+  };
+
+  // Export events to ICS
+  const handleExportEvents = async () => {
+    try {
+      const response = await fetch('/api/calendar/events', {
+        credentials: 'include'
+      });
+      
+      if (!response.ok) return;
+      
+      const data = await response.json();
+      const allEvents = data.events || [];
+      
+      // Generate ICS content
+      let icsContent = 'BEGIN:VCALENDAR\n';
+      icsContent += 'VERSION:2.0\n';
+      icsContent += 'PRODID:-//OFA//Calendar//EN\n';
+      icsContent += 'CALSCALE:GREGORIAN\n';
+      
+      allEvents.forEach(event => {
+        icsContent += 'BEGIN:VEVENT\n';
+        icsContent += `UID:${event.id}@ofa\n`;
+        icsContent += `DTSTART:${format(new Date(event.start_time), 'yyyyMMdd')}T${format(new Date(event.start_time), 'HHmmss')}\n`;
+        icsContent += `DTEND:${format(new Date(event.end_time), 'yyyyMMdd')}T${format(new Date(event.end_time), 'HHmmss')}\n`;
+        icsContent += `SUMMARY:${event.title.replace(/,/g, '\\,').replace(/;/g, '\\;')}\n`;
+        if (event.description) {
+          icsContent += `DESCRIPTION:${event.description.replace(/,/g, '\\,').replace(/;/g, '\\;')}\n`;
+        }
+        icsContent += `END:VEVENT\n`;
+      });
+      
+      icsContent += 'END:VCALENDAR\n';
+      
+      // Download file
+      const blob = new Blob([icsContent], { type: 'text/calendar' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `ofa-calendar-${format(new Date(), 'yyyy-MM-dd')}.ics`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Failed to export events:', error);
+      alert('Failed to export events');
     }
   };
 
@@ -513,7 +629,9 @@ export default function Calendar() {
           const dateStr = column.getAttribute('data-date');
           if (dateStr) {
             const date = new Date(dateStr);
-            const newTime = setMinutes(setHours(startOfDay(date), hours), minutes);
+            let newTime = setMinutes(setHours(startOfDay(date), hours), minutes);
+            // Snap to 15-minute intervals
+            newTime = snapTimeToInterval(newTime, 15);
             const start = new Date(resizingEvent.start_time);
             const end = new Date(resizingEvent.end_time);
             
@@ -558,7 +676,9 @@ export default function Calendar() {
           const dateStr = column.getAttribute('data-date');
           if (dateStr) {
             const date = new Date(dateStr);
-            const newTime = setMinutes(setHours(startOfDay(date), hours), minutes);
+            let newTime = setMinutes(setHours(startOfDay(date), hours), minutes);
+            // Snap to 15-minute intervals
+            newTime = snapTimeToInterval(newTime, 15);
             const start = new Date(resizingEvent.start_time);
             const end = new Date(resizingEvent.end_time);
             
@@ -630,6 +750,90 @@ export default function Calendar() {
 
 
 
+  // Snap time to 15-minute intervals
+  const snapTimeToInterval = (date, intervalMinutes = 15) => {
+    const minutes = date.getMinutes();
+    const snappedMinutes = Math.round(minutes / intervalMinutes) * intervalMinutes;
+    return setMinutes(date, snappedMinutes);
+  };
+
+  // Expand recurring events for display
+  const expandRecurringEvents = (events, startDate, endDate) => {
+    const expanded = [];
+    
+    events.forEach(event => {
+      if (!event.recurrence_rule) {
+        expanded.push(event);
+        return;
+      }
+      
+      try {
+        const rule = typeof event.recurrence_rule === 'string' 
+          ? JSON.parse(event.recurrence_rule) 
+          : event.recurrence_rule;
+        
+        if (!rule.freq) {
+          expanded.push(event);
+          return;
+        }
+        
+        const start = new Date(event.start_time);
+        const end = new Date(event.end_time);
+        const duration = end - start;
+        
+        let current = new Date(start);
+        let count = 0;
+        const maxCount = event.recurrence_count || 1000;
+        const endDateLimit = event.recurrence_end_date 
+          ? new Date(event.recurrence_end_date) 
+          : null;
+        
+        // Add the original event first
+        if (start >= startDate && start <= endDate) {
+          expanded.push({
+            ...event,
+            isRecurringInstance: false
+          });
+        }
+        
+        // Generate recurring instances
+        while (current <= endDate && count < maxCount) {
+          // Advance based on frequency first
+          if (rule.freq === 'daily') {
+            current = addDays(current, rule.interval || 1);
+          } else if (rule.freq === 'weekly') {
+            current = addDays(current, (rule.interval || 1) * 7);
+          } else if (rule.freq === 'monthly') {
+            current = addDays(current, (rule.interval || 1) * 30);
+          } else {
+            break;
+          }
+          
+          if (endDateLimit && current > endDateLimit) break;
+          if (current > endDate) break;
+          
+          if (current >= startDate) {
+            expanded.push({
+              ...event,
+              id: `${event.id}_${count}`,
+              start_time: current.toISOString(),
+              end_time: new Date(current.getTime() + duration).toISOString(),
+              isRecurringInstance: true,
+              originalEventId: event.id
+            });
+          }
+          
+          count++;
+        }
+      } catch (error) {
+        console.error('Error expanding recurring event:', error);
+        expanded.push(event);
+      }
+    });
+    
+    return expanded;
+  };
+
   // Format time for display
   const formatTime = (dateString) => {
     return format(new Date(dateString), 'h:mm a');
@@ -668,13 +872,7 @@ export default function Calendar() {
           }
           e.stopPropagation();
           setSelectedEvent(event);
-          setEditingEvent(event);
-          setEditFormData({
-            title: event.title,
-            description: event.description || '',
-            type: event.type,
-            color: event.color || typeColors[event.type]
-          });
+          setShowEventDetail(true);
         }}
         title={`${event.title} - ${formatTime(event.start_time)} to ${formatTime(event.end_time)}`}
       >
@@ -1024,6 +1222,13 @@ export default function Calendar() {
           
           <div className="flex items-center gap-4">
             <button
+              onClick={handleExportEvents}
+              className="px-4 py-2 bg-white border border-gray-300 text-black rounded-lg hover:bg-gray-100 transition-colors text-sm"
+              title="Export to ICS"
+            >
+              Export
+            </button>
+            <button
               onClick={handlePrev}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
@@ -1082,7 +1287,19 @@ export default function Calendar() {
           className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center"
           onClick={() => {
             setQuickAddSlot(null);
-            setNewEventData({ title: '', type: 'event', description: '', color: typeColors.event, startTime: '', endTime: '' });
+            setNewEventData({ 
+              title: '', 
+              type: 'event', 
+              description: '', 
+              color: typeColors.event, 
+              startTime: '', 
+              endTime: '',
+              timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+              reminder_minutes: null,
+              recurrence_freq: 'none',
+              recurrence_end_date: '',
+              recurrence_count: ''
+            });
             setCreatingRange(null);
             setRangeStart(null);
           }}
@@ -1176,6 +1393,96 @@ export default function Calendar() {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-ofa-ink resize-none"
                 />
               </div>
+
+              <div>
+                <label className="block text-sm text-gray-600 mb-2">Timezone</label>
+                <select
+                  value={newEventData.timezone}
+                  onChange={(e) => setNewEventData({ ...newEventData, timezone: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-ofa-ink"
+                >
+                  <option value={Intl.DateTimeFormat().resolvedOptions().timeZone}>
+                    {Intl.DateTimeFormat().resolvedOptions().timeZone}
+                  </option>
+                  <option value="UTC">UTC</option>
+                  <option value="America/New_York">America/New_York</option>
+                  <option value="America/Los_Angeles">America/Los_Angeles</option>
+                  <option value="Europe/London">Europe/London</option>
+                  <option value="Asia/Tokyo">Asia/Tokyo</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-600 mb-2">Reminder</label>
+                <select
+                  value={newEventData.reminder_minutes || ''}
+                  onChange={(e) => setNewEventData({ ...newEventData, reminder_minutes: e.target.value ? parseInt(e.target.value) : null })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-ofa-ink"
+                >
+                  <option value="">None</option>
+                  <option value="5">5 minutes before</option>
+                  <option value="15">15 minutes before</option>
+                  <option value="60">1 hour before</option>
+                  <option value="1440">1 day before</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-600 mb-2">Repeat</label>
+                <select
+                  value={newEventData.recurrence_freq}
+                  onChange={(e) => setNewEventData({ ...newEventData, recurrence_freq: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-ofa-ink"
+                >
+                  <option value="none">None</option>
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                </select>
+              </div>
+
+              {newEventData.recurrence_freq !== 'none' && (
+                <div className="space-y-2">
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">End repeat</label>
+                    <select
+                      value={newEventData.recurrence_end_date ? 'date' : newEventData.recurrence_count ? 'count' : 'never'}
+                      onChange={(e) => {
+                        if (e.target.value === 'never') {
+                          setNewEventData({ ...newEventData, recurrence_end_date: '', recurrence_count: '' });
+                        } else if (e.target.value === 'date') {
+                          setNewEventData({ ...newEventData, recurrence_end_date: format(quickAddSlot.date, 'yyyy-MM-dd'), recurrence_count: '' });
+                        } else {
+                          setNewEventData({ ...newEventData, recurrence_end_date: '', recurrence_count: '10' });
+                        }
+                      }}
+                      className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-ofa-ink"
+                    >
+                      <option value="never">Never</option>
+                      <option value="date">On date</option>
+                      <option value="count">After N occurrences</option>
+                    </select>
+                  </div>
+                  {newEventData.recurrence_end_date && (
+                    <input
+                      type="date"
+                      value={newEventData.recurrence_end_date}
+                      onChange={(e) => setNewEventData({ ...newEventData, recurrence_end_date: e.target.value })}
+                      className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-ofa-ink"
+                    />
+                  )}
+                  {newEventData.recurrence_count && (
+                    <input
+                      type="number"
+                      value={newEventData.recurrence_count}
+                      onChange={(e) => setNewEventData({ ...newEventData, recurrence_count: e.target.value })}
+                      placeholder="Number of occurrences"
+                      min="1"
+                      className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-ofa-ink"
+                    />
+                  )}
+                </div>
+              )}
               
               <div className="text-sm text-gray-600">
                 {format(quickAddSlot.date, 'EEEE, MMM d, yyyy')}
@@ -1192,7 +1499,19 @@ export default function Calendar() {
                 <button
                   onClick={() => {
                     setQuickAddSlot(null);
-                    setNewEventData({ title: '', type: 'event', description: '', color: typeColors.event, startTime: '', endTime: '' });
+                    setNewEventData({ 
+                      title: '', 
+                      type: 'event', 
+                      description: '', 
+                      color: typeColors.event, 
+                      startTime: '', 
+                      endTime: '',
+                      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                      reminder_minutes: null,
+                      recurrence_freq: 'none',
+                      recurrence_end_date: '',
+                      recurrence_count: ''
+                    });
                     setCreatingRange(null);
                     setRangeStart(null);
                   }}
@@ -1201,6 +1520,123 @@ export default function Calendar() {
                   Cancel
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Event Detail Modal */}
+      {selectedEvent && showEventDetail && !editingEvent && (
+        <div 
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center"
+          onClick={() => {
+            setShowEventDetail(false);
+            setSelectedEvent(null);
+          }}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-display text-xl text-black">{selectedEvent.title}</h3>
+              <button
+                onClick={() => {
+                  setShowEventDetail(false);
+                  setSelectedEvent(null);
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="space-y-3 mb-6">
+              <div>
+                <div className="text-xs text-gray-500 mb-1">Time</div>
+                <div className="text-sm text-gray-900">
+                  {format(new Date(selectedEvent.start_time), 'EEEE, MMM d, yyyy')} • {formatTime(selectedEvent.start_time)} - {formatTime(selectedEvent.end_time)}
+                </div>
+              </div>
+              
+              {selectedEvent.description && (
+                <div>
+                  <div className="text-xs text-gray-500 mb-1">Description</div>
+                  <div className="text-sm text-gray-900">{selectedEvent.description}</div>
+                </div>
+              )}
+              
+              {selectedEvent.timezone && (
+                <div>
+                  <div className="text-xs text-gray-500 mb-1">Timezone</div>
+                  <div className="text-sm text-gray-900">{selectedEvent.timezone}</div>
+                </div>
+              )}
+              
+              {selectedEvent.reminder_minutes && (
+                <div>
+                  <div className="text-xs text-gray-500 mb-1">Reminder</div>
+                  <div className="text-sm text-gray-900">
+                    {selectedEvent.reminder_minutes < 60 
+                      ? `${selectedEvent.reminder_minutes} minutes before`
+                      : selectedEvent.reminder_minutes < 1440
+                      ? `${Math.floor(selectedEvent.reminder_minutes / 60)} hour(s) before`
+                      : `${Math.floor(selectedEvent.reminder_minutes / 1440)} day(s) before`}
+                  </div>
+                </div>
+              )}
+              
+              {selectedEvent.recurrence_rule && (
+                <div>
+                  <div className="text-xs text-gray-500 mb-1">Repeats</div>
+                  <div className="text-sm text-gray-900">
+                    {(() => {
+                      try {
+                        const rule = typeof selectedEvent.recurrence_rule === 'string' 
+                          ? JSON.parse(selectedEvent.recurrence_rule) 
+                          : selectedEvent.recurrence_rule;
+                        return rule.freq ? `Every ${rule.freq}` : 'Repeating';
+                      } catch {
+                        return 'Repeating';
+                      }
+                    })()}
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  setEditingEvent(selectedEvent);
+                  setEditFormData({
+                    title: selectedEvent.title,
+                    description: selectedEvent.description || '',
+                    type: selectedEvent.type,
+                    color: selectedEvent.color || typeColors[selectedEvent.type],
+                    timezone: selectedEvent.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    reminder_minutes: selectedEvent.reminder_minutes || null,
+                    recurrence_rule: selectedEvent.recurrence_rule ? (typeof selectedEvent.recurrence_rule === 'string' ? JSON.parse(selectedEvent.recurrence_rule) : selectedEvent.recurrence_rule) : null
+                  });
+                }}
+                className="flex-1 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors text-sm"
+              >
+                Edit
+              </button>
+              <button
+                onClick={() => handleDuplicateEvent(selectedEvent)}
+                className="px-4 py-2 bg-white border border-gray-300 text-black rounded-lg hover:bg-gray-100 transition-colors text-sm"
+              >
+                Duplicate
+              </button>
+              <button
+                onClick={() => handleDeleteEvent(selectedEvent.id)}
+                className="px-4 py-2 bg-white border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors text-sm"
+              >
+                Delete
+              </button>
             </div>
           </div>
         </div>
@@ -1283,6 +1719,39 @@ export default function Calendar() {
                     <div>Start: {format(new Date(selectedEvent.start_time), 'MMM d, yyyy h:mm a')}</div>
                     <div>End: {format(new Date(selectedEvent.end_time), 'MMM d, yyyy h:mm a')}</div>
                   </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm text-gray-600 mb-2">Timezone</label>
+                  <select
+                    value={editFormData.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone}
+                    onChange={(e) => setEditFormData({ ...editFormData, timezone: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-ofa-ink"
+                  >
+                    <option value={Intl.DateTimeFormat().resolvedOptions().timeZone}>
+                      {Intl.DateTimeFormat().resolvedOptions().timeZone}
+                    </option>
+                    <option value="UTC">UTC</option>
+                    <option value="America/New_York">America/New_York</option>
+                    <option value="America/Los_Angeles">America/Los_Angeles</option>
+                    <option value="Europe/London">Europe/London</option>
+                    <option value="Asia/Tokyo">Asia/Tokyo</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm text-gray-600 mb-2">Reminder</label>
+                  <select
+                    value={editFormData.reminder_minutes || ''}
+                    onChange={(e) => setEditFormData({ ...editFormData, reminder_minutes: e.target.value ? parseInt(e.target.value) : null })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-ofa-ink"
+                  >
+                    <option value="">None</option>
+                    <option value="5">5 minutes before</option>
+                    <option value="15">15 minutes before</option>
+                    <option value="60">1 hour before</option>
+                    <option value="1440">1 day before</option>
+                  </select>
                 </div>
                 
                 <div className="flex gap-3 pt-4">
