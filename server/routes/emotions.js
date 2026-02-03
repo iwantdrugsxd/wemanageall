@@ -239,20 +239,86 @@ router.post('/voice', requireAuth, async (req, res) => {
   }
 });
 
-// PATCH /api/emotions/:id - Update an entry (lock/unlock)
-router.patch('/:id', requireAuth, async (req, res) => {
+// PUT /api/emotions/:id - Update text entry content
+router.put('/:id', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
-    const { locked } = req.body;
+    const { content } = req.body;
+    
+    if (content === undefined) {
+      return res.status(400).json({ error: 'Content is required.' });
+    }
     
     await ensureUnloadTable();
     
+    // Check if entry exists and is a text entry
+    const checkResult = await query(
+      `SELECT type FROM unload_entries WHERE id = $1 AND user_id = $2`,
+      [id, req.user.id]
+    );
+
+    if (checkResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Entry not found.' });
+    }
+
+    if (checkResult.rows[0].type !== 'text') {
+      return res.status(400).json({ error: 'Only text entries can be updated with PUT. Use PATCH for other fields.' });
+    }
+    
     const result = await query(
       `UPDATE unload_entries
-       SET locked = $1, updated_at = CURRENT_TIMESTAMP
+       SET content = $1, updated_at = CURRENT_TIMESTAMP
        WHERE id = $2 AND user_id = $3
-       RETURNING id, locked`,
-      [locked, id, req.user.id]
+       RETURNING id, type, content, locked, created_at, updated_at`,
+      [content, id, req.user.id]
+    );
+
+    res.json({
+      success: true,
+      entry: result.rows[0],
+    });
+  } catch (error) {
+    console.error('Update emotion error:', error);
+    res.status(500).json({ error: 'Failed to update entry.' });
+  }
+});
+
+// PATCH /api/emotions/:id - Update an entry (lock/unlock, transcript)
+router.patch('/:id', requireAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { locked, transcript } = req.body;
+    
+    await ensureUnloadTable();
+    
+    // Build update query dynamically
+    const updates = [];
+    const params = [];
+    let paramIndex = 1;
+    
+    if (locked !== undefined) {
+      updates.push(`locked = $${paramIndex++}`);
+      params.push(locked);
+    }
+    
+    if (transcript !== undefined) {
+      updates.push(`transcript = $${paramIndex++}`);
+      params.push(transcript);
+    }
+    
+    if (updates.length === 0) {
+      return res.status(400).json({ error: 'No fields to update.' });
+    }
+    
+    updates.push(`updated_at = CURRENT_TIMESTAMP`);
+    params.push(id, req.user.id);
+    
+    const result = await query(
+      `UPDATE unload_entries
+       SET ${updates.join(', ')}
+       WHERE id = $${paramIndex} AND user_id = $${paramIndex + 1}
+       RETURNING id, type, content, audio_url, duration, transcript, locked, created_at, updated_at`,
+      params
     );
 
     if (result.rows.length === 0) {
@@ -266,6 +332,117 @@ router.patch('/:id', requireAuth, async (req, res) => {
   } catch (error) {
     console.error('Update emotion error:', error);
     res.status(500).json({ error: 'Failed to update entry.' });
+  }
+});
+
+// GET /api/emotions/export - Export all entries as JSON
+router.get('/export', requireAuth, async (req, res) => {
+  try {
+    await ensureUnloadTable();
+    
+    const result = await query(
+      `SELECT id, type, content, audio_url, duration, transcript, locked, created_at, updated_at
+       FROM unload_entries
+       WHERE user_id = $1
+       ORDER BY created_at DESC`,
+      [req.user.id]
+    );
+    
+    // Generate public URLs for voice entries
+    const entriesWithUrls = result.rows.map((entry) => {
+      if (entry.type === 'voice' && entry.audio_url) {
+        try {
+          let fileName = entry.audio_url;
+          
+          if (fileName.startsWith('http')) {
+            return entry;
+          }
+          
+          let finalUrl = null;
+          if (supabase) {
+            const result = supabase.storage
+              .from('unload-recordings')
+              .getPublicUrl(fileName);
+            if (result?.publicUrl) {
+              finalUrl = result.publicUrl;
+            }
+          }
+          
+          if (!finalUrl) {
+            const supabaseUrl = process.env.VITE_SUPABASE_URL || '';
+            if (supabaseUrl) {
+              finalUrl = `${supabaseUrl}/storage/v1/object/public/unload-recordings/${fileName}`;
+            }
+          }
+          
+          if (finalUrl) {
+            return {
+              ...entry,
+              audio_url: finalUrl,
+            };
+          }
+        } catch (urlError) {
+          console.error('Error generating public URL:', urlError);
+        }
+      }
+      return entry;
+    });
+    
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Disposition', `attachment; filename="unload-entries-${Date.now()}.json"`);
+    res.json({
+      exported_at: new Date().toISOString(),
+      total_entries: entriesWithUrls.length,
+      entries: entriesWithUrls,
+    });
+  } catch (error) {
+    console.error('Export emotions error:', error);
+    res.status(500).json({ error: 'Failed to export entries.' });
+  }
+});
+
+// DELETE /api/emotions - Delete all entries for user
+router.delete('/', requireAuth, async (req, res) => {
+  try {
+    await ensureUnloadTable();
+    
+    // Get all voice entries to delete from storage
+    const voiceEntries = await query(
+      `SELECT audio_url FROM unload_entries WHERE user_id = $1 AND type = 'voice' AND audio_url IS NOT NULL`,
+      [req.user.id]
+    );
+    
+    // Delete audio files from Supabase Storage
+    if (supabase && voiceEntries.rows.length > 0) {
+      for (const entry of voiceEntries.rows) {
+        try {
+          const urlParts = entry.audio_url.split('/');
+          const fileName = urlParts[urlParts.length - 1];
+          const folderPath = `${req.user.id}/${fileName}`;
+          
+          await supabase.storage
+            .from('unload-recordings')
+            .remove([folderPath]);
+        } catch (storageError) {
+          console.error('Failed to delete from storage:', storageError);
+          // Continue with database deletion
+        }
+      }
+    }
+    
+    // Delete all entries from database
+    await query(
+      `DELETE FROM unload_entries WHERE user_id = $1`,
+      [req.user.id]
+    );
+
+    res.json({
+      success: true,
+      message: 'All entries deleted successfully.',
+    });
+  } catch (error) {
+    console.error('Delete all emotions error:', error);
+    res.status(500).json({ error: 'Failed to delete entries.' });
   }
 });
 

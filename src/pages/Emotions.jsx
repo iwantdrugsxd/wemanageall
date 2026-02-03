@@ -15,7 +15,14 @@ export default function Emotions() {
   const [selectedEntry, setSelectedEntry] = useState(null);
   const [showHistory, setShowHistory] = useState(false);
   const [filter, setFilter] = useState('all'); // all, text, voice, locked
+  const [searchQuery, setSearchQuery] = useState('');
   const [showSaveMessage, setShowSaveMessage] = useState(false);
+  const [editingEntryId, setEditingEntryId] = useState(null);
+  const [editingContent, setEditingContent] = useState('');
+  const [editingTranscript, setEditingTranscript] = useState('');
+  const [savingEdit, setSavingEdit] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [clearingAll, setClearingAll] = useState(false);
 
   // Voice recording states
   const [isRecording, setIsRecording] = useState(false);
@@ -73,6 +80,122 @@ export default function Emotions() {
       setEntries(data.entries || []);
     } catch (error) {
       console.error('Failed to fetch entries:', error);
+    }
+  };
+
+  // Filter entries by search query (client-side)
+  const filteredEntries = entries.filter(entry => {
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase();
+    if (entry.type === 'text' && entry.content) {
+      return entry.content.toLowerCase().includes(query);
+    }
+    if (entry.type === 'voice' && entry.transcript) {
+      return entry.transcript.toLowerCase().includes(query);
+    }
+    return false;
+  });
+
+  const handleEditEntry = (entry) => {
+    setEditingEntryId(entry.id);
+    if (entry.type === 'text') {
+      setEditingContent(entry.content || '');
+    } else if (entry.type === 'voice') {
+      setEditingTranscript(entry.transcript || '');
+    }
+  };
+
+  const handleUpdateEntry = async () => {
+    if (!editingEntryId) return;
+    
+    setSavingEdit(true);
+    try {
+      const entry = entries.find(e => e.id === editingEntryId);
+      if (!entry) return;
+
+      if (entry.type === 'text') {
+        const response = await fetch(`/api/emotions/${editingEntryId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ content: editingContent }),
+        });
+
+        if (!response.ok) throw new Error('Failed to update entry');
+      } else if (entry.type === 'voice') {
+        const response = await fetch(`/api/emotions/${editingEntryId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ transcript: editingTranscript }),
+        });
+
+        if (!response.ok) throw new Error('Failed to update transcript');
+      }
+
+      setEditingEntryId(null);
+      setEditingContent('');
+      setEditingTranscript('');
+      await fetchEntries();
+    } catch (error) {
+      console.error('Failed to update entry:', error);
+      alert('Failed to update entry. Please try again.');
+    } finally {
+      setSavingEdit(false);
+    }
+  };
+
+  const handleExportEntries = async () => {
+    setExporting(true);
+    try {
+      const response = await fetch('/api/emotions/export', {
+        credentials: 'include',
+      });
+
+      if (!response.ok) throw new Error('Failed to export entries');
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `unload-entries-${Date.now()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Failed to export entries:', error);
+      alert('Failed to export entries. Please try again.');
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleDeleteAll = async () => {
+    if (!confirm('Are you sure you want to delete ALL entries? This action cannot be undone.')) {
+      return;
+    }
+
+    if (!confirm('This will permanently delete all your unload entries. Are you absolutely sure?')) {
+      return;
+    }
+
+    setClearingAll(true);
+    try {
+      const response = await fetch('/api/emotions', {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      if (!response.ok) throw new Error('Failed to delete all entries');
+
+      await fetchEntries();
+      alert('All entries deleted successfully.');
+    } catch (error) {
+      console.error('Failed to delete all entries:', error);
+      alert('Failed to delete all entries. Please try again.');
+    } finally {
+      setClearingAll(false);
     }
   };
 
@@ -436,11 +559,59 @@ export default function Emotions() {
             </div>
           </div>
 
-          {/* Recent Unloads Section */}
+          {/* Search and Filters */}
           {entries.length > 0 && (
-            <div className="mt-12">
+            <div className="mt-12 mb-6">
+              <div className="flex items-center gap-4 mb-4">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search entries..."
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-gray-900"
+                />
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleExportEntries}
+                    disabled={exporting}
+                    className="px-4 py-2 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 transition-colors text-sm font-semibold disabled:opacity-50"
+                  >
+                    {exporting ? 'Exporting...' : 'Export'}
+                  </button>
+                  <button
+                    onClick={handleDeleteAll}
+                    disabled={clearingAll}
+                    className="px-4 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors text-sm font-semibold disabled:opacity-50"
+                  >
+                    {clearingAll ? 'Deleting...' : 'Delete All'}
+                  </button>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {['all', 'text', 'voice', 'locked'].map((f) => (
+                  <button
+                    key={f}
+                    onClick={() => setFilter(f)}
+                    className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                      filter === f
+                        ? 'bg-gray-900 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {f.charAt(0).toUpperCase() + f.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Recent Unloads Section */}
+          {filteredEntries.length > 0 && (
+            <div className="mt-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-h3 text-gray-900">Recent Unloads</h2>
+                <h2 className="text-h3 text-gray-900">
+                  {searchQuery ? `Search Results (${filteredEntries.length})` : 'Recent Unloads'}
+                </h2>
                 <button
                   onClick={() => {
                     setShowHistory(true);
@@ -457,7 +628,7 @@ export default function Emotions() {
 
               {/* Recent Entries List */}
               <div className="space-y-4">
-                {entries.slice(0, 5).map((entry) => {
+                {filteredEntries.slice(0, 5).map((entry) => {
                   const isPlaying = playingEntryId === entry.id;
                   return (
                     <div 
@@ -574,6 +745,15 @@ export default function Emotions() {
                             </button>
                           ) : null}
                           <button
+                            onClick={() => handleEditEntry(entry)}
+                            className="p-2.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                            title="Edit"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                          </button>
+                          <button
                             onClick={() => {
                               if (confirm('Delete this entry?')) {
                                 handleDeleteEntry(entry.id);
@@ -591,7 +771,7 @@ export default function Emotions() {
                 })}
               </div>
 
-              {entries.length > 5 && (
+              {filteredEntries.length > 5 && (
                 <div className="mt-8 text-center">
                   <button
                     onClick={() => {
@@ -600,7 +780,7 @@ export default function Emotions() {
                     }}
                     className="px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm font-semibold shadow-md"
                   >
-                    View all {entries.length} entries →
+                    View all {filteredEntries.length} entries →
                   </button>
                 </div>
               )}
@@ -608,13 +788,30 @@ export default function Emotions() {
           )}
 
           {/* Empty State */}
-          {entries.length === 0 && (
+          {filteredEntries.length === 0 && (
             <div className="mt-16 text-center max-w-2xl mx-auto">
               <div className="bg-white rounded-2xl p-12 border border-gray-200 shadow-sm">
                 <div className="text-6xl mb-6">📝</div>
-                <h3 className="text-2xl font-medium text-gray-900 mb-3">No entries yet</h3>
-                <p className="text-gray-600 text-lg mb-6">Start by writing or recording your thoughts.</p>
-                <p className="text-sm text-gray-500">Your entries will appear here once you save them.</p>
+                <h3 className="text-2xl font-medium text-gray-900 mb-3">
+                  {searchQuery ? 'No entries found' : entries.length === 0 ? 'No entries yet' : 'No entries match your filters'}
+                </h3>
+                <p className="text-gray-600 text-lg mb-6">
+                  {searchQuery 
+                    ? 'Try adjusting your search query or filters.'
+                    : 'Start by writing or recording your thoughts.'
+                  }
+                </p>
+                {searchQuery && (
+                  <button
+                    onClick={() => {
+                      setSearchQuery('');
+                      setFilter('all');
+                    }}
+                    className="px-4 py-2 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 transition-colors text-sm"
+                  >
+                    Clear filters
+                  </button>
+                )}
               </div>
             </div>
           )}
@@ -1004,6 +1201,15 @@ export default function Emotions() {
           {/* Actions */}
           <div className="flex items-center justify-between flex-wrap gap-4 pt-6 border-t border-gray-200">
             <div className="flex items-center gap-3">
+              <button
+                onClick={() => handleEditEntry(selectedEntry)}
+                className="px-6 py-3 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 transition-colors text-body-sm font-semibold flex items-center gap-2 border-2 border-gray-300"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                <span>Edit</span>
+              </button>
               {!selectedEntry.locked ? (
                 <button
                   onClick={() => handleLockEntry(selectedEntry.id, true)}
@@ -1043,14 +1249,6 @@ export default function Emotions() {
 
   // HISTORY VIEW
   if (showHistory) {
-    const filteredEntries = entries.filter(entry => {
-      if (filter === 'all') return true;
-      if (filter === 'text') return entry.type === 'text';
-      if (filter === 'voice') return entry.type === 'voice';
-      if (filter === 'locked') return entry.locked === true;
-      return true;
-    });
-
     return (
       <div className="min-h-screen bg-gradient-to-br from-ofa-ink/95 to-ofa-charcoal" style={{
         backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0)`,
@@ -1070,6 +1268,44 @@ export default function Emotions() {
             </button>
             <h2 className="font-display text-4xl text-white mb-2">Unload History</h2>
             <p className="text-white/60">A calm space for your past reflections.</p>
+            <div className="mt-6 flex items-center gap-4">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search entries..."
+                className="flex-1 px-4 py-2 bg-black/30 border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:border-white/40"
+              />
+              <div className="flex items-center gap-2">
+                {['all', 'text', 'voice', 'locked'].map((f) => (
+                  <button
+                    key={f}
+                    onClick={() => setFilter(f)}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                      filter === f
+                        ? 'bg-white text-black'
+                        : 'bg-black/30 text-white/80 hover:bg-black/50'
+                    }`}
+                  >
+                    {f.charAt(0).toUpperCase() + f.slice(1)}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={handleExportEntries}
+                disabled={exporting}
+                className="px-4 py-2 bg-black/30 text-white rounded-lg hover:bg-black/50 transition-colors text-sm font-semibold disabled:opacity-50"
+              >
+                {exporting ? 'Exporting...' : 'Export'}
+              </button>
+              <button
+                onClick={handleDeleteAll}
+                disabled={clearingAll}
+                className="px-4 py-2 bg-red-500/20 text-red-300 rounded-lg hover:bg-red-500/30 transition-colors text-sm font-semibold disabled:opacity-50"
+              >
+                {clearingAll ? 'Deleting...' : 'Delete All'}
+              </button>
+            </div>
             <div className="mt-4">
               <button
                 onClick={() => setView('home')}
@@ -1105,12 +1341,49 @@ export default function Emotions() {
 
           {/* Entries List */}
           <div className="space-y-4">
-            {filteredEntries.length === 0 ? (
+            {filteredEntries.filter(entry => {
+              if (searchQuery.trim()) {
+                const query = searchQuery.toLowerCase();
+                if (entry.type === 'text' && entry.content) {
+                  return entry.content.toLowerCase().includes(query);
+                }
+                if (entry.type === 'voice' && entry.transcript) {
+                  return entry.transcript.toLowerCase().includes(query);
+                }
+                return false;
+              }
+              return true;
+            }).length === 0 ? (
               <div className="bg-white/10 rounded-3xl p-12 border border-white/20 text-center">
-                <p className="text-white/60">No entries found.</p>
+                <p className="text-white/60">
+                  {searchQuery ? 'No entries match your search.' : 'No entries found.'}
+                </p>
+                {searchQuery && (
+                  <button
+                    onClick={() => {
+                      setSearchQuery('');
+                      setFilter('all');
+                    }}
+                    className="mt-4 px-4 py-2 bg-black/30 text-white rounded-lg hover:bg-black/50 transition-colors text-sm"
+                  >
+                    Clear filters
+                  </button>
+                )}
               </div>
             ) : (
-              filteredEntries.map((entry) => (
+              filteredEntries.filter(entry => {
+                if (searchQuery.trim()) {
+                  const query = searchQuery.toLowerCase();
+                  if (entry.type === 'text' && entry.content) {
+                    return entry.content.toLowerCase().includes(query);
+                  }
+                  if (entry.type === 'voice' && entry.transcript) {
+                    return entry.transcript.toLowerCase().includes(query);
+                  }
+                  return false;
+                }
+                return true;
+              }).map((entry) => (
                 <div key={entry.id} className="bg-white/10 rounded-3xl p-6 border border-white/20">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3 flex-wrap">
@@ -1171,6 +1444,15 @@ export default function Emotions() {
                           >
                             🔒
                           </button>
+                          <button
+                            onClick={() => handleEditEntry(entry)}
+                            className="p-2 text-white/60 hover:text-white transition-colors"
+                            title="Edit"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                          </button>
                         </>
                       )}
                       <button
@@ -1179,7 +1461,7 @@ export default function Emotions() {
                             handleDeleteEntry(entry.id);
                           }
                         }}
-                        className="p-2 text-white/60 hover:text-black transition-colors"
+                        className="p-2 text-white/60 hover:text-red-400 transition-colors"
                         title="Delete"
                       >
                         🗑️
@@ -1240,6 +1522,107 @@ export default function Emotions() {
               </button>
             </div>
           )}
+        </div>
+      </div>
+    );
+  }
+
+  // Edit Modal
+  if (editingEntryId) {
+    const entry = entries.find(e => e.id === editingEntryId);
+    if (!entry) {
+      setEditingEntryId(null);
+      return null;
+    }
+
+    return (
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="p-8">
+            <div className="flex items-start justify-between mb-6">
+              <div>
+                <h2 className="font-display text-2xl text-black mb-2">
+                  {entry.type === 'text' ? 'Edit Entry' : 'Edit Transcript'}
+                </h2>
+                <p className="text-gray-600 text-sm">
+                  {entry.type === 'text' 
+                    ? 'Update the content of your text entry'
+                    : 'Add or update the transcript for this voice entry'
+                  }
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  setEditingEntryId(null);
+                  setEditingContent('');
+                  setEditingTranscript('');
+                }}
+                className="text-gray-600 hover:text-black transition-colors text-2xl"
+              >
+                ×
+              </button>
+            </div>
+
+            {entry.type === 'text' ? (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-black mb-2">Content</label>
+                  <textarea
+                    value={editingContent}
+                    onChange={(e) => setEditingContent(e.target.value)}
+                    rows={12}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-gray-900 resize-none"
+                    placeholder="Enter your thoughts..."
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    {getWordCount(editingContent)} words
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {entry.audio_url && (
+                  <div className="bg-gray-50 rounded-xl p-4">
+                    <p className="text-sm text-gray-600 mb-2">Audio Recording</p>
+                    <audio controls src={entry.audio_url} className="w-full" />
+                  </div>
+                )}
+                <div>
+                  <label className="block text-sm font-medium text-black mb-2">Transcript</label>
+                  <textarea
+                    value={editingTranscript}
+                    onChange={(e) => setEditingTranscript(e.target.value)}
+                    rows={8}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-gray-900 resize-none"
+                    placeholder="Add or edit the transcript for this voice entry..."
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    {getWordCount(editingTranscript)} words
+                  </p>
+                </div>
+              </div>
+            )}
+
+            <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-300">
+              <button
+                onClick={() => {
+                  setEditingEntryId(null);
+                  setEditingContent('');
+                  setEditingTranscript('');
+                }}
+                className="text-gray-600 hover:text-black transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleUpdateEntry}
+                disabled={savingEdit || (entry.type === 'text' && !editingContent.trim())}
+                className="px-6 py-3 bg-black text-white rounded-xl hover:bg-black/90 disabled:opacity-50 transition-colors"
+              >
+                {savingEdit ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     );
