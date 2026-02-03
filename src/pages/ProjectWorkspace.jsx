@@ -32,6 +32,18 @@ export default function ProjectWorkspace() {
   const [userRole, setUserRole] = useState('owner');
   const [showShareModal, setShowShareModal] = useState(false);
   const [showCollaborators, setShowCollaborators] = useState(false);
+  const [editingTaskData, setEditingTaskData] = useState(null);
+  const [taskDependencies, setTaskDependencies] = useState({});
+  const [showPhaseModal, setShowPhaseModal] = useState(false);
+  const [editingPhase, setEditingPhase] = useState(null);
+  const [newPhase, setNewPhase] = useState({ name: '', description: '' });
+  const [showMilestoneModal, setShowMilestoneModal] = useState(false);
+  const [editingMilestone, setEditingMilestone] = useState(null);
+  const [newMilestone, setNewMilestone] = useState({ name: '', description: '', milestone_date: '', phase_id: '' });
+  const [editingNoteId, setEditingNoteId] = useState(null);
+  const [newNote, setNewNote] = useState({ title: '', content: '' });
+  const [activeTimeTracking, setActiveTimeTracking] = useState(null);
+  const [timeEntries, setTimeEntries] = useState({});
 
   useEffect(() => {
     if (id) {
@@ -199,6 +211,339 @@ export default function ProjectWorkspace() {
       await handleUpdateTaskStatus(draggedTask.id, targetStatus);
     }
     setDraggedTask(null);
+  };
+
+  const handleEditTask = (task) => {
+    setEditingTaskData({
+      ...task,
+      phase_id: task.phase_id || '',
+      priority: task.priority || 'medium',
+      time_estimate: task.time_estimate || '',
+      time_spent: task.time_spent || 0
+    });
+    fetchTaskDependencies(task.id);
+  };
+
+  const handleUpdateTask = async () => {
+    if (!editingTaskData) return;
+    
+    try {
+      const response = await fetch(`/api/projects/${id}/tasks/${editingTaskData.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(editingTaskData),
+      });
+      
+      if (response.ok) {
+        setEditingTaskData(null);
+        await fetchProjectData();
+      }
+    } catch (error) {
+      console.error('Failed to update task:', error);
+    }
+  };
+
+  const fetchTaskDependencies = async (taskId) => {
+    try {
+      const response = await fetch(`/api/projects/${id}/tasks/${taskId}/dependencies`, {
+        credentials: 'include',
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setTaskDependencies(prev => ({ ...prev, [taskId]: data.dependencies || [] }));
+      }
+    } catch (error) {
+      console.error('Failed to fetch dependencies:', error);
+    }
+  };
+
+  const handleAddDependency = async (taskId, dependsOnTaskId) => {
+    try {
+      const response = await fetch(`/api/projects/${id}/tasks/${taskId}/dependencies`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ depends_on_task_id: dependsOnTaskId }),
+      });
+      
+      if (response.ok) {
+        await fetchTaskDependencies(taskId);
+      }
+    } catch (error) {
+      console.error('Failed to add dependency:', error);
+    }
+  };
+
+  const handleRemoveDependency = async (taskId, depId) => {
+    try {
+      const response = await fetch(`/api/projects/${id}/tasks/${taskId}/dependencies/${depId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      
+      if (response.ok) {
+        await fetchTaskDependencies(taskId);
+      }
+    } catch (error) {
+      console.error('Failed to remove dependency:', error);
+    }
+  };
+
+  const handleCreatePhase = async () => {
+    if (!newPhase.name.trim()) return;
+    
+    try {
+      const response = await fetch(`/api/projects/${id}/phases`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(newPhase),
+      });
+      
+      if (response.ok) {
+        setShowPhaseModal(false);
+        setNewPhase({ name: '', description: '' });
+        await fetchProjectData();
+      }
+    } catch (error) {
+      console.error('Failed to create phase:', error);
+    }
+  };
+
+  const handleUpdatePhase = async () => {
+    if (!editingPhase || !editingPhase.name.trim()) return;
+    
+    try {
+      const response = await fetch(`/api/projects/${id}/phases/${editingPhase.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(editingPhase),
+      });
+      
+      if (response.ok) {
+        setEditingPhase(null);
+        await fetchProjectData();
+      }
+    } catch (error) {
+      console.error('Failed to update phase:', error);
+    }
+  };
+
+  const handleDeletePhase = async (phaseId) => {
+    if (!confirm('Delete this phase? Tasks in this phase will be unassigned.')) return;
+    
+    try {
+      const response = await fetch(`/api/projects/${id}/phases/${phaseId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      
+      if (response.ok) {
+        await fetchProjectData();
+      }
+    } catch (error) {
+      console.error('Failed to delete phase:', error);
+    }
+  };
+
+  const handleCreateMilestone = async () => {
+    if (!newMilestone.name.trim() || !newMilestone.milestone_date) return;
+    
+    try {
+      const response = await fetch(`/api/projects/${id}/milestones`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(newMilestone),
+      });
+      
+      if (response.ok) {
+        setShowMilestoneModal(false);
+        setNewMilestone({ name: '', description: '', milestone_date: '', phase_id: '' });
+        await fetchProjectData();
+      }
+    } catch (error) {
+      console.error('Failed to create milestone:', error);
+    }
+  };
+
+  const handleUpdateMilestone = async () => {
+    if (!editingMilestone || !editingMilestone.name.trim()) return;
+    
+    try {
+      const response = await fetch(`/api/projects/${id}/milestones/${editingMilestone.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(editingMilestone),
+      });
+      
+      if (response.ok) {
+        setEditingMilestone(null);
+        await fetchProjectData();
+      }
+    } catch (error) {
+      console.error('Failed to update milestone:', error);
+    }
+  };
+
+  const handleDeleteMilestone = async (milestoneId) => {
+    if (!confirm('Delete this milestone?')) return;
+    
+    try {
+      const response = await fetch(`/api/projects/${id}/milestones/${milestoneId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      
+      if (response.ok) {
+        await fetchProjectData();
+      }
+    } catch (error) {
+      console.error('Failed to delete milestone:', error);
+    }
+  };
+
+  const handleCreateNote = async () => {
+    if (!newNote.content.trim()) return;
+    
+    try {
+      const response = await fetch(`/api/projects/${id}/notes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(newNote),
+      });
+      
+      if (response.ok) {
+        setNewNote({ title: '', content: '' });
+        await fetchProjectData();
+      }
+    } catch (error) {
+      console.error('Failed to create note:', error);
+    }
+  };
+
+  const handleUpdateNote = async (noteId, noteData) => {
+    try {
+      const response = await fetch(`/api/projects/${id}/notes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ ...noteData, note_id: noteId }),
+      });
+      
+      if (response.ok) {
+        setEditingNoteId(null);
+        await fetchProjectData();
+      }
+    } catch (error) {
+      console.error('Failed to update note:', error);
+    }
+  };
+
+  const handleDeleteNote = async (noteId) => {
+    if (!confirm('Delete this note?')) return;
+    
+    try {
+      const response = await fetch(`/api/projects/${id}/notes/${noteId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      
+      if (response.ok) {
+        await fetchProjectData();
+      }
+    } catch (error) {
+      console.error('Failed to delete note:', error);
+    }
+  };
+
+  const handleStartTimeTracking = async (taskId) => {
+    try {
+      const response = await fetch(`/api/projects/${id}/tasks/${taskId}/time/start`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      
+      if (response.ok) {
+        setActiveTimeTracking(taskId);
+        await fetchTimeEntries(taskId);
+      }
+    } catch (error) {
+      console.error('Failed to start time tracking:', error);
+    }
+  };
+
+  const handleStopTimeTracking = async (taskId) => {
+    try {
+      const response = await fetch(`/api/projects/${id}/tasks/${taskId}/time/stop`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ notes: '' }),
+      });
+      
+      if (response.ok) {
+        setActiveTimeTracking(null);
+        await fetchTimeEntries(taskId);
+        await fetchProjectData();
+      }
+    } catch (error) {
+      console.error('Failed to stop time tracking:', error);
+    }
+  };
+
+  const fetchTimeEntries = async (taskId) => {
+    try {
+      const response = await fetch(`/api/projects/${id}/tasks/${taskId}/time`, {
+        credentials: 'include',
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setTimeEntries(prev => ({ ...prev, [taskId]: data.timeEntries || [] }));
+      }
+    } catch (error) {
+      console.error('Failed to fetch time entries:', error);
+    }
+  };
+
+  const handleUpdateCollaboratorRole = async (userId, role) => {
+    try {
+      const response = await fetch(`/api/projects/${id}/collaborators/${userId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ role }),
+      });
+      
+      if (response.ok) {
+        await fetchProjectData();
+      }
+    } catch (error) {
+      console.error('Failed to update collaborator role:', error);
+    }
+  };
+
+  const handleRemoveCollaborator = async (userId) => {
+    if (!confirm('Remove this collaborator?')) return;
+    
+    try {
+      const response = await fetch(`/api/projects/${id}/collaborators/${userId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      
+      if (response.ok) {
+        await fetchProjectData();
+      }
+    } catch (error) {
+      console.error('Failed to remove collaborator:', error);
+    }
   };
 
   const formatDate = (dateString) => {

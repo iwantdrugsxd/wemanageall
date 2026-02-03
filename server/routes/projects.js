@@ -1167,6 +1167,35 @@ router.delete('/:id/tasks/:taskId', requireAuth, async (req, res) => {
   }
 });
 
+// PATCH /api/projects/:id/tasks/reorder - Reorder tasks
+router.patch('/:id/tasks/reorder', requireAuth, async (req, res) => {
+  try {
+    await ensureTables();
+    
+    const { id } = req.params;
+    const { taskOrders } = req.body; // Array of { taskId, order_index }
+    
+    if (!Array.isArray(taskOrders)) {
+      return res.status(400).json({ error: 'taskOrders must be an array.' });
+    }
+    
+    // Update each task's order_index
+    for (const { taskId, order_index } of taskOrders) {
+      await query(
+        `UPDATE project_tasks
+         SET order_index = $1, updated_at = CURRENT_TIMESTAMP
+         WHERE id = $2 AND project_id = $3 AND user_id = $4`,
+        [order_index, taskId, id, req.user.id]
+      );
+    }
+    
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Reorder tasks error:', error);
+    res.status(500).json({ error: 'Failed to reorder tasks.' });
+  }
+});
+
 // ============================================
 // NOTES ROUTES
 // ============================================
@@ -1295,6 +1324,64 @@ router.post('/:id/phases', requireAuth, async (req, res) => {
   }
 });
 
+// PUT /api/projects/:id/phases/:phaseId - Update phase
+router.put('/:id/phases/:phaseId', requireAuth, async (req, res) => {
+  try {
+    await ensureTables();
+    
+    const { id, phaseId } = req.params;
+    const { name, description, order_index } = req.body;
+    
+    const result = await query(
+      `UPDATE project_phases
+       SET name = COALESCE($1, name),
+           description = COALESCE($2, description),
+           order_index = COALESCE($3, order_index),
+           updated_at = CURRENT_TIMESTAMP
+       WHERE id = $4 AND project_id = $5
+       RETURNING *`,
+      [name?.trim(), description?.trim(), order_index, phaseId, id]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Phase not found.' });
+    }
+    
+    res.json({
+      success: true,
+      phase: result.rows[0],
+    });
+  } catch (error) {
+    console.error('Update phase error:', error);
+    res.status(500).json({ error: 'Failed to update phase.' });
+  }
+});
+
+// DELETE /api/projects/:id/phases/:phaseId - Delete phase
+router.delete('/:id/phases/:phaseId', requireAuth, async (req, res) => {
+  try {
+    await ensureTables();
+    
+    const { id, phaseId } = req.params;
+    
+    const result = await query(
+      `DELETE FROM project_phases
+       WHERE id = $1 AND project_id = $2
+       RETURNING id`,
+      [phaseId, id]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Phase not found.' });
+    }
+    
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Delete phase error:', error);
+    res.status(500).json({ error: 'Failed to delete phase.' });
+  }
+});
+
 // ============================================
 // MILESTONES ROUTES
 // ============================================
@@ -1329,6 +1416,65 @@ router.post('/:id/milestones', requireAuth, async (req, res) => {
   } catch (error) {
     console.error('Create milestone error:', error);
     res.status(500).json({ error: 'Failed to create milestone.' });
+  }
+});
+
+// PUT /api/projects/:id/milestones/:milestoneId - Update milestone
+router.put('/:id/milestones/:milestoneId', requireAuth, async (req, res) => {
+  try {
+    await ensureTables();
+    
+    const { id, milestoneId } = req.params;
+    const { name, description, milestone_date, phase_id } = req.body;
+    
+    const result = await query(
+      `UPDATE project_milestones
+       SET name = COALESCE($1, name),
+           description = COALESCE($2, description),
+           milestone_date = COALESCE($3, milestone_date),
+           phase_id = COALESCE($4, phase_id),
+           updated_at = CURRENT_TIMESTAMP
+       WHERE id = $5 AND project_id = $6
+       RETURNING *`,
+      [name?.trim(), description?.trim(), milestone_date, phase_id, milestoneId, id]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Milestone not found.' });
+    }
+    
+    res.json({
+      success: true,
+      milestone: result.rows[0],
+    });
+  } catch (error) {
+    console.error('Update milestone error:', error);
+    res.status(500).json({ error: 'Failed to update milestone.' });
+  }
+});
+
+// DELETE /api/projects/:id/milestones/:milestoneId - Delete milestone
+router.delete('/:id/milestones/:milestoneId', requireAuth, async (req, res) => {
+  try {
+    await ensureTables();
+    
+    const { id, milestoneId } = req.params;
+    
+    const result = await query(
+      `DELETE FROM project_milestones
+       WHERE id = $1 AND project_id = $2
+       RETURNING id`,
+      [milestoneId, id]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Milestone not found.' });
+    }
+    
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Delete milestone error:', error);
+    res.status(500).json({ error: 'Failed to delete milestone.' });
   }
 });
 

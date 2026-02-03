@@ -28,6 +28,19 @@ export default function Projects() {
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [joinCode, setJoinCode] = useState('');
   const [joining, setJoining] = useState(false);
+  const [showArchived, setShowArchived] = useState(false);
+  const [editingProject, setEditingProject] = useState(null);
+  const [editProjectData, setEditProjectData] = useState({});
+  const [templates, setTemplates] = useState([]);
+  const [showTemplates, setShowTemplates] = useState(false);
+  const [savingTemplate, setSavingTemplate] = useState(false);
+  const [templateName, setTemplateName] = useState('');
+  const [templateDescription, setTemplateDescription] = useState('');
+  const [templateIsPublic, setTemplateIsPublic] = useState(false);
+  const [showHealthModal, setShowHealthModal] = useState(false);
+  const [showActivityModal, setShowActivityModal] = useState(false);
+  const [healthData, setHealthData] = useState(null);
+  const [activityData, setActivityData] = useState([]);
   
   // Color and icon options
   const colorOptions = [
@@ -40,8 +53,9 @@ export default function Projects() {
   useEffect(() => {
     if (user) {
       fetchProjects();
+      fetchTemplates();
     }
-  }, [user, showFavoritesOnly, filterTag]);
+  }, [user, showFavoritesOnly, filterTag, showArchived]);
 
   const fetchTags = async () => {
     try {
@@ -56,6 +70,230 @@ export default function Projects() {
       }
     } catch (error) {
       console.error('Failed to fetch tags:', error);
+    }
+  };
+
+  const fetchTemplates = async () => {
+    try {
+      const response = await fetch('/api/projects/templates', { credentials: 'include' });
+      if (response.ok) {
+        const data = await response.json();
+        setTemplates(data.templates || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch templates:', error);
+    }
+  };
+
+  const handleEditProject = (project) => {
+    setEditingProject(project);
+    setEditProjectData({
+      name: project.name || '',
+      description: project.description || '',
+      start_date: project.start_date || new Date().toISOString().split('T')[0],
+      color: project.color || '#000000',
+      icon: project.icon || '📋',
+      tags: project.tags || [],
+      cover_image_url: project.cover_image_url || null
+    });
+  };
+
+  const handleUpdateProject = async (e) => {
+    e.preventDefault();
+    if (!editingProject) return;
+    
+    try {
+      const response = await fetch(`/api/projects/${editingProject.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(editProjectData),
+      });
+      
+      if (response.ok) {
+        setEditingProject(null);
+        setEditProjectData({});
+        await fetchProjects();
+      } else {
+        const data = await response.json();
+        alert(data.error || 'Failed to update project');
+      }
+    } catch (error) {
+      console.error('Failed to update project:', error);
+      alert('Network error. Please check your connection.');
+    }
+  };
+
+  const handleArchiveProject = async (projectId) => {
+    try {
+      const response = await fetch(`/api/projects/${projectId}/archive`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      
+      if (response.ok) {
+        await fetchProjects();
+      } else {
+        const data = await response.json();
+        alert(data.error || 'Failed to archive project');
+      }
+    } catch (error) {
+      console.error('Failed to archive project:', error);
+      alert('Network error. Please check your connection.');
+    }
+  };
+
+  const handleUnarchiveProject = async (projectId) => {
+    try {
+      const response = await fetch(`/api/projects/${projectId}/unarchive`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      
+      if (response.ok) {
+        await fetchProjects();
+      } else {
+        const data = await response.json();
+        alert(data.error || 'Failed to unarchive project');
+      }
+    } catch (error) {
+      console.error('Failed to unarchive project:', error);
+      alert('Network error. Please check your connection.');
+    }
+  };
+
+  const handleRegenerateShareCode = async (projectId) => {
+    try {
+      const response = await fetch(`/api/projects/${projectId}/share`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ access_level: 'editor' }),
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        await fetchProjects();
+        alert(`New share code: ${data.share_code}`);
+      } else {
+        const data = await response.json();
+        alert(data.error || 'Failed to regenerate share code');
+      }
+    } catch (error) {
+      console.error('Failed to regenerate share code:', error);
+      alert('Network error. Please check your connection.');
+    }
+  };
+
+  const handleSaveAsTemplate = async (project) => {
+    if (!templateName.trim()) {
+      alert('Template name is required');
+      return;
+    }
+    
+    setSavingTemplate(true);
+    try {
+      const response = await fetch('/api/projects/templates', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          name: templateName.trim(),
+          description: templateDescription.trim() || null,
+          project_id: project.id,
+          icon: project.icon || '📋',
+          color: project.color || '#000000',
+          is_public: templateIsPublic
+        }),
+      });
+      
+      if (response.ok) {
+        setTemplateName('');
+        setTemplateDescription('');
+        setTemplateIsPublic(false);
+        setShowTemplates(false);
+        await fetchTemplates();
+        alert('Template saved successfully!');
+      } else {
+        const data = await response.json();
+        alert(data.error || 'Failed to save template');
+      }
+    } catch (error) {
+      console.error('Failed to save template:', error);
+      alert('Network error. Please check your connection.');
+    } finally {
+      setSavingTemplate(false);
+    }
+  };
+
+  const handleApplyTemplate = async (templateId) => {
+    setCreating(true);
+    try {
+      const template = templates.find(t => t.id === templateId);
+      if (!template) return;
+      
+      const response = await fetch('/api/projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          name: `${template.name} (Copy)`,
+          description: template.description || '',
+          color: template.color || '#000000',
+          icon: template.icon || '📋',
+          template_id: templateId
+        }),
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setShowCreateModal(false);
+        setShowTemplates(false);
+        await fetchProjects();
+        if (data.project?.id) {
+          navigate(`/projects/${data.project.id}`);
+        }
+      } else {
+        const data = await response.json();
+        alert(data.error || 'Failed to create project from template');
+      }
+    } catch (error) {
+      console.error('Failed to apply template:', error);
+      alert('Network error. Please check your connection.');
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const handleFetchHealth = async (projectId) => {
+    try {
+      const response = await fetch(`/api/projects/${projectId}/health`, {
+        credentials: 'include',
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setHealthData(data.health);
+        setShowHealthModal(true);
+      }
+    } catch (error) {
+      console.error('Failed to fetch health:', error);
+    }
+  };
+
+  const handleFetchActivity = async (projectId) => {
+    try {
+      const response = await fetch(`/api/projects/${projectId}/activity?limit=20`, {
+        credentials: 'include',
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setActivityData(data.activity || []);
+        setShowActivityModal(true);
+      }
+    } catch (error) {
+      console.error('Failed to fetch activity:', error);
     }
   };
   
@@ -105,7 +343,7 @@ export default function Projects() {
       let url = '/api/projects?';
       if (showFavoritesOnly) url += 'favorite=true&';
       if (filterTag) url += `tag=${encodeURIComponent(filterTag)}&`;
-      url += 'archived=false';
+      url += showArchived ? 'archived=true' : 'archived=false';
       
       const response = await fetch(url, {
         credentials: 'include',
@@ -279,6 +517,19 @@ export default function Projects() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
               </svg>
               Favorites
+            </button>
+            <button
+              onClick={() => setShowArchived(!showArchived)}
+              className={`px-4 py-2 rounded-xl transition-colors flex items-center gap-2 ${
+                showArchived
+                  ? 'bg-black text-white'
+                  : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+              </svg>
+              {showArchived ? 'Active' : 'Archived'}
             </button>
             <button
               onClick={() => setShowFilters(!showFilters)}
@@ -474,24 +725,91 @@ export default function Projects() {
                         <span className="text-xs text-black" style={{ color: '#000000' }}>+{project.collaborators.length}</span>
                       </div>
                     )}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteProject(project.id, project.name);
-                      }}
-                      className="p-1.5 rounded hover:bg-gray-100 transition-colors opacity-0 group-hover:opacity-100"
-                      style={{ color: '#000000' }}
-                      title="Delete project"
-                    >
-                      <svg 
-                        className="w-4 h-4" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        viewBox="0 0 24 24"
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleFetchHealth(project.id);
+                        }}
+                        className="p-1.5 rounded hover:bg-gray-100 transition-colors opacity-0 group-hover:opacity-100"
+                        title="View health"
                       >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
+                        <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleFetchActivity(project.id);
+                        }}
+                        className="p-1.5 rounded hover:bg-gray-100 transition-colors opacity-0 group-hover:opacity-100"
+                        title="View activity"
+                      >
+                        <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditProject(project);
+                        }}
+                        className="p-1.5 rounded hover:bg-gray-100 transition-colors opacity-0 group-hover:opacity-100"
+                        title="Edit project"
+                      >
+                        <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </button>
+                      {showArchived ? (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleUnarchiveProject(project.id);
+                          }}
+                          className="p-1.5 rounded hover:bg-gray-100 transition-colors opacity-0 group-hover:opacity-100"
+                          title="Unarchive project"
+                        >
+                          <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                          </svg>
+                        </button>
+                      ) : (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (confirm('Archive this project?')) {
+                              handleArchiveProject(project.id);
+                            }
+                          }}
+                          className="p-1.5 rounded hover:bg-gray-100 transition-colors opacity-0 group-hover:opacity-100"
+                          title="Archive project"
+                        >
+                          <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                          </svg>
+                        </button>
+                      )}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteProject(project.id, project.name);
+                        }}
+                        className="p-1.5 rounded hover:bg-gray-100 transition-colors opacity-0 group-hover:opacity-100"
+                        style={{ color: '#000000' }}
+                        title="Delete project"
+                      >
+                        <svg 
+                          className="w-4 h-4" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
                 </div>
                 
@@ -508,16 +826,14 @@ export default function Projects() {
                           onClick={(e) => {
                             e.stopPropagation();
                             navigator.clipboard.writeText(project.share_code).then(() => {
-                              alert('Share code copied to clipboard!');
+                              // Silent copy
                             }).catch(() => {
-                              // Fallback if clipboard API fails
                               const textArea = document.createElement('textarea');
                               textArea.value = project.share_code;
                               document.body.appendChild(textArea);
                               textArea.select();
                               document.execCommand('copy');
                               document.body.removeChild(textArea);
-                              alert('Share code copied to clipboard!');
                             });
                           }}
                           className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-200 rounded"
@@ -525,6 +841,20 @@ export default function Projects() {
                         >
                           <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (confirm('Regenerate share code? The old code will no longer work.')) {
+                              handleRegenerateShareCode(project.id);
+                            }
+                          }}
+                          className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-200 rounded"
+                          title="Regenerate share code"
+                        >
+                          <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                           </svg>
                         </button>
                       </div>
@@ -553,8 +883,43 @@ export default function Projects() {
             className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="font-display text-2xl font-semibold text-black mb-2">Create New Project</h3>
-            <p className="text-sm text-gray-600 mb-6">Start a new focus area for your work.</p>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="font-display text-2xl font-semibold text-black mb-2">Create New Project</h3>
+                <p className="text-sm text-gray-600">Start a new focus area for your work.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowTemplates(!showTemplates)}
+                className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                {showTemplates ? 'Hide' : 'Use'} Templates
+              </button>
+            </div>
+            
+            {showTemplates && templates.length > 0 && (
+              <div className="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                <label className="block text-sm font-medium text-black mb-2">Start from Template</label>
+                <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
+                  {templates.map((template) => (
+                    <button
+                      key={template.id}
+                      type="button"
+                      onClick={() => handleApplyTemplate(template.id)}
+                      className="p-3 text-left border border-gray-300 rounded-lg hover:border-black hover:bg-white transition-colors"
+                    >
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-lg">{template.icon || '📋'}</span>
+                        <span className="text-sm font-medium text-black truncate">{template.name}</span>
+                      </div>
+                      {template.description && (
+                        <p className="text-xs text-gray-600 line-clamp-2">{template.description}</p>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
             
             {error && (
               <div className="mb-4 p-3 bg-gray-100 border text-black rounded-xl">
@@ -811,12 +1176,228 @@ export default function Projects() {
                   className="px-6 py-3 bg-white border border-gray-300 text-gray-600 rounded-xl hover:bg-gray-100 transition-colors disabled:opacity-50"
                 >
                   Cancel
+                  </button>
+                </div>
+              </form>
+                  </div>
+                </div>
+      )}
+
+      {/* Edit Project Modal */}
+      {editingProject && (
+        <div 
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => {
+            setEditingProject(null);
+            setEditProjectData({});
+          }}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="font-display text-2xl font-semibold text-black mb-2">Edit Project</h3>
+            <p className="text-sm text-gray-600 mb-6">Update project details.</p>
+            
+            <form onSubmit={handleUpdateProject}>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-black mb-2">Project Name</label>
+                <input
+                  type="text"
+                  value={editProjectData.name}
+                  onChange={(e) => setEditProjectData({ ...editProjectData, name: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-black"
+                  required
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-black mb-2">Description</label>
+                <textarea
+                  value={editProjectData.description || ''}
+                  onChange={(e) => setEditProjectData({ ...editProjectData, description: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-black resize-none"
+                  rows={3}
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-black mb-2">Start Date</label>
+                <input
+                  type="date"
+                  value={editProjectData.start_date}
+                  onChange={(e) => setEditProjectData({ ...editProjectData, start_date: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-black"
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-black mb-2">Color</label>
+                <input
+                  type="color"
+                  value={editProjectData.color}
+                  onChange={(e) => setEditProjectData({ ...editProjectData, color: e.target.value })}
+                  className="w-full h-12 border border-gray-300 rounded-xl"
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-black mb-2">Icon</label>
+                <div className="grid grid-cols-10 gap-2">
+                  {iconOptions.map((icon) => (
+                    <button
+                      key={icon}
+                      type="button"
+                      onClick={() => setEditProjectData({ ...editProjectData, icon })}
+                      className={`p-2 text-xl rounded-lg border-2 transition-colors ${
+                        editProjectData.icon === icon ? 'border-black bg-gray-100' : 'border-gray-300 hover:border-gray-400'
+                      }`}
+                    >
+                      {icon}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-black mb-2">Tags (comma-separated)</label>
+                <input
+                  type="text"
+                  value={editProjectData.tags?.join(', ') || ''}
+                  onChange={(e) => setEditProjectData({ 
+                    ...editProjectData, 
+                    tags: e.target.value.split(',').map(t => t.trim()).filter(t => t) 
+                  })}
+                  placeholder="e.g., work, personal, urgent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-black"
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  type="submit"
+                  className="flex-1 px-6 py-3 bg-black text-white rounded-xl hover:bg-gray-900 transition-colors font-medium"
+                >
+                  Save Changes
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingProject(null);
+                    setEditProjectData({});
+                  }}
+                  className="px-6 py-3 bg-white border border-gray-300 text-gray-600 rounded-xl hover:bg-gray-100 transition-colors"
+                >
+                  Cancel
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Health Modal */}
+      {showHealthModal && healthData && (
+        <div 
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setShowHealthModal(false)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="font-display text-2xl font-semibold text-black mb-2">Project Health</h3>
+            <div className="space-y-4">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-gray-600">Health Score</span>
+                  <span className={`text-lg font-semibold ${
+                    healthData.status === 'healthy' ? 'text-green-600' :
+                    healthData.status === 'warning' ? 'text-yellow-600' : 'text-red-600'
+                  }`}>
+                    {healthData.score}/100
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className={`h-2 rounded-full ${
+                      healthData.status === 'healthy' ? 'bg-green-600' :
+                      healthData.status === 'warning' ? 'bg-yellow-600' : 'bg-red-600'
+                    }`}
+                    style={{ width: `${healthData.score}%` }}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <p className="text-xs text-gray-600 mb-1">Total Tasks</p>
+                  <p className="text-xl font-semibold text-black">{healthData.tasks.total}</p>
+                </div>
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <p className="text-xs text-gray-600 mb-1">Completed</p>
+                  <p className="text-xl font-semibold text-green-600">{healthData.tasks.completed}</p>
+                </div>
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <p className="text-xs text-gray-600 mb-1">In Progress</p>
+                  <p className="text-xl font-semibold text-blue-600">{healthData.tasks.in_progress}</p>
+                </div>
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <p className="text-xs text-gray-600 mb-1">Overdue</p>
+                  <p className="text-xl font-semibold text-red-600">{healthData.tasks.overdue}</p>
+                </div>
+              </div>
+              <div className="pt-4 border-t">
+                <p className="text-xs text-gray-600 mb-2">Time Tracking</p>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Estimated: {Math.round(healthData.time.estimated_minutes / 60)}h</span>
+                  <span className="text-sm text-gray-600">Spent: {Math.round(healthData.time.spent_minutes / 60)}h</span>
+                </div>
               </div>
             </div>
-          )}
-      </div>
+            <button
+              onClick={() => setShowHealthModal(false)}
+              className="mt-6 w-full px-6 py-3 bg-black text-white rounded-xl hover:bg-gray-900 transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Activity Modal */}
+      {showActivityModal && (
+        <div 
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setShowActivityModal(false)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md max-h-[80vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="font-display text-2xl font-semibold text-black mb-2">Recent Activity</h3>
+            <div className="space-y-3 mt-4">
+              {activityData.length === 0 ? (
+                <p className="text-sm text-gray-600 text-center py-8">No activity yet</p>
+              ) : (
+                activityData.map((activity) => (
+                  <div key={activity.id} className="p-3 bg-gray-50 rounded-lg">
+                    <p className="text-sm text-black">{activity.description || activity.action_type}</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {new Date(activity.created_at).toLocaleString()}
+                    </p>
+                  </div>
+                ))
+              )}
+            </div>
+            <button
+              onClick={() => setShowActivityModal(false)}
+              className="mt-6 w-full px-6 py-3 bg-black text-white rounded-xl hover:bg-gray-900 transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
