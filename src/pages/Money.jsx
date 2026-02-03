@@ -537,10 +537,10 @@ export default function Money() {
                     </div>
                     <div className="flex items-center gap-3">
                       <p className="text-sm font-medium text-green-600 dark:text-green-400">${parseFloat(item.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center gap-1">
                         <button
                           onClick={() => handleEditIncome(item)}
-                          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1"
+                          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1 transition-colors"
                           title="Edit income"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -549,7 +549,7 @@ export default function Money() {
                         </button>
                         <button
                           onClick={() => handleDeleteIncome(item.id)}
-                          className="text-gray-400 hover:text-red-600 dark:hover:text-red-400 p-1"
+                          className="text-gray-400 hover:text-red-600 dark:hover:text-red-400 p-1 transition-colors"
                           title="Delete income"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
