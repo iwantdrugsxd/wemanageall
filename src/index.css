@@ -2,6 +2,57 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Dark Theme Palette - CSS Variables */
+:root {
+  /* Light Theme (default) */
+  --bg-base: #ffffff;
+  --bg-surface: #f9fafb;
+  --bg-card: #ffffff;
+  --bg-modal: #ffffff;
+  --bg-elevated: #ffffff;
+  
+  --text-primary: #000000;
+  --text-secondary: #1f2937;
+  --text-muted: #6b7280;
+  
+  --border-subtle: #e5e7eb;
+  --border-mid: #d1d5db;
+  --border-strong: #9ca3af;
+  
+  --accent: #000000;
+  --accent-muted: #374151;
+  
+  --error: #dc2626;
+  --error-bg: #fef2f2;
+  --success: #16a34a;
+  --success-bg: #f0fdf4;
+}
+
+.dark {
+  /* Dark Theme */
+  --bg-base: #0f172a;
+  --bg-surface: #1e293b;
+  --bg-card: #1e293b;
+  --bg-modal: #1e293b;
+  --bg-elevated: #334155;
+  
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  
+  --border-subtle: #334155;
+  --border-mid: #475569;
+  --border-strong: #64748b;
+  
+  --accent: #f1f5f9;
+  --accent-muted: #94a3b8;
+  
+  --error: #f87171;
+  --error-bg: #7f1d1d;
+  --success: #4ade80;
+  --success-bg: #14532d;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
@@ -10,7 +61,9 @@
   }
 
   body {
-    @apply bg-white dark:bg-gray-900 text-black dark:text-white font-sans antialiased;
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    font-family: 'Inter', system-ui, sans-serif;
     line-height: 1.7;
     transition: background-color 0.3s ease, color 0.3s ease;
   }
@@ -21,8 +74,13 @@
   }
 
   ::selection {
-    background-color: #000000;
-    color: #ffffff;
+    background-color: var(--accent);
+    color: var(--bg-base);
+  }
+  
+  .dark ::selection {
+    background-color: var(--accent);
+    color: var(--bg-base);
   }
 
   .material-symbols-outlined {
@@ -44,27 +102,42 @@
 
 @layer components {
   .btn-primary {
+    background-color: var(--accent);
+    color: var(--bg-base);
     @apply inline-flex items-center justify-center px-8 py-4 
-           bg-black text-white font-medium text-sm tracking-wider
+           font-medium text-sm tracking-wider
            rounded-full transition-all duration-500 ease-out
-           hover:bg-gray-900 hover:shadow-xl hover:shadow-black/10
+           hover:shadow-xl hover:shadow-black/10 dark:hover:shadow-white/10
            hover:-translate-y-0.5 active:translate-y-0
-           focus:outline-none focus:ring-2 focus:ring-black/50 focus:ring-offset-2 focus:ring-offset-white
+           focus:outline-none focus:ring-2 focus:ring-black/50 dark:focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-800
            disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .dark .btn-primary {
+    background-color: var(--accent);
+    color: var(--bg-base);
   }
 
   .btn-secondary {
+    background-color: transparent;
+    color: var(--text-primary);
+    border-color: var(--border-mid);
     @apply inline-flex items-center justify-center px-8 py-4 
-           bg-transparent text-black font-medium text-sm tracking-wider
-           border border-gray-400 rounded-full
+           font-medium text-sm tracking-wider
+           border rounded-full
            transition-all duration-500 ease-out
-           hover:border-black hover:bg-black/5
-           focus:outline-none focus:ring-2 focus:ring-black/30;
+           hover:border-gray-900 dark:hover:border-gray-300 hover:bg-black/5 dark:hover:bg-white/5
+           focus:outline-none focus:ring-2 focus:ring-black/30 dark:focus:ring-white/30;
   }
 
   .btn-ghost {
-    @apply inline-flex items-center gap-2 text-gray-600 hover:text-black 
+    color: var(--text-muted);
+    @apply inline-flex items-center gap-2 
            transition-colors duration-300 text-sm font-medium;
+  }
+  
+  .btn-ghost:hover {
+    color: var(--text-primary);
   }
 
   .section {
@@ -72,33 +145,42 @@
   }
 
   .section-title {
-    @apply font-display text-4xl md:text-5xl lg:text-6xl text-black leading-tight tracking-tight;
+    color: var(--text-primary);
+    @apply font-display text-4xl md:text-5xl lg:text-6xl leading-tight tracking-tight;
   }
 
   .section-subtitle {
-    @apply text-lg md:text-xl text-gray-600 max-w-2xl leading-relaxed;
+    color: var(--text-muted);
+    @apply text-lg md:text-xl max-w-2xl leading-relaxed;
   }
 
   .card {
-    @apply bg-white dark:bg-gray-800 backdrop-blur-sm rounded-2xl p-8 
-           border border-gray-300 dark:border-gray-700
+    background-color: var(--bg-card);
+    border-color: var(--border-subtle);
+    @apply backdrop-blur-sm rounded-2xl p-8 
+           border
            transition-all duration-500 ease-out
            hover:shadow-xl hover:shadow-black/5 dark:hover:shadow-black/20 hover:border-gray-400 dark:hover:border-gray-600
            hover:-translate-y-1;
   }
 
   .card-feature {
-    @apply bg-white dark:bg-gray-800 backdrop-blur-sm 
-           rounded-3xl p-10 border border-gray-300 dark:border-gray-700
+    background-color: var(--bg-card);
+    border-color: var(--border-subtle);
+    @apply backdrop-blur-sm 
+           rounded-3xl p-10 border
            transition-all duration-500
            hover:shadow-2xl hover:shadow-black/10 dark:hover:shadow-black/30;
   }
 
   .input-field {
-    @apply w-full px-5 py-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl
-           text-black dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400
+    background-color: var(--bg-card);
+    border-color: var(--border-subtle);
+    color: var(--text-primary);
+    @apply w-full px-5 py-4 rounded-xl
+           placeholder:text-gray-500 dark:placeholder:text-gray-400
            transition-all duration-300
-           focus:outline-none focus:border-black dark:focus:border-white focus:ring-4 focus:ring-black/5 dark:focus:ring-white/10;
+           focus:outline-none focus:border-gray-900 dark:focus:border-gray-400 focus:ring-4 focus:ring-black/5 dark:focus:ring-white/10;
   }
 
   .feature-icon {
@@ -108,7 +190,12 @@
   }
 
   .nav-link {
-    @apply text-gray-600 hover:text-black transition-colors duration-300 text-sm tracking-wide;
+    color: var(--text-muted);
+    @apply transition-colors duration-300 text-sm tracking-wide;
+  }
+  
+  .nav-link:hover {
+    color: var(--text-primary);
   }
 
   .gradient-orb {
@@ -123,7 +210,9 @@
   }
 
   .dashboard-card {
-    @apply bg-white dark:bg-gray-800 backdrop-blur-sm rounded-2xl border border-gray-300 dark:border-gray-700
+    background-color: var(--bg-card);
+    border-color: var(--border-subtle);
+    @apply backdrop-blur-sm rounded-2xl border
            transition-all duration-300 hover:shadow-lg hover:shadow-black/5 dark:hover:shadow-black/20;
   }
 
@@ -226,11 +315,11 @@
 
 /* Dark mode scrollbar */
 .dark ::-webkit-scrollbar-thumb {
-  background: #4a5568;
+  background: var(--border-mid);
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: #718096;
+  background: var(--border-strong);
 }
 
 

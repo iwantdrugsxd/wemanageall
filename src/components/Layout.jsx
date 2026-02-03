@@ -90,9 +90,9 @@ export default function Layout({ children }) {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-base)' }}>
       {/* Top Navigation Bar */}
-      <header className="sticky top-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-300 dark:border-gray-700 transition-colors duration-300">
+      <header className="sticky top-0 z-50 border-b transition-colors duration-300" style={{ backgroundColor: 'var(--bg-base)', borderColor: 'var(--border-subtle)' }}>
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
@@ -110,11 +110,16 @@ export default function Layout({ children }) {
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={`text-sm font-medium transition-colors ${
-                      isActive
-                        ? 'text-black dark:text-white'
-                        : 'text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white'
-                    }`}
+                    className="text-sm font-medium transition-colors"
+                    style={{
+                      color: isActive ? 'var(--text-primary)' : 'var(--text-muted)'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isActive) e.target.style.color = 'var(--text-primary)';
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isActive) e.target.style.color = 'var(--text-muted)';
+                    }}
                   >
                     {item.label}
                   </Link>
@@ -127,23 +132,33 @@ export default function Layout({ children }) {
               {/* Theme Toggle Button */}
               <button
                 onClick={toggleTheme}
-                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                className="p-2 rounded-lg transition-colors"
+                style={{
+                  color: 'var(--text-muted)',
+                  backgroundColor: 'transparent'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = 'var(--bg-surface)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = 'transparent';
+                }}
                 title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
                 aria-label="Toggle theme"
               >
                 {theme === 'light' ? (
-                  <svg className="w-6 h-6 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--text-muted)' }}>
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                   </svg>
                 ) : (
-                  <svg className="w-6 h-6 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--text-muted)' }}>
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
                 )}
               </button>
               {/* Date Display - shown on Money page */}
               {location.pathname === '/money' && (
-                <span className="text-sm text-gray-600 dark:text-gray-400 font-medium transition-colors">
+                <span className="text-sm font-medium transition-colors" style={{ color: 'var(--text-muted)' }}>
                   {new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).toUpperCase()}
                 </span>
               )}
@@ -151,10 +166,20 @@ export default function Layout({ children }) {
               {/* Notifications Icon */}
               <Link
                 to="/notifications"
-                className="relative p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                className="relative p-2 rounded-lg transition-colors"
+                style={{
+                  backgroundColor: 'transparent'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = 'var(--bg-surface)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = 'transparent';
+                }}
               >
                 <svg
-                  className={`w-6 h-6 transition-colors ${location.pathname === '/notifications' ? 'text-black dark:text-white' : 'text-gray-600 dark:text-gray-400'}`}
+                  className="w-6 h-6 transition-colors"
+                  style={{ color: location.pathname === '/notifications' ? 'var(--text-primary)' : 'var(--text-muted)' }}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -167,7 +192,13 @@ export default function Layout({ children }) {
                   />
                 </svg>
                 {unreadCount > 0 && (
-                  <span className="absolute top-1 right-1 w-5 h-5 bg-black dark:bg-white text-white dark:text-black text-xs font-medium rounded-full flex items-center justify-center transition-colors">
+                  <span 
+                    className="absolute top-1 right-1 w-5 h-5 text-xs font-medium rounded-full flex items-center justify-center transition-colors"
+                    style={{
+                      backgroundColor: 'var(--accent)',
+                      color: 'var(--bg-base)'
+                    }}
+                  >
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </span>
                 )}
@@ -175,7 +206,18 @@ export default function Layout({ children }) {
               
               <button
                 onClick={() => setShowQuickAction(true)}
-                className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
+                className="px-4 py-2 rounded-lg text-sm transition-colors flex items-center gap-2 border"
+                style={{
+                  backgroundColor: 'var(--bg-card)',
+                  borderColor: 'var(--border-subtle)',
+                  color: 'var(--text-muted)'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = 'var(--bg-surface)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = 'var(--bg-card)';
+                }}
               >
                 <span>⌘K</span>
               </button>
@@ -183,16 +225,31 @@ export default function Layout({ children }) {
               <div className="relative">
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                  className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+                  style={{
+                    backgroundColor: 'var(--bg-surface)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = 'var(--bg-elevated)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = 'var(--bg-surface)';
+                  }}
                 >
-                  <span className="text-black dark:text-white text-sm font-medium transition-colors">{initial}</span>
+                  <span className="text-sm font-medium transition-colors" style={{ color: 'var(--text-primary)' }}>{initial}</span>
                 </button>
 
                 {showUserMenu && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-300 dark:border-gray-700 py-2 z-50 transition-colors">
-                    <div className="px-4 py-2 border-b border-gray-300 dark:border-gray-700">
-                      <p className="text-sm font-medium text-black dark:text-white transition-colors">{user?.name}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 transition-colors">{user?.email}</p>
+                  <div 
+                    className="absolute right-0 mt-2 w-56 rounded-xl shadow-xl py-2 z-50 transition-colors border"
+                    style={{
+                      backgroundColor: 'var(--bg-modal)',
+                      borderColor: 'var(--border-subtle)'
+                    }}
+                  >
+                    <div className="px-4 py-2 border-b" style={{ borderColor: 'var(--border-subtle)' }}>
+                      <p className="text-sm font-medium transition-colors" style={{ color: 'var(--text-primary)' }}>{user?.name}</p>
+                      <p className="text-xs transition-colors" style={{ color: 'var(--text-muted)' }}>{user?.email}</p>
                     </div>
                     
                     <div className="py-2">
@@ -202,11 +259,22 @@ export default function Layout({ children }) {
                           <button
                             key={item.path}
                             onClick={() => handleNavClick(item.path)}
-                            className={`w-full text-left px-4 py-2 text-sm transition-colors flex items-center gap-3 ${
-                              isActive
-                                ? 'bg-black/10 dark:bg-white/10 text-black dark:text-white font-medium'
-                                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-                            }`}
+                            className="w-full text-left px-4 py-2 text-sm transition-colors flex items-center gap-3"
+                            style={{
+                              backgroundColor: isActive ? 'var(--bg-surface)' : 'transparent',
+                              color: isActive ? 'var(--text-primary)' : 'var(--text-muted)',
+                              fontWeight: isActive ? '500' : 'normal'
+                            }}
+                            onMouseEnter={(e) => {
+                              if (!isActive) {
+                                e.target.style.backgroundColor = 'var(--bg-surface)';
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (!isActive) {
+                                e.target.style.backgroundColor = 'transparent';
+                              }
+                            }}
                           >
                             <span>{item.label}</span>
                           </button>
@@ -214,19 +282,33 @@ export default function Layout({ children }) {
                       })}
                     </div>
 
-                    <hr className="my-2 border-gray-300 dark:border-gray-700" />
+                    <hr className="my-2" style={{ borderColor: 'var(--border-subtle)' }} />
                     
                     <Link
                       to="/pricing"
                       onClick={() => setShowUserMenu(false)}
-                      className="block w-full text-left px-4 py-2 text-sm text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      className="block w-full text-left px-4 py-2 text-sm transition-colors"
+                      style={{ color: 'var(--text-primary)' }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = 'var(--bg-surface)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = 'transparent';
+                      }}
                     >
                       Pricing & Plans
                     </Link>
                     
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 text-sm text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      className="w-full text-left px-4 py-2 text-sm transition-colors"
+                      style={{ color: 'var(--text-primary)' }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = 'var(--bg-surface)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = 'transparent';
+                      }}
                     >
                       Log out
                     </button>
