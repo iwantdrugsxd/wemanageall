@@ -420,6 +420,7 @@ export default function PDFReader({ resourceId, onClose }) {
               />
             </Document>
           </div>
+          </div>
         </div>
       </div>
 

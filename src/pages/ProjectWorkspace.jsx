@@ -1034,7 +1034,6 @@ export default function ProjectWorkspace() {
                 ))
               )}
             </div>
-          </div>
             
             {/* Formatting Toolbar (appears on focus) */}
             <div className="mt-4 flex items-center gap-2 p-2 bg-gray-100 rounded-lg">
