@@ -349,6 +349,43 @@ router.post('/income', requireAuth, async (req, res) => {
   }
 });
 
+// POST /api/money/income/bulk-delete - Bulk delete income streams
+router.post('/income/bulk-delete', requireAuth, async (req, res) => {
+  try {
+    await ensureTables();
+
+    const { ids } = req.body;
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ error: 'No income ids provided.' });
+    }
+
+    const uniqueIds = Array.from(
+      new Set(ids.filter((id) => typeof id === 'string' && id.trim() !== ''))
+    );
+    const validIds = uniqueIds.filter((id) => /^[0-9a-f-]{36}$/i.test(id));
+
+    if (validIds.length === 0) {
+      return res.status(400).json({ error: 'No valid income ids provided.' });
+    }
+
+    const result = await query(
+      `DELETE FROM income_streams
+       WHERE user_id = $1 AND id = ANY($2::uuid[])
+       RETURNING id`,
+      [req.user.id, validIds]
+    );
+
+    res.json({
+      success: true,
+      deletedCount: result.rows.length,
+      deletedIds: result.rows.map((row) => row.id),
+    });
+  } catch (error) {
+    console.error('Bulk delete income error:', error);
+    res.status(500).json({ error: 'Failed to delete income streams.' });
+  }
+});
+
 // POST /api/money/subscriptions - Add subscription
 router.post('/subscriptions', requireAuth, async (req, res) => {
   try {
@@ -511,6 +548,43 @@ router.delete('/expenses/:id', requireAuth, async (req, res) => {
   } catch (error) {
     console.error('Delete expense error:', error);
     res.status(500).json({ error: 'Failed to delete expense.' });
+  }
+});
+
+// POST /api/money/expenses/bulk-delete - Bulk delete expenses
+router.post('/expenses/bulk-delete', requireAuth, async (req, res) => {
+  try {
+    await ensureTables();
+
+    const { ids } = req.body;
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ error: 'No expense ids provided.' });
+    }
+
+    const uniqueIds = Array.from(
+      new Set(ids.filter((id) => typeof id === 'string' && id.trim() !== ''))
+    );
+    const validIds = uniqueIds.filter((id) => /^[0-9a-f-]{36}$/i.test(id));
+
+    if (validIds.length === 0) {
+      return res.status(400).json({ error: 'No valid expense ids provided.' });
+    }
+
+    const result = await query(
+      `DELETE FROM expenses
+       WHERE user_id = $1 AND id = ANY($2::uuid[])
+       RETURNING id`,
+      [req.user.id, validIds]
+    );
+
+    res.json({
+      success: true,
+      deletedCount: result.rows.length,
+      deletedIds: result.rows.map((row) => row.id),
+    });
+  } catch (error) {
+    console.error('Bulk delete expense error:', error);
+    res.status(500).json({ error: 'Failed to delete expenses.' });
   }
 });
 

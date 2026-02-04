@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 
 export default function Money() {
@@ -21,6 +21,8 @@ export default function Money() {
     company: ''
   });
   const [editingIncome, setEditingIncome] = useState(null);
+  const [selectedIncomeIds, setSelectedIncomeIds] = useState([]);
+  const selectAllIncomeRef = useRef(null);
   
   // Expense form state
   const [expenseForm, setExpenseForm] = useState({
@@ -31,6 +33,8 @@ export default function Money() {
     date: new Date().toISOString().split('T')[0]
   });
   const [editingExpense, setEditingExpense] = useState(null);
+  const [selectedExpenseIds, setSelectedExpenseIds] = useState([]);
+  const selectAllExpenseRef = useRef(null);
   
   // Subscription form state
   const [subscriptionForm, setSubscriptionForm] = useState({
@@ -52,6 +56,14 @@ export default function Money() {
   useEffect(() => {
     fetchMoneyData();
   }, []);
+
+  useEffect(() => {
+    setSelectedIncomeIds((prev) => prev.filter((id) => income.some((item) => item.id === id)));
+  }, [income]);
+
+  useEffect(() => {
+    setSelectedExpenseIds((prev) => prev.filter((id) => expenses.some((item) => item.id === id)));
+  }, [expenses]);
 
   const fetchMoneyData = async () => {
     try {
@@ -157,6 +169,52 @@ export default function Money() {
     }
   };
 
+  const handleToggleIncomeSelection = (id) => {
+    setSelectedIncomeIds((prev) => {
+      if (prev.includes(id)) {
+        return prev.filter((selectedId) => selectedId !== id);
+      }
+      return [...prev, id];
+    });
+  };
+
+  const handleToggleAllFilteredIncome = (filteredIds) => {
+    if (filteredIds.length === 0) return;
+    const allSelected = filteredIds.every((id) => selectedIncomeIds.includes(id));
+    setSelectedIncomeIds((prev) => {
+      if (allSelected) {
+        return prev.filter((id) => !filteredIds.includes(id));
+      }
+      return Array.from(new Set([...prev, ...filteredIds]));
+    });
+  };
+
+  const handleBulkDeleteIncome = async () => {
+    if (selectedIncomeIds.length === 0) return;
+    const label = selectedIncomeIds.length === 1 ? 'income entry' : 'income entries';
+    if (!confirm(`Are you sure you want to delete ${selectedIncomeIds.length} ${label}?`)) return;
+
+    try {
+      const response = await fetch('/api/money/income/bulk-delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ ids: selectedIncomeIds })
+      });
+
+      if (response.ok) {
+        setSelectedIncomeIds([]);
+        fetchMoneyData();
+      } else {
+        const error = await response.json();
+        alert(error.error || 'Failed to delete income entries');
+      }
+    } catch (error) {
+      console.error('Error bulk deleting income:', error);
+      alert('Failed to delete income entries');
+    }
+  };
+
   const handleEditIncome = (incomeItem) => {
     setEditingIncome(incomeItem);
     setIncomeForm({
@@ -254,6 +312,52 @@ export default function Money() {
     });
     setEntryType('expense');
     setShowAddModal(true);
+  };
+
+  const handleToggleExpenseSelection = (id) => {
+    setSelectedExpenseIds((prev) => {
+      if (prev.includes(id)) {
+        return prev.filter((selectedId) => selectedId !== id);
+      }
+      return [...prev, id];
+    });
+  };
+
+  const handleToggleAllFilteredExpenses = (filteredIds) => {
+    if (filteredIds.length === 0) return;
+    const allSelected = filteredIds.every((id) => selectedExpenseIds.includes(id));
+    setSelectedExpenseIds((prev) => {
+      if (allSelected) {
+        return prev.filter((id) => !filteredIds.includes(id));
+      }
+      return Array.from(new Set([...prev, ...filteredIds]));
+    });
+  };
+
+  const handleBulkDeleteExpenses = async () => {
+    if (selectedExpenseIds.length === 0) return;
+    const label = selectedExpenseIds.length === 1 ? 'expense' : 'expenses';
+    if (!confirm(`Are you sure you want to delete ${selectedExpenseIds.length} ${label}?`)) return;
+
+    try {
+      const response = await fetch('/api/money/expenses/bulk-delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ ids: selectedExpenseIds })
+      });
+
+      if (response.ok) {
+        setSelectedExpenseIds([]);
+        fetchMoneyData();
+      } else {
+        const error = await response.json();
+        alert(error.error || 'Failed to delete expenses');
+      }
+    } catch (error) {
+      console.error('Error bulk deleting expenses:', error);
+      alert('Failed to delete expenses');
+    }
   };
 
   // Subscription handlers
@@ -440,7 +544,25 @@ export default function Money() {
 
   const filteredExpenses = getFilteredExpenses();
   const filteredIncome = getFilteredIncome();
+  const filteredIncomeIds = filteredIncome.map((item) => item.id);
+  const allFilteredIncomeSelected = filteredIncomeIds.length > 0 && filteredIncomeIds.every((id) => selectedIncomeIds.includes(id));
+  const someFilteredIncomeSelected = filteredIncomeIds.some((id) => selectedIncomeIds.includes(id)) && !allFilteredIncomeSelected;
+  const filteredExpenseIds = filteredExpenses.map((item) => item.id);
+  const allFilteredExpensesSelected = filteredExpenseIds.length > 0 && filteredExpenseIds.every((id) => selectedExpenseIds.includes(id));
+  const someFilteredExpensesSelected = filteredExpenseIds.some((id) => selectedExpenseIds.includes(id)) && !allFilteredExpensesSelected;
   const netBalance = totalIncome - totalExpenses;
+
+  useEffect(() => {
+    if (selectAllIncomeRef.current) {
+      selectAllIncomeRef.current.indeterminate = someFilteredIncomeSelected;
+    }
+  }, [someFilteredIncomeSelected]);
+
+  useEffect(() => {
+    if (selectAllExpenseRef.current) {
+      selectAllExpenseRef.current.indeterminate = someFilteredExpensesSelected;
+    }
+  }, [someFilteredExpensesSelected]);
 
   if (loading) {
     return (
@@ -519,10 +641,48 @@ export default function Money() {
                 </button>
               </div>
             </div>
+            {filteredIncome.length > 0 && (
+              <div className="flex items-center justify-between mb-2">
+                <label className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                  <input
+                    ref={selectAllIncomeRef}
+                    type="checkbox"
+                    checked={allFilteredIncomeSelected}
+                    onChange={() => handleToggleAllFilteredIncome(filteredIncomeIds)}
+                    className="h-4 w-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                    aria-label="Select all income entries"
+                  />
+                  Select all
+                </label>
+                {selectedIncomeIds.length > 0 && (
+                  <button
+                    onClick={handleBulkDeleteIncome}
+                    className="text-xs font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                    title="Delete selected income entries"
+                  >
+                    Delete Selected ({selectedIncomeIds.length})
+                  </button>
+                )}
+              </div>
+            )}
             {filteredIncome.length > 0 ? (
               <div className="space-y-2">
                 {filteredIncome.map((item) => (
-                  <div key={item.id} className="group flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg transition-colors">
+                  <div
+                    key={item.id}
+                    className={`group flex items-center gap-3 p-3 rounded-lg transition-colors ${
+                      selectedIncomeIds.includes(item.id)
+                        ? 'bg-orange-50 dark:bg-orange-900/20'
+                        : 'hover:bg-gray-50 dark:hover:bg-gray-700/50'
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedIncomeIds.includes(item.id)}
+                      onChange={() => handleToggleIncomeSelection(item.id)}
+                      className="h-4 w-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                      aria-label={`Select income ${item.source || 'entry'}`}
+                    />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 dark:text-white">{item.source || 'Income'}</p>
                       <div className="flex items-center gap-2 mt-0.5">
@@ -537,7 +697,7 @@ export default function Money() {
                     </div>
                     <div className="flex items-center gap-3">
                       <p className="text-sm font-medium text-green-600 dark:text-green-400">${parseFloat(item.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
                           onClick={() => handleEditIncome(item)}
                           className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1 transition-colors"
@@ -608,10 +768,48 @@ export default function Money() {
                 </button>
               </div>
             </div>
+            {filteredExpenses.length > 0 && (
+              <div className="flex items-center justify-between mb-2">
+                <label className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                  <input
+                    ref={selectAllExpenseRef}
+                    type="checkbox"
+                    checked={allFilteredExpensesSelected}
+                    onChange={() => handleToggleAllFilteredExpenses(filteredExpenseIds)}
+                    className="h-4 w-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                    aria-label="Select all expense entries"
+                  />
+                  Select all
+                </label>
+                {selectedExpenseIds.length > 0 && (
+                  <button
+                    onClick={handleBulkDeleteExpenses}
+                    className="text-xs font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                    title="Delete selected expense entries"
+                  >
+                    Delete Selected ({selectedExpenseIds.length})
+                  </button>
+                )}
+              </div>
+            )}
             {filteredExpenses.length > 0 ? (
               <div className="space-y-2">
                 {filteredExpenses.map((item) => (
-                  <div key={item.id} className="group flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg transition-colors">
+                  <div
+                    key={item.id}
+                    className={`group flex items-center gap-3 p-3 rounded-lg transition-colors ${
+                      selectedExpenseIds.includes(item.id)
+                        ? 'bg-orange-50 dark:bg-orange-900/20'
+                        : 'hover:bg-gray-50 dark:hover:bg-gray-700/50'
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedExpenseIds.includes(item.id)}
+                      onChange={() => handleToggleExpenseSelection(item.id)}
+                      className="h-4 w-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                      aria-label={`Select expense ${item.description || 'entry'}`}
+                    />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <p className="text-sm font-medium text-gray-900 dark:text-white">{item.description || 'Expense'}</p>
