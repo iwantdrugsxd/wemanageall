@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import WorkspaceLayout from '../components/project-workspace/WorkspaceLayout';
 
 export default function ProjectWorkspace() {
   const { id } = useParams();
@@ -11,7 +12,40 @@ export default function ProjectWorkspace() {
   const [notes, setNotes] = useState([]);
   const [phases, setPhases] = useState([]);
   const [milestones, setMilestones] = useState([]);
-  const [activeView, setActiveView] = useState('board'); // list, board, timeline, notes
+  const [activeSection, setActiveSection] = useState('overview'); // overview, tasks, notes, activity, files
+  const [activeView, setActiveView] = useState('board'); // list, board, timeline, notes (for backward compatibility)
+
+  // Map section to view
+  useEffect(() => {
+    const sectionToView = {
+      'overview': 'board',
+      'tasks': 'list',
+      'notes': 'notes',
+      'activity': 'timeline',
+      'files': 'board' // placeholder
+    };
+    setActiveView(sectionToView[activeSection] || 'board');
+  }, [activeSection]);
+
+  const handleSectionChange = (section) => {
+    setActiveSection(section);
+  };
+
+  const handleEdit = () => {
+    // TODO: Implement edit project modal
+    alert('Edit project - to be implemented');
+  };
+
+  const handleArchive = () => {
+    if (confirm('Archive this project?')) {
+      // TODO: Implement archive
+      alert('Archive project - to be implemented');
+    }
+  };
+
+  const handleShare = () => {
+    setShowShareModal(true);
+  };
   const [loading, setLoading] = useState(true);
   const [showAddTask, setShowAddTask] = useState(false);
   const [newTask, setNewTask] = useState({
@@ -581,69 +615,86 @@ export default function ProjectWorkspace() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
-      {/* Header */}
-      <div className="mb-8">
-        <p className="text-sm text-black mb-1">PROJECT WORKSPACE</p>
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="font-display text-4xl font-bold text-black">{project.name}</h1>
-          <div className="flex items-center gap-3">
-            {(userRole === 'owner' || userRole === 'admin') && (
+    <div className="max-w-full mx-auto h-screen flex flex-col">
+      <WorkspaceLayout
+        project={project}
+        userRole={userRole}
+        activeSection={activeSection}
+        onSectionChange={handleSectionChange}
+        onEdit={handleEdit}
+        onArchive={handleArchive}
+        onShare={handleShare}
+      >
+        {/* View-specific controls */}
+        {(activeSection === 'tasks' || activeSection === 'overview') && (
+          <div className="mb-4 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {activeSection === 'tasks' && (
+                <>
+                  <button
+                    onClick={() => setActiveView('list')}
+                    className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                      activeView === 'list' ? '' : ''
+                    }`}
+                    style={activeView === 'list' ? {
+                      backgroundColor: 'var(--accent)',
+                      color: 'var(--bg-base)'
+                    } : {
+                      backgroundColor: 'var(--bg-surface)',
+                      color: 'var(--text-muted)'
+                    }}
+                  >
+                    List
+                  </button>
+                  <button
+                    onClick={() => setActiveView('board')}
+                    className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                      activeView === 'board' ? '' : ''
+                    }`}
+                    style={activeView === 'board' ? {
+                      backgroundColor: 'var(--accent)',
+                      color: 'var(--bg-base)'
+                    } : {
+                      backgroundColor: 'var(--bg-surface)',
+                      color: 'var(--text-muted)'
+                    }}
+                  >
+                    Board
+                  </button>
+                </>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
               <button
-                onClick={() => setShowShareModal(true)}
-                className="px-4 py-2 border border-black text-black rounded-xl hover:bg-gray-100 transition-colors flex items-center gap-2"
+                onClick={() => setShowCollaborators(!showCollaborators)}
+                className="px-3 py-1.5 rounded-lg text-sm transition-colors border"
+                style={{
+                  backgroundColor: 'var(--bg-card)',
+                  borderColor: 'var(--border-subtle)',
+                  color: 'var(--text-primary)'
+                }}
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
-                Share
+                {collaborators.length + 1}
               </button>
-            )}
-            <button
-              onClick={() => setShowCollaborators(!showCollaborators)}
-              className="px-4 py-2 border border-gray-300 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors flex items-center gap-2"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-              {collaborators.length + 1}
-            </button>
-            <button className="px-4 py-2 border border-gray-300 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors flex items-center gap-2">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-              </svg>
-              Filter
-            </button>
-            <button
-              onClick={() => setShowAddTask(true)}
-              className="px-4 py-2 bg-black text-white rounded-xl hover:bg-gray-900 transition-colors flex items-center gap-2"
-            >
-              <span>+</span>
-              Add Task
-            </button>
+              <button
+                onClick={() => setShowAddTask(true)}
+                className="px-3 py-1.5 rounded-lg text-sm transition-colors"
+                style={{
+                  backgroundColor: 'var(--accent)',
+                  color: 'var(--bg-base)'
+                }}
+              >
+                + Add Task
+              </button>
+            </div>
           </div>
-        </div>
-
-        {/* Navigation Tabs */}
-        <div className="flex items-center gap-6 border-b border-gray-300">
-          {['list', 'board', 'timeline', 'notes'].map((view) => (
-            <button
-              key={view}
-              onClick={() => setActiveView(view)}
-              className={`pb-3 px-2 text-sm font-medium transition-colors capitalize ${
-                activeView === view
-                  ? 'text-black border-b-2 border-black'
-                  : 'text-gray-600 hover:text-black'
-              }`}
-            >
-              {view}
-            </button>
-          ))}
-        </div>
-      </div>
+        )}
 
       {/* Board View */}
-      {activeView === 'board' && (
+      {activeView === 'board' && (activeSection === 'overview' || activeSection === 'tasks') && (
         <div className="grid grid-cols-3 gap-6">
           {['todo', 'in_progress', 'done'].map((status) => (
             <div
@@ -714,7 +765,7 @@ export default function ProjectWorkspace() {
       )}
 
       {/* List View */}
-      {activeView === 'list' && (
+      {activeView === 'list' && activeSection === 'tasks' && (
         <div className="space-y-3">
           {tasks.map((task) => (
             <div
@@ -755,7 +806,7 @@ export default function ProjectWorkspace() {
       )}
 
       {/* Timeline View */}
-      {activeView === 'timeline' && (
+      {activeView === 'timeline' && activeSection === 'activity' && (
         <div className="bg-white rounded-xl border border-gray-300">
           <div className="p-6 border-b border-gray-300 flex items-center justify-between">
             <h3 className="font-display text-lg font-semibold text-black">Timeline</h3>
@@ -896,8 +947,16 @@ export default function ProjectWorkspace() {
         </div>
       )}
 
+      {/* Files Section (Placeholder) */}
+      {activeSection === 'files' && (
+        <div className="text-center py-12" style={{ color: 'var(--text-muted)' }}>
+          <p className="text-lg mb-2">Files</p>
+          <p className="text-sm">File management coming soon</p>
+        </div>
+      )}
+
       {/* Notes View */}
-      {activeView === 'notes' && (
+      {activeView === 'notes' && activeSection === 'notes' && (
         <div className="space-y-4">
           <div className="bg-white rounded-xl border border-gray-300 p-6">
             <div className="flex items-center justify-between mb-4">
@@ -1299,6 +1358,7 @@ export default function ProjectWorkspace() {
           </div>
         </div>
       )}
+      </WorkspaceLayout>
     </div>
   );
 }

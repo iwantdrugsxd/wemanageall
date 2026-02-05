@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import ProjectsHeader from '../components/projects/ProjectsHeader';
+import ProjectsFilters from '../components/projects/ProjectsFilters';
+import ProjectsTable from '../components/projects/ProjectsTable';
+import ProjectsGrid from '../components/projects/ProjectsGrid';
 
 export default function Projects() {
   const { user } = useAuth();
@@ -41,6 +45,8 @@ export default function Projects() {
   const [showActivityModal, setShowActivityModal] = useState(false);
   const [healthData, setHealthData] = useState(null);
   const [activityData, setActivityData] = useState([]);
+  const [viewMode, setViewMode] = useState('table'); // 'table' or 'grid'
+  const [searchQuery, setSearchQuery] = useState('');
   
   // Color and icon options
   const colorOptions = [
@@ -476,7 +482,7 @@ export default function Projects() {
             state: { message: data.error || 'Upgrade required to create more projects.' } 
           });
         } else {
-          setError(data.error || 'Failed to create project. Please try again.');
+        setError(data.error || 'Failed to create project. Please try again.');
         }
       }
     } catch (error) {
@@ -504,375 +510,144 @@ export default function Projects() {
   return (
     <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
       {/* Header */}
-        <div className="mb-8">
-        <p className="text-sm text-black mb-2">PERSONAL LIFE OS</p>
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h1 className="font-display text-4xl font-bold text-black mb-2">Project Selection Hub</h1>
-            <p className="text-gray-600">Choose a focus area for your current session.</p>
-          </div>
-          <div className="flex items-center gap-3">
+      <ProjectsHeader
+        projects={projects}
+        showFavoritesOnly={showFavoritesOnly}
+        showArchived={showArchived}
+        onNewProject={() => setShowCreateModal(true)}
+        onShowTemplates={() => setShowTemplates(true)}
+      />
+
+      {/* Filters */}
+      <ProjectsFilters
+        showFavoritesOnly={showFavoritesOnly}
+        setShowFavoritesOnly={setShowFavoritesOnly}
+        filterTag={filterTag}
+        setFilterTag={setFilterTag}
+        showArchived={showArchived}
+        setShowArchived={setShowArchived}
+        availableTags={availableTags}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        onFilterChange={() => setTimeout(fetchProjects, 100)}
+      />
+
+      {/* View Toggle & Join Button */}
+      <div className="mb-6 flex items-center justify-between">
+        <div className="flex items-center gap-2">
             <button
-              onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
-              className={`px-4 py-2 rounded-xl transition-colors flex items-center gap-2 ${
-                showFavoritesOnly
-                  ? 'bg-black text-white'
-                  : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-100'
-              }`}
-            >
-              <svg className="w-4 h-4" fill={showFavoritesOnly ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-              </svg>
-              Favorites
+            onClick={() => setViewMode('table')}
+            className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
+              viewMode === 'table' ? '' : ''
+            }`}
+            style={viewMode === 'table' ? {
+              backgroundColor: 'var(--accent)',
+              color: 'var(--bg-base)'
+            } : {
+              backgroundColor: 'var(--bg-surface)',
+              color: 'var(--text-muted)'
+            }}
+          >
+            Table
             </button>
             <button
-              onClick={() => setShowArchived(!showArchived)}
-              className={`px-4 py-2 rounded-xl transition-colors flex items-center gap-2 ${
-                showArchived
-                  ? 'bg-black text-white'
-                  : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-100'
-              }`}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-              </svg>
-              {showArchived ? 'Active' : 'Archived'}
+            onClick={() => setViewMode('grid')}
+            className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
+              viewMode === 'grid' ? '' : ''
+            }`}
+            style={viewMode === 'grid' ? {
+              backgroundColor: 'var(--accent)',
+              color: 'var(--bg-base)'
+            } : {
+              backgroundColor: 'var(--bg-surface)',
+              color: 'var(--text-muted)'
+            }}
+          >
+            Grid
             </button>
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="px-4 py-2 bg-white border border-gray-300 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors flex items-center gap-2"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-              </svg>
-              Filter
-            </button>
+        </div>
             <button
               onClick={() => setShowJoinModal(true)}
-              className="px-4 py-2 bg-black text-white rounded-xl hover:bg-gray-900 transition-colors flex items-center gap-2"
+          className="px-4 py-2 rounded-lg text-sm transition-colors flex items-center gap-2"
+          style={{
+            backgroundColor: 'var(--accent)',
+            color: 'var(--bg-base)'
+          }}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
               Join Project
             </button>
-          </div>
         </div>
 
-        {/* Filters */}
-        {showFilters && (
-          <div className="mb-6 p-4 bg-white rounded-xl border border-gray-300">
-            <div className="flex items-center gap-4 flex-wrap">
-              <div className="flex-1 min-w-[200px]">
-                <label className="block text-sm font-medium text-black mb-2">Filter by Tag</label>
-                <select
-                  value={filterTag}
-                  onChange={(e) => {
-                    setFilterTag(e.target.value);
-                    setTimeout(fetchProjects, 100);
-                  }}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-black"
-                >
-                  <option value="">All Tags</option>
-                  {availableTags.map(tag => (
-                    <option key={tag} value={tag}>{tag}</option>
-                  ))}
-                </select>
-              </div>
-              {filterTag && (
-                <button
-                  onClick={() => {
-                    setFilterTag('');
-                    setTimeout(fetchProjects, 100);
-                  }}
-                  className="px-4 py-2 text-sm text-gray-600 hover:text-black"
-                >
-                  Clear Filter
-                </button>
-              )}
-              </div>
-          </div>
-        )}
-      </div>
-
-      {/* Projects Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Create New Project Card */}
-        <div
-          onClick={() => setShowCreateModal(true)}
-          className="bg-white rounded-lg p-8 border-2 border-dashed border-gray-300 hover:border-black cursor-pointer transition-all duration-200 group"
+      {/* Projects View */}
+      {viewMode === 'table' ? (
+        <div 
+          className="rounded-lg border overflow-hidden"
+          style={{
+            backgroundColor: 'var(--bg-card)',
+            borderColor: 'var(--border-subtle)'
+          }}
         >
-          <div className="flex flex-col items-center justify-center h-full min-h-[250px]">
-            <div className="w-12 h-12 rounded-lg bg-gray-100 group-hover:bg-gray-200 flex items-center justify-center mb-4 transition-colors">
-              <span className="text-2xl text-black">+</span>
-                </div>
-            <h3 className="text-base text-black mb-1" style={{ color: '#000000' }}>Create New Project</h3>
-            <p className="text-xs text-black text-center" style={{ color: '#000000', opacity: 0.5 }}>Start from scratch</p>
-                </div>
-              </div>
-
-        {/* Existing Project Cards */}
-                {projects.map((project) => (
-                  <div
-                    key={project.id}
-            onClick={() => navigate(`/projects/${project.id}`)}
-            className="bg-white rounded-lg overflow-hidden border border-gray-200 hover:border-black cursor-pointer transition-all duration-200 group relative"
-            style={{ borderLeftColor: '#000000', borderLeftWidth: '4px' }}
-          >
-            {/* Favorite Button */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleToggleFavorite(project.id, project.is_favorite);
-              }}
-              className="absolute top-3 left-3 z-10 p-1.5 rounded bg-white hover:bg-gray-50 transition-colors"
-            >
-              <svg 
-                className={`w-4 h-4 ${project.is_favorite ? 'text-black fill-current' : 'text-black'}`}
-                style={{ color: project.is_favorite ? '#000000' : 'rgba(0,0,0,0.3)' }}
-                fill={project.is_favorite ? "currentColor" : "none"} 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-              </svg>
-            </button>
-            
-            {/* Cover Section */}
-            <div 
-              className="h-32 relative overflow-hidden"
-              style={{ backgroundColor: '#000000' }}
-            >
-              {project.cover_image_url ? (
-                <img
-                  src={project.cover_image_url}
-                  alt={project.name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#000000' }}>
-                  <div className="w-12 h-12 rounded-lg flex items-center justify-center">
-                    <span className="text-2xl">{project.icon || '📋'}</span>
-                      </div>
-                    </div>
-              )}
-              
-              {/* Progress Circle */}
-              <div className="absolute top-4 right-4">
-                <div className="relative w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
-                  <svg className="transform -rotate-90 w-10 h-10">
-                    <circle
-                      cx="20"
-                      cy="20"
-                      r="18"
-                      stroke="rgba(255,255,255,0.2)"
-                      strokeWidth="2"
-                      fill="none"
-                    />
-                    <circle
-                      cx="20"
-                      cy="20"
-                      r="18"
-                      stroke="white"
-                      strokeWidth="2"
-                      fill="none"
-                      strokeDasharray={2 * Math.PI * 18}
-                      strokeDashoffset={2 * Math.PI * 18 * (1 - (project.progress || 0) / 100)}
-                      className="transition-all duration-300"
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-xs text-white" style={{ color: '#ffffff' }}>{project.progress || 0}%</span>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Project Name Overlay */}
-              <div className="absolute bottom-0 left-0 right-0 p-4" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.7), transparent)' }}>
-                <h3 className="text-base text-white" style={{ color: '#ffffff' }}>{project.name}</h3>
-              </div>
-            </div>
-
-            {/* Content Section */}
-            <div className="p-5">
-              {/* Tags */}
-              {project.tags && project.tags.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mb-3">
-                  {project.tags.map((tag, idx) => (
-                    <span
-                      key={idx}
-                      className="px-2 py-0.5 text-xs bg-gray-100 rounded text-black"
-                      style={{ color: '#000000' }}
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
-              
-              <div className="mb-3">
-                <p className="text-xs text-black uppercase tracking-wide mb-2" style={{ color: '#000000' }}>Next Task</p>
-                {project.nextTask ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: '#000000' }}></div>
-                    <p className="text-sm text-black line-clamp-1" style={{ color: '#000000' }}>{project.nextTask.title}</p>
+          <ProjectsTable
+            projects={projects}
+            showArchived={showArchived}
+            searchQuery={searchQuery}
+            onToggleFavorite={handleToggleFavorite}
+            onEdit={handleEditProject}
+            onArchive={handleArchiveProject}
+            onUnarchive={handleUnarchiveProject}
+            onDelete={handleDeleteProject}
+            onHealth={handleFetchHealth}
+            onActivity={handleFetchActivity}
+            formatDate={formatDate}
+          />
                   </div>
                 ) : (
-                  <p className="text-sm text-black" style={{ color: '#000000', opacity: 0.5 }}>No tasks yet</p>
-                )}
-              </div>
-              
-              <div className="pt-3 border-t" style={{ borderColor: '#e5e5e5' }}>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-black" style={{ color: '#000000' }}>{project.tasksRemaining || 0} tasks remaining</span>
-                  <div className="flex items-center gap-2">
-                    {project.collaborators && project.collaborators.length > 0 && (
-                      <div className="flex items-center gap-1 px-2 py-0.5 bg-gray-100 rounded">
-                        <div className="w-4 h-4 rounded-full" style={{ backgroundColor: '#000000' }}></div>
-                        <span className="text-xs text-black" style={{ color: '#000000' }}>+{project.collaborators.length}</span>
-                      </div>
-                    )}
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleFetchHealth(project.id);
-                        }}
-                        className="p-1.5 rounded hover:bg-gray-100 transition-colors opacity-0 group-hover:opacity-100"
-                        title="View health"
-                      >
-                        <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                        </svg>
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleFetchActivity(project.id);
-                        }}
-                        className="p-1.5 rounded hover:bg-gray-100 transition-colors opacity-0 group-hover:opacity-100"
-                        title="View activity"
-                      >
-                        <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEditProject(project);
-                        }}
-                        className="p-1.5 rounded hover:bg-gray-100 transition-colors opacity-0 group-hover:opacity-100"
-                        title="Edit project"
-                      >
-                        <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
-                      </button>
-                      {showArchived ? (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleUnarchiveProject(project.id);
-                          }}
-                          className="p-1.5 rounded hover:bg-gray-100 transition-colors opacity-0 group-hover:opacity-100"
-                          title="Unarchive project"
-                        >
-                          <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                          </svg>
-                        </button>
-                      ) : (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (confirm('Archive this project?')) {
-                              handleArchiveProject(project.id);
-                            }
-                          }}
-                          className="p-1.5 rounded hover:bg-gray-100 transition-colors opacity-0 group-hover:opacity-100"
-                          title="Archive project"
-                        >
-                          <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                          </svg>
-                        </button>
-                      )}
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteProject(project.id, project.name);
-                        }}
-                        className="p-1.5 rounded hover:bg-gray-100 transition-colors opacity-0 group-hover:opacity-100"
-                        style={{ color: '#000000' }}
-                        title="Delete project"
-                      >
-                        <svg 
-                          className="w-4 h-4" 
-                          fill="none" 
-                          stroke="currentColor" 
-                          viewBox="0 0 24 24"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
+        <div>
+          {/* Create New Project Card (only in grid view) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            <div
+              onClick={() => setShowCreateModal(true)}
+              className="rounded-lg p-8 border-2 border-dashed cursor-pointer transition-all duration-200 group"
+              style={{
+                backgroundColor: 'var(--bg-card)',
+                borderColor: 'var(--border-subtle)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'var(--accent)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border-subtle)';
+              }}
+            >
+              <div className="flex flex-col items-center justify-center h-full min-h-[250px]">
+                <div 
+                  className="w-12 h-12 rounded-lg flex items-center justify-center mb-4 transition-colors"
+                  style={{ backgroundColor: 'var(--bg-surface)' }}
+                >
+                  <span className="text-2xl" style={{ color: 'var(--text-primary)' }}>+</span>
                     </div>
+                <h3 className="text-base mb-1" style={{ color: 'var(--text-primary)' }}>Create New Project</h3>
+                <p className="text-xs text-center" style={{ color: 'var(--text-muted)' }}>Start from scratch</p>
                   </div>
                 </div>
-                
-                {/* Share Code Display */}
-                {project.share_code && (
-                  <div className="flex items-center gap-2 p-2 bg-gray-100 rounded-lg group">
-                    <div className="flex-1">
-                      <p className="text-xs text-black font-medium mb-1">Share Code</p>
-                      <div className="flex items-center gap-2">
-                        <code className="text-sm font-mono tracking-wider text-black bg-white px-2 py-1 rounded border border-gray-300">
-                          {project.share_code}
-                        </code>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigator.clipboard.writeText(project.share_code).then(() => {
-                              // Silent copy
-                            }).catch(() => {
-                              const textArea = document.createElement('textarea');
-                              textArea.value = project.share_code;
-                              document.body.appendChild(textArea);
-                              textArea.select();
-                              document.execCommand('copy');
-                              document.body.removeChild(textArea);
-                            });
-                          }}
-                          className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-200 rounded"
-                          title="Copy share code"
-                        >
-                          <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                          </svg>
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (confirm('Regenerate share code? The old code will no longer work.')) {
-                              handleRegenerateShareCode(project.id);
-                            }
-                          }}
-                          className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-200 rounded"
-                          title="Regenerate share code"
-                        >
-                          <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                          </svg>
-                        </button>
                       </div>
-                    </div>
+          <ProjectsGrid
+            projects={projects}
+            showArchived={showArchived}
+            searchQuery={searchQuery}
+            onToggleFavorite={handleToggleFavorite}
+            onEdit={handleEditProject}
+            onArchive={handleArchiveProject}
+            onUnarchive={handleUnarchiveProject}
+            onDelete={handleDeleteProject}
+            onHealth={handleFetchHealth}
+            onActivity={handleFetchActivity}
+          />
                   </div>
                 )}
-              </div>
-            </div>
-                    </div>
-                  ))}
-                </div>
 
       {/* Create Project Modal */}
       {showCreateModal && (
