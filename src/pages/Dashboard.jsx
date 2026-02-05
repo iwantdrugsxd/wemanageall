@@ -2,6 +2,13 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link, useLocation } from 'react-router-dom';
 import InsightsWidget from '../components/InsightsWidget';
+import HomeHeader from '../components/home/HomeHeader';
+import IntentionsPanel from '../components/home/IntentionsPanel';
+import TasksPanel from '../components/home/TasksPanel';
+import ReflectionPanel from '../components/home/ReflectionPanel';
+import CalendarPanel from '../components/home/CalendarPanel';
+import InsightsPanel from '../components/home/InsightsPanel';
+import ThinkingSpacePanel from '../components/home/ThinkingSpacePanel';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -860,863 +867,292 @@ export default function Dashboard() {
     { id: 'decision', label: 'Decision draft', desc: 'Think through your options. What matters most?' },
   ];
 
+  // Handler wrappers for components
+  const handleCancelEditTask = () => {
+    setEditingTaskId(null);
+    setEditingTaskTitle('');
+    setEditingTaskDueDate('');
+    setEditingTaskTimeEstimate('');
+    setEditingTaskTimeSpent('');
+  };
+
+  const handleCancelAddEvent = () => {
+    setShowAddEvent(false);
+    setNewEvent({ title: '', startTime: '', endTime: '', description: '', type: 'event' });
+    setEventError('');
+  };
+
+  const handleCancelEditThought = () => {
+    setEditingThoughtId(null);
+    setEditingThoughtContent('');
+    setEditingThoughtMode('freewrite');
+  };
+
   if (loading) {
-    return <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12 text-center text-gray-500">Loading...</div>;
-  }
-
-  return (
-    <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="text-label text-gray-500 mb-2">PERSONAL LIFE OS</div>
-        <h1 className="text-h2 text-gray-900 mb-3">
-          {greeting}, {firstName}.
-        </h1>
-        <p className="text-body-sm text-gray-600 italic font-serif">
-          "The present moment is the only time over which we have dominion."
-        </p>
-      </div>
-
-      {/* Insights Widget */}
-      <InsightsWidget />
-
-      {/* Main Grid Layout */}
-      <div className="grid md:grid-cols-3 gap-6 mb-6">
-        {/* Left Column */}
-        <div className="md:col-span-2 space-y-6">
-          {/* Today's Intention */}
-          <div className="bg-white rounded-lg p-6 border border-gray-200">
-          <div className="flex items-center justify-between mb-4">
-              <h3 className="text-label text-gray-700">TODAY'S INTENTION</h3>
-              {intentionSaved && (
-                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              )}
-            </div>
-          
-          {intentions && intentions.length > 0 ? (
-              <div className="space-y-2 mb-4">
-              {intentions.map((intention) => (
-                  <div key={intention.id} className="group flex items-center gap-3">
-                  {editingIntentionId === intention.id ? (
-                      <div className="flex-1 flex items-center gap-2">
-          <input
-            type="text"
-                        value={editingIntentionText}
-                        onChange={(e) => setEditingIntentionText(e.target.value)}
-                          className="flex-1 px-3 py-2 border-b border-gray-300 focus:outline-none focus:border-gray-900 text-sm"
-                        autoFocus
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') handleUpdateIntention();
-                            if (e.key === 'Escape') {
-                              setEditingIntentionId(null);
-                              setEditingIntentionText('');
-                            }
-                          }}
-          />
-          <button
-                        onClick={handleUpdateIntention}
-                          className="px-3 py-1 text-xs text-gray-700 hover:text-gray-900"
-                      >
-                        Save
-                      </button>
-                      <button
-                        onClick={() => {
-                          setEditingIntentionId(null);
-                          setEditingIntentionText('');
-                        }}
-                          className="px-3 py-1 text-xs text-gray-500 hover:text-gray-700"
-                      >
-                        Cancel
-          </button>
-                  </div>
-                  ) : (
-                    <>
-                        <input
-                          type="text"
-                          value={intention.intention}
-                          readOnly
-                          className="flex-1 px-3 py-2 border-b border-gray-200 text-sm text-gray-700 bg-transparent"
-                        />
-                        <button
-                          onClick={() => handleEditIntention(intention)}
-                          className="px-3 py-1 text-xs text-gray-500 hover:text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          EDIT
-                        </button>
-                        <button
-                          onClick={() => handleDeleteIntention(intention.id)}
-                          className="px-3 py-1 text-xs text-gray-500 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          DELETE
-                        </button>
-                    </>
-                  )}
-                </div>
-              ))}
-            </div>
-          ) : (
-              showAddIntention ? (
-            <div className="mb-4">
-              <input
-                type="text"
-                value={newIntention}
-                    onChange={(e) => setNewIntention(e.target.value)}
-                    placeholder="Focus on high-fidelity architectural time management"
-                    className="w-full px-3 py-2 border-b border-gray-300 focus:outline-none focus:border-gray-900 text-sm"
-                autoFocus
-                onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleAddIntention();
-                      if (e.key === 'Escape') {
-                    setShowAddIntention(false);
-                    setNewIntention('');
-                  }
-                }}
-              />
-            </div>
-          ) : (
-                <div className="mb-4">
-                  <input
-                    type="text"
-                    placeholder="Focus on high-fidelity architectural time management"
-                    className="w-full px-3 py-2 border-b border-gray-200 text-sm text-gray-400"
-              onClick={() => setShowAddIntention(true)}
-                    readOnly
-                  />
-                </div>
-              )
-            )}
-            
-            {intentionError && (
-              <div className="text-xs text-red-600 mb-2">{intentionError}</div>
-            )}
-                </div>
-                
-          {/* Daily Objectives */}
-          <div className="bg-white rounded-lg p-6 border border-gray-200">
-          <div className="flex items-center justify-between mb-4">
-              <h2 className="text-label text-gray-700">DAILY OBJECTIVES</h2>
-              <span className="text-xs text-gray-600">{progressPercentage}%</span>
-            </div>
-
-            {/* Filters and Sort */}
-            <div className="flex items-center gap-2 mb-4">
-              <select
-                value={taskFilter}
-                onChange={(e) => setTaskFilter(e.target.value)}
-                className="text-xs px-2 py-1 border border-gray-300 rounded bg-white text-gray-700 focus:outline-none focus:border-gray-900"
-              >
-                <option value="all">All</option>
-                <option value="pending">Pending</option>
-                <option value="completed">Completed</option>
-                <option value="overdue">Overdue</option>
-              </select>
-              <select
-                value={taskSort}
-                onChange={(e) => setTaskSort(e.target.value)}
-                className="text-xs px-2 py-1 border border-gray-300 rounded bg-white text-gray-700 focus:outline-none focus:border-gray-900"
-              >
-                <option value="due-date">Due Date</option>
-                <option value="created">Created</option>
-              </select>
-            </div>
-            
-          <div className="space-y-3 mb-4">
-            {filteredTasks.length === 0 ? (
-                <p className="text-sm text-gray-400 text-center py-4">
-                  {taskFilter === 'all' ? 'No objectives yet' : `No ${taskFilter} objectives`}
-                </p>
-              ) : (
-                filteredTasks.map((task) => {
-                  const timeSpent = task.time_spent ? Math.round(task.time_spent / 60) : 0;
-                  const timeEstimate = task.time_estimate ? Math.round(task.time_estimate / 60) : null;
-                  const isCompleted = task.status === 'completed' || task.status === 'done';
-                  
-                  return editingTaskId === task.id ? (
-                    <div key={task.id} className="p-3 bg-gray-50 rounded border border-gray-200 space-y-2">
-                      <input
-                        type="text"
-                        value={editingTaskTitle}
-                        onChange={(e) => setEditingTaskTitle(e.target.value)}
-                        placeholder="Task title"
-                        className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-gray-900"
-                        autoFocus
-                      />
-                      <div className="grid grid-cols-2 gap-2">
-                        <input
-                          type="date"
-                          value={editingTaskDueDate}
-                          onChange={(e) => setEditingTaskDueDate(e.target.value)}
-                          className="px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-gray-900"
-                        />
-                        <input
-                          type="number"
-                          value={editingTaskTimeEstimate}
-                          onChange={(e) => setEditingTaskTimeEstimate(e.target.value)}
-                          placeholder="Est. (hours)"
-                          min="0"
-                          step="0.5"
-                          className="px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-gray-900"
-                        />
-                      </div>
-                      <input
-                        type="number"
-                        value={editingTaskTimeSpent}
-                        onChange={(e) => setEditingTaskTimeSpent(e.target.value)}
-                        placeholder="Time spent (hours)"
-                        min="0"
-                        step="0.5"
-                        className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-gray-900"
-                      />
-                      <div className="flex gap-2">
-                        <button
-                          onClick={handleUpdateTask}
-                          className="px-3 py-1.5 text-xs bg-gray-900 text-white rounded hover:bg-gray-800"
-                        >
-                          Save
-                        </button>
-                        <button
-                          onClick={() => {
-                            setEditingTaskId(null);
-                            setEditingTaskTitle('');
-                            setEditingTaskDueDate('');
-                            setEditingTaskTimeEstimate('');
-                            setEditingTaskTimeSpent('');
-                          }}
-                          className="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div key={task.id} className="group flex items-center gap-3">
-                      <input
-                        type="checkbox"
-                        checked={isCompleted}
-                        onChange={(e) => handleToggleTask(task.id, e.target.checked)}
-                        className="w-4 h-4 rounded border-gray-300"
-                      />
-                      <span className={`flex-1 text-sm ${isCompleted ? 'line-through text-gray-400' : 'text-gray-700'}`}>
-                        {task.title}
-                      </span>
-                      {timeEstimate && (
-                        <span className="text-xs text-gray-500">
-                          {timeSpent}h / {timeEstimate}h
-                        </span>
-                      )}
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button
-                          onClick={() => handleEditTask(task)}
-                          className="text-gray-400 hover:text-gray-600 p-1"
-                          title="Edit task"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                          </svg>
-                        </button>
-                        <button
-                          onClick={() => handleDeleteTask(task.id)}
-                          className="text-gray-400 hover:text-red-600 p-1"
-                          title="Delete task"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
+    return (
+      <div className="min-h-screen p-6 lg:p-8 flex items-center justify-center" style={{ backgroundColor: 'var(--bg-base)' }}>
+        <div className="text-center transition-colors" style={{ color: 'var(--text-muted)' }}>
+          Loading...
                       </div>
                     </div>
                   );
-                })
-            )}
-          </div>
+  }
 
-          {showTaskInput ? (
-            <form
-                onSubmit={(e) => {
-                e.preventDefault();
-                if (newTask.trim()) {
-                    handleAddTask(newTask, newTaskTimeEstimate || null);
-                }
+  return (
+    <div className="min-h-screen p-6 lg:p-8" style={{ backgroundColor: 'var(--bg-base)' }}>
+      <div className="max-w-7xl mx-auto">
+        {/* Page Header */}
+        <HomeHeader user={user} />
+
+        {/* Two Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Left Column (Primary) */}
+          <div className="lg:col-span-8 space-y-6">
+            {/* Today's Intention */}
+            <IntentionsPanel
+              intentions={intentions}
+              newIntention={newIntention}
+              setNewIntention={setNewIntention}
+              showAddIntention={showAddIntention}
+              setShowAddIntention={setShowAddIntention}
+              editingIntentionId={editingIntentionId}
+              setEditingIntentionId={setEditingIntentionId}
+              editingIntentionText={editingIntentionText}
+              setEditingIntentionText={setEditingIntentionText}
+              intentionSaved={intentionSaved}
+              intentionError={intentionError}
+              savingIntention={savingIntention}
+              onAddIntention={handleAddIntention}
+              onUpdateIntention={handleUpdateIntention}
+              onDeleteIntention={handleDeleteIntention}
+              onEditIntention={handleEditIntention}
+            />
+            {/* Daily Objectives */}
+            <TasksPanel
+              filteredTasks={filteredTasks}
+              taskFilter={taskFilter}
+              setTaskFilter={setTaskFilter}
+              taskSort={taskSort}
+              setTaskSort={setTaskSort}
+              progressPercentage={progressPercentage}
+              showTaskInput={showTaskInput}
+              setShowTaskInput={setShowTaskInput}
+              newTask={newTask}
+              setNewTask={setNewTask}
+              newTaskTimeEstimate={newTaskTimeEstimate}
+              setNewTaskTimeEstimate={setNewTaskTimeEstimate}
+              editingTaskId={editingTaskId}
+              editingTaskTitle={editingTaskTitle}
+              setEditingTaskTitle={setEditingTaskTitle}
+              editingTaskDueDate={editingTaskDueDate}
+              setEditingTaskDueDate={setEditingTaskDueDate}
+              editingTaskTimeEstimate={editingTaskTimeEstimate}
+              setEditingTaskTimeEstimate={setEditingTaskTimeEstimate}
+              editingTaskTimeSpent={editingTaskTimeSpent}
+              setEditingTaskTimeSpent={setEditingTaskTimeSpent}
+              onAddTask={handleAddTask}
+              onToggleTask={handleToggleTask}
+              onEditTask={handleEditTask}
+              onUpdateTask={handleUpdateTask}
+              onDeleteTask={handleDeleteTask}
+              onCancelEditTask={handleCancelEditTask}
+            />
+
+            {/* Reflection */}
+            <ReflectionPanel
+              reflection={reflection}
+              setReflection={setReflection}
+              reflectionMood={reflectionMood}
+              setReflectionMood={setReflectionMood}
+              reflectionSaved={reflectionSaved}
+              reflectionLastSaved={reflectionLastSaved}
+              reflectionError={reflectionError}
+              savingReflection={savingReflection}
+              onSaveReflection={handleSaveReflection}
+              onDeleteReflection={handleDeleteReflection}
+            />
+
+            {/* Time Allocation */}
+            <div 
+              className="rounded-lg p-6 border transition-colors"
+              style={{ 
+                backgroundColor: 'var(--bg-card)',
+                borderColor: 'var(--border-subtle)'
               }}
-              className="space-y-2"
             >
-              <input
-                type="text"
-                value={newTask}
-                onChange={(e) => setNewTask(e.target.value)}
-                  placeholder="Type an objective..."
-                  className="w-full px-3 py-2 border-b border-gray-300 focus:outline-none focus:border-gray-900 text-sm"
-                autoFocus
-                required
-              />
-              <div className="flex items-center gap-2">
-                <input
-                  type="number"
-                  value={newTaskTimeEstimate}
-                  onChange={(e) => setNewTaskTimeEstimate(e.target.value)}
-                  placeholder="Time (hours)"
-                  min="0"
-                  step="0.5"
-                  className="w-24 px-3 py-2 border-b border-gray-300 focus:outline-none focus:border-gray-900 text-sm"
-                />
-                <span className="text-xs text-gray-500">hours</span>
-                <div className="flex-1"></div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowTaskInput(false);
-                    setNewTask('');
-                    setNewTaskTimeEstimate('');
-                  }}
-                  className="text-xs text-gray-500 hover:text-gray-700 px-2"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="text-xs bg-gray-900 text-white px-3 py-1.5 rounded hover:bg-gray-800"
-                >
-                  Add
-                </button>
-              </div>
-            </form>
-          ) : (
-            <button
-              onClick={() => setShowTaskInput(true)}
-                className="text-sm text-gray-500 hover:text-gray-700 transition-colors flex items-center gap-1.5"
-            >
-                <span>+</span>
-                <span>ADD OBJECTIVE</span>
-            </button>
-          )}
-                  </div>
-
-          {/* Reflection Section */}
-          <div className="bg-white rounded-lg p-6 border border-gray-200">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-label text-gray-700">REFLECTION</h2>
-              {reflectionSaved && (
-                <div className="flex items-center gap-2 text-xs text-gray-500">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  {reflectionLastSaved && (
-                    <span>Saved {new Date(reflectionLastSaved).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</span>
-                  )}
-                </div>
-              )}
-            </div>
-            
-            <div className="space-y-3">
-              <div>
-                <label className="block text-xs text-gray-600 mb-2">Mood (optional)</label>
-                <select
-                  value={reflectionMood || ''}
-                  onChange={(e) => setReflectionMood(e.target.value || null)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-gray-900"
-                >
-                  <option value="">Select mood</option>
-                  <option value="excited">😊 Excited</option>
-                  <option value="grateful">🙏 Grateful</option>
-                  <option value="calm">😌 Calm</option>
-                  <option value="focused">🎯 Focused</option>
-                  <option value="tired">😴 Tired</option>
-                  <option value="anxious">😰 Anxious</option>
-                  <option value="frustrated">😤 Frustrated</option>
-                  <option value="content">😊 Content</option>
-                </select>
-              </div>
-              
-              <textarea
-                value={reflection}
-                onChange={(e) => setReflection(e.target.value)}
-                placeholder="How did today go? What did you learn? What would you do differently?"
-                className="w-full h-32 px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-gray-900 resize-none"
-              />
-              
-              {reflectionError && (
-                <div className="text-xs text-red-600">{reflectionError}</div>
-              )}
-              
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handleSaveReflection}
-                  disabled={savingReflection}
-                  className="px-4 py-1.5 text-xs bg-gray-900 text-white rounded hover:bg-gray-800 disabled:opacity-50 transition-colors"
-                >
-                  {savingReflection ? 'Saving...' : 'Save Reflection'}
-                </button>
-                {reflection && (
-                  <button
-                    onClick={handleDeleteReflection}
-                    className="px-4 py-1.5 text-xs text-gray-500 hover:text-red-600 transition-colors"
-                  >
-                    Delete
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Time Allocation */}
-          <div className="bg-white rounded-lg p-6 border border-gray-200">
-            <h2 className="text-label text-gray-700 mb-4">TIME ALLOCATION</h2>
-            {pieChartData.length > 0 ? (
-              <div className="space-y-4">
-                {/* Pie Chart */}
-                <div className="flex items-center justify-center">
-                  <div className="relative w-48 h-48">
-                    <svg className="w-48 h-48 transform -rotate-90" viewBox="0 0 192 192">
-                      <circle
-                        cx="96"
-                        cy="96"
-                        r="80"
-                        fill="none"
-                        stroke="#e5e7eb"
-                        strokeWidth="12"
-                      />
-                      {(() => {
-                        let currentAngle = 0;
-                        const radius = 80;
-                        const circumference = 2 * Math.PI * radius;
-                        return pieChartData.map((item, index) => {
-                          const percentage = (item.minutes / totalTimeEstimated);
-                          const angle = percentage * 360;
-                          const dashLength = (circumference * percentage);
-                          const gapLength = circumference - dashLength;
-                          const offset = currentAngle * (circumference / 360);
-                          currentAngle += angle;
-                          return (
-                            <circle
-                              key={index}
-                              cx="96"
-                              cy="96"
-                              r={radius}
-                              fill="none"
-                              stroke={item.color}
-                              strokeWidth="12"
-                              strokeDasharray={`${dashLength} ${gapLength}`}
-                              strokeDashoffset={-offset}
-                              strokeLinecap="round"
-                            />
-                          );
-                        });
-                      })()}
-                    </svg>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="text-center">
-                        <div className="text-2xl font-medium text-gray-900">
-                          {Math.round(totalTimeEstimated / 60 * 10) / 10}h
+              <h2 className="text-sm font-medium uppercase tracking-wide mb-4 transition-colors" style={{ color: 'var(--text-primary)' }}>
+                Time Allocation
+              </h2>
+              {pieChartData.length > 0 ? (
+                <div className="space-y-4">
+                  {/* Pie Chart */}
+                  <div className="flex items-center justify-center">
+                    <div className="relative w-48 h-48">
+                      <svg className="w-48 h-48 transform -rotate-90" viewBox="0 0 192 192">
+                        <circle
+                          cx="96"
+                          cy="96"
+                          r="80"
+                          fill="none"
+                          stroke="#e5e7eb"
+                          strokeWidth="12"
+                        />
+                        {(() => {
+                          let currentAngle = 0;
+                          const radius = 80;
+                          const circumference = 2 * Math.PI * radius;
+                          return pieChartData.map((item, index) => {
+                            const percentage = (item.minutes / totalTimeEstimated);
+                            const angle = percentage * 360;
+                            const dashLength = (circumference * percentage);
+                            const gapLength = circumference - dashLength;
+                            const offset = currentAngle * (circumference / 360);
+                            currentAngle += angle;
+                            return (
+                              <circle
+                                key={index}
+                                cx="96"
+                                cy="96"
+                                r={radius}
+                                fill="none"
+                                stroke={item.color}
+                                strokeWidth="12"
+                                strokeDasharray={`${dashLength} ${gapLength}`}
+                                strokeDashoffset={-offset}
+                                strokeLinecap="round"
+                              />
+                            );
+                          });
+                        })()}
+                      </svg>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="text-center">
+                          <div className="text-2xl font-medium transition-colors" style={{ color: 'var(--text-primary)' }}>
+                            {Math.round(totalTimeEstimated / 60 * 10) / 10}h
+                          </div>
+                          <div className="text-xs transition-colors" style={{ color: 'var(--text-muted)' }}>Total</div>
                         </div>
-                        <div className="text-xs text-gray-500">Total</div>
                       </div>
                     </div>
                   </div>
-                </div>
-                
-                {/* Legend */}
-                <div className="space-y-2 max-h-48 overflow-y-auto">
-                  {pieChartData.map((item, index) => {
-                    const percentage = ((item.minutes / totalTimeEstimated) * 100).toFixed(1);
-                    return (
-                      <div key={index} className="flex items-center justify-between gap-2 text-xs">
-                        <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <div 
-                            className="w-3 h-3 rounded-full flex-shrink-0" 
-                            style={{ backgroundColor: item.color }}
-                          ></div>
-                          <span className="text-gray-700 truncate" title={item.fullName}>
-                            {item.name}
-                          </span>
+                  
+                  {/* Legend */}
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {pieChartData.map((item, index) => {
+                      const percentage = ((item.minutes / totalTimeEstimated) * 100).toFixed(1);
+                      return (
+                        <div key={index} className="flex items-center justify-between gap-2 text-xs">
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <div 
+                              className="w-3 h-3 rounded-full flex-shrink-0" 
+                              style={{ backgroundColor: item.color }}
+                            ></div>
+                            <span className="truncate transition-colors" style={{ color: 'var(--text-primary)' }} title={item.fullName}>
+                              {item.name}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <span className="transition-colors" style={{ color: 'var(--text-muted)' }}>{item.value}h</span>
+                            <span className="transition-colors" style={{ color: 'var(--text-muted)' }}>({percentage}%)</span>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2 flex-shrink-0">
-                          <span className="text-gray-600">{item.value}h</span>
-                          <span className="text-gray-400">({percentage}%)</span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <div className="relative w-32 h-32 mx-auto mb-4">
-                  <svg className="w-32 h-32 transform -rotate-90">
-                    <circle
-                      cx="64"
-                      cy="64"
-                      r="56"
-                      fill="none"
-                      stroke="#e5e7eb"
-                      strokeWidth="8"
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-sm text-gray-400">0%</span>
+                      );
+                    })}
                   </div>
                 </div>
-                <p className="text-xs text-gray-500">Add time estimates to tasks to see allocation</p>
-              </div>
-            )}
+              ) : (
+                <div className="text-center py-8">
+                  <div className="relative w-32 h-32 mx-auto mb-4">
+                    <svg className="w-32 h-32 transform -rotate-90">
+                      <circle
+                        cx="64"
+                        cy="64"
+                        r="56"
+                        fill="none"
+                        stroke="#e5e7eb"
+                        strokeWidth="8"
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-sm transition-colors" style={{ color: 'var(--text-muted)' }}>0%</span>
+                    </div>
+                  </div>
+                  <p className="text-xs transition-colors" style={{ color: 'var(--text-muted)' }}>Add time estimates to tasks to see allocation</p>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
 
-        {/* Right Column */}
-        <div className="space-y-6">
+          {/* Right Column (Secondary) */}
+          <div className="lg:col-span-4 space-y-6">
           {/* Current Local Time */}
-          <div className="bg-white rounded-lg p-6 border border-gray-200 text-center">
-            <div className="text-label text-gray-500 mb-3">CURRENT LOCAL TIME</div>
-            <div className="text-5xl font-light text-gray-900 mb-2 tracking-tight">
+            <div 
+              className="rounded-lg p-6 border text-center transition-colors"
+              style={{ 
+                backgroundColor: 'var(--bg-card)',
+                borderColor: 'var(--border-subtle)'
+              }}
+            >
+              <div className="text-xs font-medium uppercase tracking-wide mb-3 transition-colors" style={{ color: 'var(--text-muted)' }}>
+                Current Local Time
+              </div>
+              <div className="text-5xl font-light mb-2 tracking-tight transition-colors" style={{ color: 'var(--text-primary)' }}>
               {currentTime}
             </div>
-            <div className="text-label text-gray-600">
+              <div className="text-sm transition-colors" style={{ color: 'var(--text-muted)' }}>
               {currentDate}
             </div>
           </div>
 
           {/* Schedule */}
-          <div className="bg-white rounded-lg p-6 border border-gray-200">
-            <div className="flex items-center justify-between mb-4">
-                <h2 className="text-label text-gray-700">SCHEDULE</h2>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setShowAddEvent(true)}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
-                  title="Add Event"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                </button>
-                <Link to="/calendar" className="text-gray-400 hover:text-gray-600">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                </Link>
-              </div>
-            </div>
-            
-            {showAddEvent ? (
-              <div className="mb-4 p-3 bg-gray-50 rounded border border-gray-200">
-                <div className="space-y-2">
-                  <input
-                    type="text"
-                    value={newEvent.title}
-                    onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
-                    placeholder="Event title"
-                    className="w-full px-3 py-2 border-b border-gray-300 focus:outline-none focus:border-gray-900 text-sm"
-                    autoFocus
-                  />
-                  <div className="grid grid-cols-2 gap-2">
-                    <input
-                      type="time"
-                      value={newEvent.startTime}
-                      onChange={(e) => setNewEvent({ ...newEvent, startTime: e.target.value })}
-                      className="w-full px-3 py-2 border-b border-gray-300 focus:outline-none focus:border-gray-900 text-sm"
-                    />
-                    <input
-                      type="time"
-                      value={newEvent.endTime}
-                      onChange={(e) => setNewEvent({ ...newEvent, endTime: e.target.value })}
-                      min={newEvent.startTime || undefined}
-                      className="w-full px-3 py-2 border-b border-gray-300 focus:outline-none focus:border-gray-900 text-sm"
-                    />
-                  </div>
-                  {eventError && (
-                    <p className="text-xs text-red-600">{eventError}</p>
-                  )}
-                  <div className="flex gap-2">
-                    <button
-                      onClick={handleCreateEvent}
-                      disabled={savingEvent || !newEvent.title.trim() || !newEvent.startTime || !newEvent.endTime}
-                      className="px-3 py-1.5 text-xs bg-gray-900 text-white rounded hover:bg-gray-800 disabled:opacity-50 transition-colors"
-                    >
-                      {savingEvent ? 'Adding...' : 'Add'}
-                    </button>
-                    <button
-                      onClick={() => {
-                        setShowAddEvent(false);
-                        setNewEvent({ title: '', startTime: '', endTime: '', description: '', type: 'event' });
-                        setEventError('');
-                      }}
-                      className="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700 transition-colors"
-                    >
-                      Cancel
-                    </button>
-              </div>
-                </div>
-              </div>
-            ) : null}
-            
-            <div className="space-y-4 max-h-[600px] overflow-y-auto">
-              {sortedDayKeys.length > 0 ? (
-                sortedDayKeys.map((dayKey) => {
-                  const dayData = eventsByDay[dayKey];
-                  const dayEvents = dayData.events;
-                  const isToday = formatDayLabel(dayData.date) === 'TODAY';
-                  
-                  return (
-                    <div key={dayKey} className="space-y-2">
-                      <div className="flex items-center gap-2 mb-2">
-                        <h3 className={`text-xs uppercase tracking-wider font-medium ${isToday ? 'text-gray-900' : 'text-gray-600'}`}>
-                          {formatDayLabel(dayData.date)}
-                        </h3>
-                        {isToday && (
-                          <div className="flex-1 h-px bg-gray-200"></div>
-                        )}
-                      </div>
-                      
-                      <div className="space-y-2.5 pl-2">
-                        {dayEvents.map((event) => {
-                          const eventStart = new Date(event.start_time);
-                          const eventEnd = new Date(event.end_time);
-                          const isActive = eventStart <= now && eventEnd >= now;
-                          const isUpcoming = eventStart > now;
-                          
-                          return (
-                            <div key={event.id} className="group flex items-start gap-3 hover:bg-gray-50 -mx-2 px-2 py-1 rounded transition-colors">
-                              <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
-                                isActive ? 'bg-green-500' : isUpcoming ? 'bg-gray-400' : 'bg-gray-300'
-                              }`}></div>
-                              <div className="flex-1 min-w-0">
-                                {isActive && (
-                                  <div className="text-xs text-green-600 font-medium mb-0.5">ACTIVE NOW</div>
-                                )}
-                                <div className={`text-sm ${isActive ? 'text-gray-900 font-medium' : 'text-gray-700'}`}>
-                                  {event.title}
-                                </div>
-                                <div className="text-xs text-gray-500 mt-0.5">
-                                  {formatEventTime(event.start_time, event.end_time)}
-                                </div>
-              </div>
-                              <button
-                                onClick={() => handleDeleteEvent(event.id)}
-                                className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-red-600 p-1"
-                                title="Delete event"
-                              >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                              </button>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  );
-                })
-              ) : (
-                !showAddEvent && (
-                  <p className="text-xs text-gray-400 text-center py-4">No events scheduled</p>
-                )
-              )}
-            </div>
-            
-            <Link 
-              to="/calendar" 
-              className="block mt-4 text-center text-xs text-gray-500 hover:text-gray-700 transition-colors"
-            >
-              + VIEW FULL CALENDAR
-            </Link>
-          </div>
+            <CalendarPanel
+              calendarEvents={calendarEvents}
+              showAddEvent={showAddEvent}
+              setShowAddEvent={setShowAddEvent}
+              newEvent={newEvent}
+              setNewEvent={setNewEvent}
+              eventError={eventError}
+              savingEvent={savingEvent}
+              eventsByDay={eventsByDay}
+              sortedDayKeys={sortedDayKeys}
+              formatDayLabel={formatDayLabel}
+              formatEventTime={formatEventTime}
+              onCreateEvent={handleCreateEvent}
+              onDeleteEvent={handleDeleteEvent}
+              onCancelAddEvent={handleCancelAddEvent}
+            />
+
+            {/* Insights */}
+            <InsightsPanel />
 
           {/* Thinking Space */}
-          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <h2 className="text-label text-gray-700">THINKING SPACE</h2>
-              <button
-                onClick={() => setShowThinkingSpace(!showThinkingSpace)}
-                  className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
-              >
-                  {showThinkingSpace ? 'COLLAPSE' : 'EXPAND'}
-              </button>
-                    </div>
-                  </div>
-
-          {showThinkingSpace ? (
-            <div className="p-6">
-              {todayThoughts.length > 0 && (
-                  <div className="mb-5 pb-5 border-b border-gray-100">
-                    <h4 className="text-xs font-medium text-gray-600 mb-2">Today's Saved Entries ({todayThoughts.length})</h4>
-                    <div className="space-y-2 max-h-40 overflow-y-auto">
-                    {todayThoughts.map((thought) => (
-                        <div key={thought.id} className="p-2.5 bg-gray-50 rounded border border-gray-100">
-                          <div className="flex items-center justify-between mb-1.5">
-                            <span className="text-xs text-gray-500 font-medium">
-                            {thought.mode === 'freewrite' ? 'Free write' : thought.mode === 'stuck' ? "I'm stuck" : 'Decision draft'}
-                          </span>
-                            <div className="flex items-center gap-1.5">
-                              <span className="text-xs text-gray-400">
-                              {new Date(thought.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
-                            </span>
-                            <button
-                              onClick={() => handleEditThought(thought)}
-                                className="p-0.5 text-gray-400 hover:text-gray-600"
-                            >
-                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                              </svg>
-                            </button>
-                            <button
-                              onClick={() => handleDeleteThought(thought.id)}
-                                className="p-0.5 text-gray-400 hover:text-gray-600"
-                            >
-                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                              </svg>
-                            </button>
-                          </div>
-                        </div>
-                          <p className="text-xs text-gray-700 line-clamp-2">{thought.content}</p>
-                      </div>
-                    ))}
+            <ThinkingSpacePanel
+              showThinkingSpace={showThinkingSpace}
+              setShowThinkingSpace={setShowThinkingSpace}
+              thoughtMode={thoughtMode}
+              setThoughtMode={setThoughtMode}
+              thoughtContent={thoughtContent}
+              setThoughtContent={setThoughtContent}
+              wordCount={wordCount}
+              lastSaved={lastSaved}
+              saved={saved}
+              thoughtError={thoughtError}
+              saving={saving}
+              todayThoughts={todayThoughts}
+              editingThoughtId={editingThoughtId}
+              editingThoughtContent={editingThoughtContent}
+              setEditingThoughtContent={setEditingThoughtContent}
+              editingThoughtMode={editingThoughtMode}
+              setEditingThoughtMode={setEditingThoughtMode}
+              thoughtModes={thoughtModes}
+              onSaveThought={handleSaveThought}
+              onUpdateThought={handleUpdateThought}
+              onEditThought={handleEditThought}
+              onDeleteThought={handleDeleteThought}
+              onCancelEditThought={handleCancelEditThought}
+            />
                   </div>
                 </div>
-              )}
-              
-              {editingThoughtId && (
-                  <div className="mb-5 pb-5 border-b border-gray-100">
-                    <h4 className="text-xs font-medium text-gray-600 mb-2">Editing Entry</h4>
-                    <div className="mb-3 flex gap-2 flex-wrap">
-                    {thoughtModes.map((m) => (
-                      <button
-                        key={m.id}
-                        onClick={() => setEditingThoughtMode(m.id)}
-                          className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
-                          editingThoughtMode === m.id
-                              ? 'bg-gray-900 text-white'
-                              : 'bg-gray-50 border border-gray-200 text-gray-600 hover:bg-gray-100'
-                        }`}
-                      >
-                        {m.label}
-                      </button>
-                    ))}
-                  </div>
-                  <textarea 
-                    value={editingThoughtContent}
-                    onChange={(e) => setEditingThoughtContent(e.target.value)}
-                    placeholder="Edit your thought..."
-                      className="w-full h-40 p-3 bg-gray-50 border border-gray-200 rounded focus:outline-none focus:border-gray-400 text-gray-700 text-sm leading-relaxed resize-none mb-3"
-                  />
-                  <div className="flex gap-2">
-                    <button
-                      onClick={handleUpdateThought}
-                      disabled={!editingThoughtContent.trim() || saving}
-                        className="px-4 py-1.5 bg-gray-900 text-white rounded text-xs hover:bg-gray-800 disabled:opacity-50 transition-colors"
-                    >
-                      {saving ? 'Saving...' : 'Save Changes'}
-                    </button>
-                    <button
-                      onClick={() => {
-                        setEditingThoughtId(null);
-                        setEditingThoughtContent('');
-                        setEditingThoughtMode('freewrite');
-                      }}
-                        className="px-4 py-1.5 bg-gray-50 text-gray-600 rounded text-xs hover:bg-gray-100 transition-colors"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              )}
-              
-              {!editingThoughtId && (
-                <>
-                    <div className="mb-4 flex gap-2 flex-wrap">
-                {thoughtModes.map((m) => (
-                  <button
-                    key={m.id}
-                    onClick={() => setThoughtMode(m.id)}
-                          className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
-                      thoughtMode === m.id
-                              ? 'bg-gray-900 text-white'
-                              : 'bg-gray-50 border border-gray-200 text-gray-600 hover:bg-gray-100'
-                    }`}
-                  >
-                    {m.label}
-                  </button>
-                ))}
-                </div>
-                
-                <textarea 
-                value={thoughtContent}
-                onChange={(e) => setThoughtContent(e.target.value)}
-                placeholder="Start typing your stream of consciousness here..."
-                      className="w-full h-48 p-3 bg-gray-50 border border-gray-200 rounded focus:outline-none focus:border-gray-400 text-gray-700 text-sm leading-relaxed resize-none mb-3"
-              />
-
-              <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3 text-xs text-gray-400">
-                        <span>{wordCount} words</span>
-                        {lastSaved && (
-                          <span>Saved {Math.floor((Date.now() - lastSaved) / 60000)}m ago</span>
-                        )}
-                </div>
-                <button
-                  onClick={handleSaveThought}
-                  disabled={!thoughtContent.trim() || saving}
-                        className="px-4 py-1.5 bg-gray-900 text-white rounded text-xs hover:bg-gray-800 disabled:opacity-50 transition-colors flex items-center gap-1.5"
-                      >
-                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                        <span>Save</span>
-                </button>
-              </div>
-                </>
-              )}
-              
-              {saved && (
-                  <div className="mt-3 p-2 text-xs text-gray-600 text-center">
-                    Saved successfully
-                </div>
-              )}
-              {thoughtError && (
-                  <div className="mt-3 p-2 text-xs text-red-600 text-center">
-                    {thoughtError}
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="p-6">
-              {todayThoughts.length > 0 ? (
-                  <div className="space-y-2 mb-3">
-                    <p className="text-xs text-gray-500 mb-3">Today's entries:</p>
-                  {todayThoughts.slice(0, 3).map((thought) => (
-                      <div key={thought.id} className="p-2.5 bg-gray-50 rounded border border-gray-100">
-                        <div className="flex items-center justify-between mb-1.5">
-                          <span className="text-xs text-gray-500 font-medium">
-                          {thought.mode === 'freewrite' ? 'Free write' : thought.mode === 'stuck' ? "I'm stuck" : 'Decision draft'}
-                        </span>
-                          <span className="text-xs text-gray-400">
-                          {new Date(thought.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
-                        </span>
-                      </div>
-                        <p className="text-xs text-gray-700 line-clamp-2">{thought.content}</p>
-                    </div>
-                  ))}
-                  {todayThoughts.length > 3 && (
-                      <p className="text-xs text-gray-400 text-center">+{todayThoughts.length - 3} more entries</p>
-                  )}
-                </div>
-              ) : (
-                  <div className="text-center mb-3">
-                    <p className="text-xs text-gray-500 italic mb-3">Need to process your thoughts? Capture the whispers of your mind here.</p>
-                </div>
-              )}
-              <button
-                onClick={() => setShowThinkingSpace(true)}
-                  className="w-full px-4 py-2 bg-gray-900 text-white rounded text-xs hover:bg-gray-800 transition-colors"
-              >
-                  {todayThoughts.length > 0 ? 'CONTINUE WRITING' : 'START WRITING'}
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
       </div>
     </div>
   );
