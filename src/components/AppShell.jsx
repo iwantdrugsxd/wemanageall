@@ -13,6 +13,8 @@ export default function AppShell({ children }) {
   const [unreadCount, setUnreadCount] = useState(0);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [subscription, setSubscription] = useState(null);
+  const [usage, setUsage] = useState({ projects: null, seats: null, storage: null });
 
   const firstName = user?.name?.split(' ')[0] || 'User';
   const initial = firstName.charAt(0).toUpperCase();
@@ -42,9 +44,45 @@ export default function AppShell({ children }) {
     }
   };
 
+  // Fetch subscription and usage data
+  const fetchSubscription = async () => {
+    try {
+      const response = await fetch('/api/subscriptions/current', {
+        credentials: 'include',
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setSubscription(data.subscription);
+      }
+    } catch (error) {
+      // Silent fail
+    }
+  };
+
+  const fetchUsage = async () => {
+    try {
+      // Fetch projects count
+      const projectsRes = await fetch('/api/projects?archived=false', {
+        credentials: 'include',
+      });
+      if (projectsRes.ok) {
+        const projectsData = await projectsRes.json();
+        setUsage(prev => ({ ...prev, projects: projectsData.projects?.length || 0 }));
+      }
+
+      // Fetch organization members (seats) if applicable
+      // This is a placeholder - adjust based on your API
+      setUsage(prev => ({ ...prev, seats: null, storage: null }));
+    } catch (error) {
+      // Silent fail
+    }
+  };
+
   useEffect(() => {
     if (user) {
       fetchUnreadCount();
+      fetchSubscription();
+      fetchUsage();
       const interval = setInterval(fetchUnreadCount, 30000);
       
       const handleInsightsUpdate = () => {
@@ -173,23 +211,61 @@ export default function AppShell({ children }) {
           })}
         </nav>
 
-        {/* Usage Meter (Placeholder) */}
+        {/* Plan Badge + Usage Meter */}
         {!sidebarCollapsed && (
-          <div className="p-4 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
-            <div className="mb-2">
-              <div className="flex justify-between text-xs mb-1">
-                <span className="transition-colors" style={{ color: 'var(--text-muted)' }}>Storage</span>
-                <span className="transition-colors" style={{ color: 'var(--text-muted)' }}>45%</span>
-              </div>
-              <div className="w-full h-1.5 rounded-full" style={{ backgroundColor: 'var(--bg-surface)' }}>
-                <div 
-                  className="h-full rounded-full transition-all"
-                  style={{ 
-                    width: '45%', 
-                    backgroundColor: 'var(--accent)' 
-                  }}
-                />
-              </div>
+          <div className="p-4 border-t space-y-3" style={{ borderColor: 'var(--border-subtle)' }}>
+            {/* Plan Badge */}
+            <div className="px-3 py-2 rounded-lg transition-colors" style={{ backgroundColor: 'var(--bg-surface)' }}>
+              <p className="text-xs font-medium mb-1 transition-colors" style={{ color: 'var(--text-muted)' }}>
+                Plan
+              </p>
+              <p className="text-sm font-medium transition-colors capitalize" style={{ color: 'var(--text-primary)' }}>
+                {subscription?.plan_type === 'premium' ? 'Starter' : 
+                 subscription?.plan_type === 'team_starter' ? 'Team' : 
+                 subscription?.plan_type ? subscription.plan_type : 'Free'}
+              </p>
+            </div>
+
+            {/* Usage Meters */}
+            <div className="space-y-2">
+              {usage.projects !== null && (
+                <div>
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="transition-colors" style={{ color: 'var(--text-muted)' }}>Projects</span>
+                    <span className="transition-colors" style={{ color: 'var(--text-muted)' }}>
+                      {usage.projects}
+                    </span>
+                  </div>
+                </div>
+              )}
+              {usage.storage !== null ? (
+                <div>
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="transition-colors" style={{ color: 'var(--text-muted)' }}>Storage</span>
+                    <span className="transition-colors" style={{ color: 'var(--text-muted)' }}>
+                      {usage.storage}%
+                    </span>
+                  </div>
+                  <div className="w-full h-1.5 rounded-full" style={{ backgroundColor: 'var(--bg-surface)' }}>
+                    <div 
+                      className="h-full rounded-full transition-all"
+                      style={{ 
+                        width: `${usage.storage}%`, 
+                        backgroundColor: 'var(--accent)' 
+                      }}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="transition-colors" style={{ color: 'var(--text-muted)' }}>Storage</span>
+                    <span className="transition-colors" style={{ color: 'var(--text-muted)' }}>
+                      Not available
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -430,6 +506,20 @@ export default function AppShell({ children }) {
                           }}
                         >
                           Settings
+                        </Link>
+                        <Link
+                          to="/admin"
+                          onClick={() => setShowUserMenu(false)}
+                          className="block w-full text-left px-4 py-2 text-sm transition-colors"
+                          style={{ color: 'var(--text-primary)' }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = 'var(--bg-surface)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                          }}
+                        >
+                          Admin
                         </Link>
                         <Link
                           to="/pricing"

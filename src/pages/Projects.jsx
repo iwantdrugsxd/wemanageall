@@ -5,6 +5,7 @@ import ProjectsHeader from '../components/projects/ProjectsHeader';
 import ProjectsFilters from '../components/projects/ProjectsFilters';
 import ProjectsTable from '../components/projects/ProjectsTable';
 import ProjectsGrid from '../components/projects/ProjectsGrid';
+import UpgradeGate from '../components/UpgradeGate';
 
 export default function Projects() {
   const { user } = useAuth();
@@ -531,6 +532,9 @@ export default function Projects() {
         setSearchQuery={setSearchQuery}
         onFilterChange={() => setTimeout(fetchProjects, 100)}
       />
+
+      {/* Upgrade Gate */}
+      <UpgradeGate message="Upgrade to unlock unlimited projects and advanced features" />
 
       {/* View Toggle & Join Button */}
       <div className="mb-6 flex items-center justify-between">

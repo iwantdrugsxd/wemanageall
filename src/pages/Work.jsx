@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import Calendar from './Calendar';
 import Notifications from './Notifications';
 import TasksPanel from '../components/home/TasksPanel';
+import UpgradeGate from '../components/UpgradeGate';
 
 /**
  * Work Hub - Central execution center for tasks, calendar, and notifications
@@ -302,6 +303,9 @@ export default function Work() {
             </button>
           </div>
         </div>
+
+        {/* Upgrade Gate */}
+        <UpgradeGate message="Upgrade for unlimited tasks, advanced calendar features, and priority support" />
 
         {/* Tabs */}
         <div className="mb-6 border-b" style={{ borderColor: 'var(--border-subtle)' }}>

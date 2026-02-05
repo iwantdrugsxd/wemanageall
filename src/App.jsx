@@ -20,6 +20,7 @@ import Lists from './pages/Lists';
 import Pricing from './pages/Pricing';
 import Work from './pages/Work';
 import Docs from './pages/Docs';
+import Admin from './pages/Admin';
 import Layout from './components/Layout';
 
 // Loading spinner component
@@ -223,6 +224,16 @@ function App() {
           <ProtectedRoute requireOnboarding>
             <Layout>
               <Settings />
+            </Layout>
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/admin" 
+        element={
+          <ProtectedRoute requireOnboarding>
+            <Layout>
+              <Admin />
             </Layout>
           </ProtectedRoute>
         } 
