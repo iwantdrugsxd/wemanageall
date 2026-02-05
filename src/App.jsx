@@ -18,8 +18,8 @@ import Notifications from './pages/Notifications';
 import Library from './pages/Library';
 import Lists from './pages/Lists';
 import Pricing from './pages/Pricing';
-import Work from './pages/Work';
-import Docs from './pages/Docs';
+import WorkHub from './pages/WorkHub';
+import DocsHub from './pages/DocsHub';
 import Admin from './pages/Admin';
 import Layout from './components/Layout';
 
@@ -144,7 +144,7 @@ function App() {
         element={
           <ProtectedRoute requireOnboarding>
             <Layout>
-              <Work />
+              <WorkHub />
             </Layout>
           </ProtectedRoute>
         } 
@@ -154,7 +154,7 @@ function App() {
         element={
           <ProtectedRoute requireOnboarding>
             <Layout>
-              <Docs />
+              <DocsHub />
             </Layout>
           </ProtectedRoute>
         } 

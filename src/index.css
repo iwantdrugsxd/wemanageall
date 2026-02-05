@@ -26,6 +26,26 @@
   --error-bg: #fef2f2;
   --success: #16a34a;
   --success-bg: #f0fdf4;
+  
+  /* Enterprise UI System Tokens */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  
+  --focus-ring: 0 0 0 2px var(--accent);
+  
+  /* Status Colors */
+  --status-info-bg: #dbeafe;
+  --status-info-fg: #1e40af;
+  --status-success-bg: #f0fdf4;
+  --status-success-fg: #16a34a;
+  --status-warning-bg: #fef3c7;
+  --status-warning-fg: #d97706;
+  --status-danger-bg: #fef2f2;
+  --status-danger-fg: #dc2626;
 }
 
 .dark {
@@ -51,6 +71,26 @@
   --error-bg: #7f1d1d;
   --success: #4ade80;
   --success-bg: #14532d;
+  
+  /* Enterprise UI System Tokens (Dark) */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+  
+  --focus-ring: 0 0 0 2px var(--accent);
+  
+  /* Status Colors (Dark) */
+  --status-info-bg: #1e3a8a;
+  --status-info-fg: #93c5fd;
+  --status-success-bg: #14532d;
+  --status-success-fg: #4ade80;
+  --status-warning-bg: #78350f;
+  --status-warning-fg: #fbbf24;
+  --status-danger-bg: #7f1d1d;
+  --status-danger-fg: #f87171;
 }
 
 @layer base {
@@ -68,9 +108,16 @@
     transition: background-color 0.3s ease, color 0.3s ease;
   }
 
+  /* Typography - Marketing pages use serif, app uses sans */
   h1, h2, h3 {
     @apply font-serif;
     letter-spacing: -0.03em;
+  }
+  
+  /* Override for app shell - use Inter (sans) */
+  .app h1, .app h2, .app h3 {
+    font-family: 'Inter', system-ui, sans-serif;
+    letter-spacing: normal;
   }
 
   ::selection {
@@ -318,6 +365,27 @@
   
   .success-bg {
     background-color: var(--success-bg);
+  }
+  
+  /* Enterprise Layout Utilities */
+  .app-page {
+    @apply max-w-7xl mx-auto px-6 lg:px-8 py-8;
+  }
+  
+  .app-panel {
+    @apply rounded-lg border transition-colors;
+    background-color: var(--bg-card);
+    border-color: var(--border-subtle);
+  }
+  
+  .app-title {
+    @apply text-3xl md:text-4xl font-light transition-colors;
+    color: var(--text-primary);
+  }
+  
+  .app-subtitle {
+    @apply text-sm transition-colors;
+    color: var(--text-muted);
   }
 }
 
