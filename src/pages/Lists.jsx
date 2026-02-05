@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { formatDistanceToNow } from 'date-fns';
 
-export default function Lists() {
+export default function Lists({ embedded = false }) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { id } = useParams();
@@ -266,21 +266,23 @@ export default function Lists() {
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
-      {/* Header */}
-      <div className="flex items-start justify-between mb-8">
-        <div>
-          <h1 className="font-display text-4xl md:text-5xl text-black mb-2">My Lists</h1>
-          <p className="text-gray-600 text-lg">Manage your personal intentions and collections.</p>
+    <div className={embedded ? "" : "max-w-7xl mx-auto px-6 lg:px-8 py-12"}>
+      {/* Header - only show if not embedded */}
+      {!embedded && (
+        <div className="flex items-start justify-between mb-8">
+          <div>
+            <h1 className="font-display text-4xl md:text-5xl text-black mb-2">My Lists</h1>
+            <p className="text-gray-600 text-lg">Manage your personal intentions and collections.</p>
+          </div>
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="px-6 py-3 bg-black text-white rounded-xl hover:bg-black transition-colors flex items-center gap-2 font-medium"
+          >
+            <span className="text-xl">+</span>
+            <span>Create New List</span>
+          </button>
         </div>
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="px-6 py-3 bg-black text-white rounded-xl hover:bg-black transition-colors flex items-center gap-2 font-medium"
-        >
-          <span className="text-xl">+</span>
-          <span>Create New List</span>
-        </button>
-      </div>
+      )}
 
       {/* Navigation/Filter Bar */}
       <div className="flex items-center gap-6 mb-6 border-b border-gray-300 pb-4">

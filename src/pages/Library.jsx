@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import PDFReader from '../components/PDFReader';
 
-export default function Library() {
+export default function Library({ embedded = false }) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { id } = useParams();
@@ -280,21 +280,23 @@ export default function Library() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
-      {/* Header */}
-      <div className="flex items-start justify-between mb-8">
-        <div>
-          <h1 className="font-display text-4xl md:text-5xl text-black mb-2">Resource Library</h1>
-          <p className="text-gray-600 text-lg">Curated intellectual assets and reading logs.</p>
+    <div className={embedded ? "" : "max-w-7xl mx-auto px-6 lg:px-8 py-12"}>
+      {/* Header - only show if not embedded */}
+      {!embedded && (
+        <div className="flex items-start justify-between mb-8">
+          <div>
+            <h1 className="font-display text-4xl md:text-5xl text-black mb-2">Resource Library</h1>
+            <p className="text-gray-600 text-lg">Curated intellectual assets and reading logs.</p>
+          </div>
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="px-6 py-3 bg-black text-white rounded-xl hover:bg-gray-900 transition-colors flex items-center gap-2 font-medium"
+          >
+            <span className="text-xl">+</span>
+            <span>Add Resource</span>
+          </button>
         </div>
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="px-6 py-3 bg-black text-white rounded-xl hover:bg-gray-900 transition-colors flex items-center gap-2 font-medium"
-        >
-          <span className="text-xl">+</span>
-          <span>Add Resource</span>
-        </button>
-      </div>
+      )}
 
       {/* Search and Filters */}
       <div className="mb-6 space-y-4">

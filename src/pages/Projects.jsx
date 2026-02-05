@@ -9,6 +9,9 @@ import ProjectsGrid from '../components/projects/ProjectsGrid';
 import UpgradeGate from '../components/UpgradeGate';
 import EmptyState from '../components/ui/EmptyState';
 import Button from '../components/ui/Button';
+import DatabaseToolbar from '../components/database/DatabaseToolbar';
+import PropertiesDrawer from '../components/database/PropertiesDrawer';
+import { useSavedViews } from '../hooks/useSavedViews';
 
 export default function Projects() {
   const { user } = useAuth();
@@ -49,8 +52,15 @@ export default function Projects() {
   const [showActivityModal, setShowActivityModal] = useState(false);
   const [healthData, setHealthData] = useState(null);
   const [activityData, setActivityData] = useState([]);
-  const [viewMode, setViewMode] = useState('table'); // 'table' or 'grid'
+  const [viewMode, setViewMode] = useState('table'); // 'table' or 'grid' - default to table
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [showPropertiesDrawer, setShowPropertiesDrawer] = useState(false);
+  const [sortField, setSortField] = useState({ field: '', direction: 'asc' });
+  const [groupBy, setGroupBy] = useState(null);
+  
+  // Saved views integration
+  const savedViews = useSavedViews('projects');
   
   // Color and icon options
   const colorOptions = [
@@ -503,8 +513,20 @@ export default function Projects() {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase();
   };
 
+  // Apply saved view if active
+  useEffect(() => {
+    const activeView = savedViews.getActiveView();
+    if (activeView) {
+      setViewMode(activeView.viewType || 'table');
+      setSearchQuery(activeView.search || '');
+      if (activeView.sort) setSortField(activeView.sort);
+      if (activeView.group) setGroupBy(activeView.group);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [savedViews.activeViewId]);
+
   // Client-side search filtering
-  const filteredProjects = projects.filter(project => {
+  let filteredProjects = projects.filter(project => {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
     return (
@@ -513,6 +535,40 @@ export default function Projects() {
       project.tags?.some(tag => tag.toLowerCase().includes(query))
     );
   });
+
+  // Apply sorting
+  if (sortField.field) {
+    filteredProjects = [...filteredProjects].sort((a, b) => {
+      let aVal = a[sortField.field];
+      let bVal = b[sortField.field];
+      
+      if (sortField.field === 'updated_at' || sortField.field === 'created_at' || sortField.field === 'start_date') {
+        aVal = new Date(aVal || 0);
+        bVal = new Date(bVal || 0);
+      }
+      
+      if (aVal < bVal) return sortField.direction === 'asc' ? -1 : 1;
+      if (aVal > bVal) return sortField.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+
+  // Handle row click to open properties drawer
+  const handleProjectClick = (project) => {
+    setSelectedProject(project);
+    setShowPropertiesDrawer(true);
+  };
+
+  // Save current view
+  const handleSaveCurrentView = (name) => {
+    savedViews.saveCurrentAsView(name, {
+      viewType: viewMode,
+      filters: { favorites: showFavoritesOnly, archived: showArchived, tag: filterTag },
+      sort: sortField,
+      group: groupBy,
+      search: searchQuery
+    });
+  };
 
   if (loading) {
     return (
@@ -535,21 +591,68 @@ export default function Projects() {
         onJoinProject={() => setShowJoinModal(true)}
       />
 
-      {/* Toolbar */}
-      <ProjectsToolbar
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        showFavoritesOnly={showFavoritesOnly}
-        setShowFavoritesOnly={setShowFavoritesOnly}
-        showArchived={showArchived}
-        setShowArchived={setShowArchived}
-        filterTag={filterTag}
-        setFilterTag={setFilterTag}
-        availableTags={availableTags}
-        viewMode={viewMode}
-        setViewMode={setViewMode}
-        onFilterChange={() => setTimeout(fetchProjects, 100)}
+      {/* Database Toolbar */}
+      <DatabaseToolbar
+        viewType={viewMode}
+        onViewChange={setViewMode}
+        search={searchQuery}
+        onSearchChange={setSearchQuery}
+        filters={{ favorites: showFavoritesOnly, archived: showArchived, tag: filterTag }}
+        onFiltersChange={(filters) => {
+          setShowFavoritesOnly(filters.favorites || false);
+          setShowArchived(filters.archived || false);
+          setFilterTag(filters.tag || '');
+          setTimeout(fetchProjects, 100);
+        }}
+        sort={sortField}
+        onSortChange={setSortField}
+        group={groupBy}
+        onGroupChange={setGroupBy}
+        savedViews={savedViews}
+        onNew={() => setShowCreateModal(true)}
       />
+
+      {/* Legacy Toolbar (for backward compatibility with filters) */}
+      <div className="mb-4 flex items-center gap-2 flex-wrap">
+        <Button
+          variant={showFavoritesOnly ? 'primary' : 'secondary'}
+          size="sm"
+          onClick={() => {
+            setShowFavoritesOnly(!showFavoritesOnly);
+            setTimeout(fetchProjects, 100);
+          }}
+        >
+          ⭐ Favorites
+        </Button>
+        <Button
+          variant={showArchived ? 'primary' : 'secondary'}
+          size="sm"
+          onClick={() => {
+            setShowArchived(!showArchived);
+            setTimeout(fetchProjects, 100);
+          }}
+        >
+          {showArchived ? 'Active' : 'Archived'}
+        </Button>
+        <select
+          value={filterTag}
+          onChange={(e) => {
+            setFilterTag(e.target.value);
+            setTimeout(fetchProjects, 100);
+          }}
+          className="px-3 py-1.5 text-sm border rounded-lg"
+          style={{
+            borderColor: 'var(--border-subtle)',
+            backgroundColor: 'var(--bg-card)',
+            color: 'var(--text-primary)'
+          }}
+        >
+          <option value="">All Tags</option>
+          {availableTags.map(tag => (
+            <option key={tag} value={tag}>{tag}</option>
+          ))}
+        </select>
+      </div>
 
       {/* Upgrade Gate */}
       <UpgradeGate message="Upgrade to unlock unlimited projects and advanced features" />
@@ -588,6 +691,7 @@ export default function Projects() {
             onHealth={handleFetchHealth}
             onActivity={handleFetchActivity}
             formatDate={formatDate}
+            onRowClick={handleProjectClick}
           />
         </div>
       ) : (
@@ -1171,6 +1275,73 @@ export default function Projects() {
           </div>
         </div>
       )}
+
+      {/* Properties Drawer */}
+      <PropertiesDrawer
+        isOpen={showPropertiesDrawer}
+        onClose={() => {
+          setShowPropertiesDrawer(false);
+          setSelectedProject(null);
+        }}
+        title={selectedProject?.name || 'Project Properties'}
+        sections={selectedProject ? [
+          {
+            title: 'Details',
+            fields: [
+              {
+                key: 'name',
+                label: 'Name',
+                value: selectedProject.name,
+                readOnly: false,
+                onChange: (value) => {
+                  // Could implement inline edit here if needed
+                }
+              },
+              {
+                key: 'description',
+                label: 'Description',
+                value: selectedProject.description || 'Not available',
+                readOnly: true
+              },
+              {
+                key: 'progress',
+                label: 'Progress',
+                value: `${selectedProject.progress || 0}%`,
+                readOnly: true
+              },
+              {
+                key: 'status',
+                label: 'Status',
+                value: selectedProject.archived_at ? 'Archived' : 'Active',
+                readOnly: true
+              }
+            ]
+          },
+          {
+            title: 'Metadata',
+            fields: [
+              {
+                key: 'start_date',
+                label: 'Start Date',
+                value: selectedProject.start_date ? new Date(selectedProject.start_date).toLocaleDateString() : 'Not available',
+                readOnly: true
+              },
+              {
+                key: 'tags',
+                label: 'Tags',
+                value: selectedProject.tags?.join(', ') || 'Not available',
+                readOnly: true
+              },
+              {
+                key: 'updated_at',
+                label: 'Last Updated',
+                value: selectedProject.updated_at ? new Date(selectedProject.updated_at).toLocaleString() : 'Not available',
+                readOnly: true
+              }
+            ]
+          }
+        ] : []}
+      />
     </Page>
   );
 }

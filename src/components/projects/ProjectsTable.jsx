@@ -18,7 +18,8 @@ export default function ProjectsTable({
   onDelete,
   onHealth,
   onActivity,
-  formatDate
+  formatDate,
+  onRowClick
 }) {
   const navigate = useNavigate();
 
@@ -56,7 +57,13 @@ export default function ProjectsTable({
           {projects.map((project) => (
             <tr
               key={project.id}
-              onClick={() => navigate(`/projects/${project.id}`)}
+              onClick={() => {
+                if (onRowClick) {
+                  onRowClick(project);
+                } else {
+                  navigate(`/projects/${project.id}`);
+                }
+              }}
               className="border-b cursor-pointer hover:bg-opacity-50 transition-colors"
               style={{ 
                 borderColor: 'var(--border-subtle)',
