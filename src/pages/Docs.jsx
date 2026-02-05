@@ -8,12 +8,12 @@ import Button from '../components/ui/Button';
 // Icons are inline SVG paths
 
 /**
- * Docs Hub - Unified knowledge hub for Library, Lists, and Resources
+ * Docs Hub - Unified knowledge hub for Resources, Lists
  * Phase 5: Database-style interface with tabs (no left sidebar)
  */
 export default function Docs() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const view = searchParams.get('view') || 'library';
+  const view = searchParams.get('view') || 'resources';
 
   const handleViewChange = (newView) => {
     setSearchParams({ view: newView });
@@ -26,7 +26,7 @@ export default function Docs() {
         subtitle="All knowledge, lists, and resources in one place"
         actions={
           <Button onClick={() => {
-            if (view === 'library') {
+            if (view === 'resources') {
               // Trigger Library's add modal if available
               window.dispatchEvent(new CustomEvent('library:open-add-modal'));
             } else if (view === 'lists') {
@@ -45,35 +45,20 @@ export default function Docs() {
       {/* Collection Tabs */}
       <Tabs value={view} onValueChange={handleViewChange} className="mb-6">
         <TabsList>
-          <TabsTrigger value="library" activeValue={view} onValueChange={handleViewChange}>
-            📚 Library
+          <TabsTrigger value="resources" activeValue={view} onValueChange={handleViewChange}>
+            📁 Resources
           </TabsTrigger>
           <TabsTrigger value="lists" activeValue={view} onValueChange={handleViewChange}>
             📋 Lists
           </TabsTrigger>
-          <TabsTrigger value="resources" activeValue={view} onValueChange={handleViewChange}>
-            📁 Resources
-          </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="library" activeValue={view}>
+        <TabsContent value="resources" activeValue={view}>
           <Library embedded />
         </TabsContent>
 
         <TabsContent value="lists" activeValue={view}>
           <Lists embedded />
-        </TabsContent>
-
-        <TabsContent value="resources" activeValue={view}>
-          <div className="text-center py-16">
-            <div className="text-6xl mb-4">📁</div>
-            <h2 className="text-2xl font-light mb-2 transition-colors" style={{ color: 'var(--text-primary)' }}>
-              Resources
-            </h2>
-            <p className="text-sm transition-colors" style={{ color: 'var(--text-muted)' }}>
-              Coming soon
-            </p>
-          </div>
         </TabsContent>
       </Tabs>
     </Page>

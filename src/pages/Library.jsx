@@ -295,13 +295,13 @@ export default function Library({ embedded = false }) {
 
   // If viewing a specific resource, show PDF reader
   if (id) {
-    return <PDFReader resourceId={id} onClose={() => navigate('/library')} />;
+        return <PDFReader resourceId={id} onClose={() => navigate('/resources')} />;
   }
 
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12 text-center">
-        <p className="text-gray-600">Loading library...</p>
+        <p className="text-gray-600">Loading resources...</p>
       </div>
     );
   }
@@ -312,7 +312,7 @@ export default function Library({ embedded = false }) {
       {!embedded && (
         <div className="flex items-start justify-between mb-8">
           <div>
-            <h1 className="font-display text-4xl md:text-5xl text-black mb-2">Resource Library</h1>
+            <h1 className="font-display text-4xl md:text-5xl text-black mb-2">Resources</h1>
             <p className="text-gray-600 text-lg">Curated intellectual assets and reading logs.</p>
           </div>
           <button
@@ -469,7 +469,7 @@ export default function Library({ embedded = false }) {
               <div className="flex items-start justify-between mb-6">
                 <div>
                   <h2 className="font-display text-3xl text-black mb-2">Add New Resource</h2>
-                  <p className="text-gray-600 text-sm">Peaceful Professionalism — Organize your digital library</p>
+                  <p className="text-gray-600 text-sm">Peaceful Professionalism — Organize your digital resources</p>
                 </div>
                 <button
                   onClick={() => {
@@ -657,7 +657,7 @@ export default function Library({ embedded = false }) {
                   className="px-6 py-3 bg-black text-white rounded-xl hover:bg-black/90 disabled:opacity-50 transition-colors flex items-center gap-2"
                 >
                   <span>📁</span>
-                  <span>{uploading ? 'Uploading...' : 'Save to Library'}</span>
+                  <span>{uploading ? 'Uploading...' : 'Save Resource'}</span>
                 </button>
               </div>
             </div>

@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 
 // Pages
@@ -82,6 +82,12 @@ function AuthRoute({ children }) {
   }
 
   return children;
+}
+
+// Redirect component for /library/:id to /resources/:id
+function LibraryRedirect() {
+  const { id } = useParams();
+  return <Navigate to={`/resources/${id}`} replace />;
 }
 
 function App() {
@@ -278,14 +284,12 @@ function App() {
           </ProtectedRoute>
         } 
       />
-      {/* Library routes */}
+      {/* Library routes - redirect to Resources */}
       <Route 
         path="/library" 
         element={
           <ProtectedRoute requireOnboarding>
-            <Layout>
-              <Library />
-            </Layout>
+            <Navigate to="/resources" replace />
           </ProtectedRoute>
         } 
       />
@@ -293,9 +297,7 @@ function App() {
         path="/library/:id" 
         element={
           <ProtectedRoute requireOnboarding>
-            <Layout>
-              <Library />
-            </Layout>
+            <LibraryRedirect />
           </ProtectedRoute>
         } 
       />

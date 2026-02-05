@@ -81,7 +81,7 @@ export default function Topbar({ onQuickAction }) {
   // Get route-aware placeholder
   const getPlaceholder = () => {
     if (scope === 'projects') return 'Search projects…';
-    if (scope === 'library') return 'Search library…';
+    if (scope === 'library') return 'Search resources…';
     if (scope === 'lists') return 'Search lists…';
     return 'Search…';
   };
@@ -184,7 +184,7 @@ export default function Topbar({ onQuickAction }) {
                     New Task
                   </Link>
                   <Link
-                    to="/docs?view=library"
+                    to="/docs?view=resources"
                     onClick={() => setShowCreateMenu(false)}
                     className="block w-full text-left px-4 py-2 text-sm transition-colors"
                     style={{ color: 'var(--text-primary)' }}
