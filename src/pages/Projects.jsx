@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useSearch } from '../context/SearchContext';
 import Page from '../components/layout/Page';
 import ProjectsHeader from '../components/projects/ProjectsHeader';
 import ProjectsToolbar from '../components/projects/ProjectsToolbar';
@@ -16,6 +17,7 @@ import { useSavedViews } from '../hooks/useSavedViews';
 export default function Projects() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { query: globalQuery, setQuery: setGlobalQuery } = useSearch();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -61,6 +63,17 @@ export default function Projects() {
   
   // Saved views integration
   const savedViews = useSavedViews('projects');
+
+  // Sync global search with local searchQuery
+  useEffect(() => {
+    setSearchQuery(globalQuery);
+  }, [globalQuery]);
+
+  // Sync local searchQuery changes to global search
+  const handleSearchChange = (value) => {
+    setSearchQuery(value);
+    setGlobalQuery(value);
+  };
   
   // Color and icon options
   const colorOptions = [
@@ -596,7 +609,7 @@ export default function Projects() {
         viewType={viewMode}
         onViewChange={setViewMode}
         search={searchQuery}
-        onSearchChange={setSearchQuery}
+        onSearchChange={handleSearchChange}
         filters={{ favorites: showFavoritesOnly, archived: showArchived, tag: filterTag }}
         onFiltersChange={(filters) => {
           setShowFavoritesOnly(filters.favorites || false);

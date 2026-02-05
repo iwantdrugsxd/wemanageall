@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useSearch } from '../context/SearchContext';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function Lists({ embedded = false }) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { id } = useParams();
+  const { query: globalQuery, setQuery: setGlobalQuery } = useSearch();
   const [lists, setLists] = useState([]);
   const [filter, setFilter] = useState('all');
   const [viewMode, setViewMode] = useState('grid');
@@ -14,6 +16,21 @@ export default function Lists({ embedded = false }) {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [error, setError] = useState(null);
+
+  // Sync global search with local searchQuery (only for list index view, not detail view)
+  useEffect(() => {
+    if (!id) {
+      setSearchQuery(globalQuery);
+    }
+  }, [globalQuery, id]);
+
+  // Sync local searchQuery changes to global search
+  const handleSearchChange = (value) => {
+    setSearchQuery(value);
+    if (!id) {
+      setGlobalQuery(value);
+    }
+  };
 
   // Create list form state
   const [listName, setListName] = useState('');
@@ -289,27 +306,28 @@ export default function Lists({ embedded = false }) {
         </div>
       )}
 
-      {/* Navigation/Filter Bar */}
-      <div className="flex items-center gap-6 mb-6 border-b border-gray-300 pb-4">
-        {['all', 'recent', 'pinned', 'shared'].map((f) => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`text-sm font-medium transition-colors pb-2 capitalize ${
-              filter === f
-                ? 'text-black border-b-2 border-ofa-ink'
-                : 'text-gray-600 hover:text-black'
-            }`}
-          >
-            {f === 'all' ? 'All Lists' : f}
-          </button>
-        ))}
-      </div>
+      {/* Navigation/Filter Bar - only show if no error */}
+      {!error && (
+        <div className="flex items-center gap-6 mb-6 border-b border-gray-300 pb-4">
+          {['all', 'recent', 'pinned', 'shared'].map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`text-sm font-medium transition-colors pb-2 capitalize ${
+                filter === f
+                  ? 'text-black border-b-2 border-ofa-ink'
+                  : 'text-gray-600 hover:text-black'
+              }`}
+            >
+              {f === 'all' ? 'All Lists' : f}
+            </button>
+          ))}
+        </div>
       )}
 
       {/* Controls - only show if no error */}
       {!error && (
-      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-6">
         <p className="text-gray-600 text-sm">
           Showing {filteredLists.length} {filteredLists.length === 1 ? 'list' : 'lists'}
         </p>
@@ -346,12 +364,12 @@ export default function Lists({ embedded = false }) {
           <input
             type="text"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
             placeholder="Search lists..."
             className="px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-ofa-ink text-sm"
           />
         </div>
-      </div>
+        </div>
       )}
 
       {/* Lists Grid - only show if no error */}

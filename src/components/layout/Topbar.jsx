@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useLocation } from 'react-router-dom';
+import { useSearch } from '../../context/SearchContext';
 import IconButton from '../ui/IconButton';
 import { cn } from '../../lib/cn';
 
@@ -11,9 +12,11 @@ export default function Topbar({ onQuickAction }) {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { query, setQuery, clearQuery, scope } = useSearch();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [showCreateMenu, setShowCreateMenu] = useState(false);
+  const searchInputRef = useRef(null);
 
   const firstName = user?.name?.split(' ')[0] || 'User';
   const initial = firstName.charAt(0).toUpperCase();
@@ -52,24 +55,36 @@ export default function Topbar({ onQuickAction }) {
     }
   }, [user, location.pathname]);
 
-  // Handle ⌘K shortcut
+  // Handle ⌘K shortcut - focus search input
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
-        if (onQuickAction) {
-          onQuickAction();
+        if (searchInputRef.current) {
+          searchInputRef.current.focus();
         }
       }
       if (e.key === 'Escape') {
         setShowUserMenu(false);
         setShowCreateMenu(false);
+        if (searchInputRef.current && document.activeElement === searchInputRef.current) {
+          clearQuery();
+          searchInputRef.current.blur();
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onQuickAction]);
+  }, [clearQuery]);
+
+  // Get route-aware placeholder
+  const getPlaceholder = () => {
+    if (scope === 'projects') return 'Search projects…';
+    if (scope === 'library') return 'Search library…';
+    if (scope === 'lists') return 'Search lists…';
+    return 'Search…';
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -91,20 +106,37 @@ export default function Topbar({ onQuickAction }) {
           {/* Search */}
           <div className="flex-1 max-w-xl hidden sm:block">
             <div 
-              className="flex items-center gap-3 px-4 py-2 rounded-lg transition-colors cursor-text"
+              className="relative flex items-center gap-2 px-4 py-2 rounded-lg transition-colors border"
               style={{ 
                 backgroundColor: 'var(--bg-surface)',
-                color: 'var(--text-muted)'
-              }}
-              onClick={() => {
-                if (onQuickAction) onQuickAction();
+                borderColor: 'var(--border-subtle)'
               }}
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--text-muted)' }}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
-              <span className="text-sm">Search...</span>
-              <span className="ml-auto text-xs opacity-50 hidden md:inline">⌘K</span>
+              <input
+                ref={searchInputRef}
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder={getPlaceholder()}
+                className="flex-1 bg-transparent border-none outline-none text-sm w-full"
+                style={{ color: 'var(--text-primary)' }}
+              />
+              {query && (
+                <button
+                  onClick={clearQuery}
+                  className="flex-shrink-0 p-1 rounded transition-colors hover:bg-[--bg-elevated]"
+                  aria-label="Clear search"
+                  style={{ color: 'var(--text-muted)' }}
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+              <span className="ml-auto text-xs opacity-50 hidden md:inline" style={{ color: 'var(--text-muted)' }}>⌘K</span>
             </div>
           </div>
 

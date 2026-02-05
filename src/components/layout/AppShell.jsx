@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { SearchProvider } from '../../context/SearchContext';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
 import { cn } from '../../lib/cn';
@@ -57,21 +58,22 @@ export default function AppShell({ children }) {
   }, [user, location.pathname]);
 
   return (
-    <div className="app min-h-screen flex" style={{ backgroundColor: 'var(--bg-base)' }}>
-      {/* Sidebar */}
-      <Sidebar 
-        collapsed={sidebarCollapsed} 
-        onToggleCollapse={setSidebarCollapsed}
-      />
+    <SearchProvider>
+      <div className="app min-h-screen flex" style={{ backgroundColor: 'var(--bg-base)' }}>
+        {/* Sidebar */}
+        <Sidebar 
+          collapsed={sidebarCollapsed} 
+          onToggleCollapse={setSidebarCollapsed}
+        />
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Topbar */}
-        <Topbar onQuickAction={() => setShowQuickAction(true)} />
+        {/* Main Content Area */}
+        <div className="flex-1 flex flex-col min-w-0">
+          {/* Topbar */}
+          <Topbar onQuickAction={() => setShowQuickAction(true)} />
 
-        {/* Main Content */}
-        <main className="flex-1 overflow-auto">{children}</main>
-      </div>
+          {/* Main Content */}
+          <main className="flex-1 overflow-auto">{children}</main>
+        </div>
 
       {/* Mobile Menu Overlay */}
       {showMobileMenu && (
@@ -146,6 +148,7 @@ export default function AppShell({ children }) {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </SearchProvider>
   );
 }

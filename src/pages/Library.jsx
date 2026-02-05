@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useSearch } from '../context/SearchContext';
 import PDFReader from '../components/PDFReader';
 
 export default function Library({ embedded = false }) {
@@ -8,6 +9,7 @@ export default function Library({ embedded = false }) {
   const navigate = useNavigate();
   const { id } = useParams();
   const location = useLocation();
+  const { query: globalQuery, setQuery: setGlobalQuery } = useSearch();
   const isResourcesRoute = location.pathname.startsWith('/resources');
   const [resources, setResources] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -15,6 +17,17 @@ export default function Library({ embedded = false }) {
   const [selectedFolder, setSelectedFolder] = useState('all');
   const [selectedPriority, setSelectedPriority] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Sync global search with local searchQuery
+  useEffect(() => {
+    setSearchQuery(globalQuery);
+  }, [globalQuery]);
+
+  // Sync local searchQuery changes to global search
+  const handleSearchChange = (value) => {
+    setSearchQuery(value);
+    setGlobalQuery(value);
+  };
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingResource, setEditingResource] = useState(null);
   const [editForm, setEditForm] = useState({
@@ -319,7 +332,7 @@ export default function Library({ embedded = false }) {
           <input
             type="text"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
             placeholder="Search by title, author, or notes..."
             className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-ofa-ink"
           />
