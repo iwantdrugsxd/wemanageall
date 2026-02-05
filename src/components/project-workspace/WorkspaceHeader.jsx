@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import PageHeader from '../layout/PageHeader';
 import Button from '../ui/Button';
 import IconButton from '../ui/IconButton';
@@ -20,7 +21,12 @@ export default function WorkspaceHeader({
     <PageHeader
       title={
         <div className="flex items-center gap-2">
-          <span className="text-sm font-normal text-[var(--text-muted)]">Projects</span>
+          <Link
+            to="/projects"
+            className="text-sm font-normal text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+          >
+            Projects
+          </Link>
           <span className="text-sm text-[var(--text-muted)]">/</span>
           <span>{project?.name || 'Project'}</span>
         </div>
