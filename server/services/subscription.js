@@ -1,4 +1,5 @@
 import Razorpay from 'razorpay';
+import crypto from 'crypto';
 import { query } from '../db/config.js';
 import dotenv from 'dotenv';
 
@@ -33,30 +34,30 @@ export const SUBSCRIPTION_PLANS = {
     },
   },
   premium: {
-    name: 'Premium',
-    price: 9, // $9/month or ₹750/month
-    priceAnnual: 90, // $90/year (save 17%)
+    name: 'Starter',
+    price: 199, // ₹199/month
+    priceAnnual: 1990, // ₹1,990/year
     features: {
       projects: -1, // Unlimited
       calendarEvents: -1, // Unlimited
       teamMembers: 0,
-      storage: 1000, // MB
+      storage: 1024, // MB (1 GB)
       analytics: true,
-      integrations: true,
+      integrations: false,
       support: 'email',
     },
   },
   team_starter: {
-    name: 'Team Starter',
-    price: 9, // $9/user/month or ₹750/user/month
-    priceAnnual: 90, // $90/user/year
+    name: 'Team',
+    price: 499, // ₹499/seat/month
+    priceAnnual: 4990, // ₹4,990/seat/year
     minSeats: 2,
     maxSeats: 25,
     features: {
       projects: -1,
       calendarEvents: -1,
-      teamMembers: 25,
-      storage: 5000, // MB
+      teamMembers: 25, // Hard max, but also enforce purchased seats
+      storage: 5120, // MB (5 GB)
       analytics: true,
       integrations: true,
       support: 'priority',
@@ -103,7 +104,28 @@ export const SUBSCRIPTION_PLANS = {
 };
 
 /**
+ * Check if a subscription status is active (including valid trials)
+ */
+function isActiveStatus(status, trialEnd) {
+  if (status === 'active') {
+    return true;
+  }
+  
+  // Check if trial is still valid
+  if (status === 'trial' && trialEnd) {
+    const now = new Date();
+    const trialEndDate = new Date(trialEnd);
+    if (now < trialEndDate) {
+      return true; // Trial is still active
+    }
+  }
+  
+  return false;
+}
+
+/**
  * Get user's current subscription
+ * Auto-expires trials that have passed
  */
 export async function getUserSubscription(userId) {
   try {
@@ -122,22 +144,52 @@ export async function getUserSubscription(userId) {
         status: 'active',
         seats: 1,
         current_period_end: null,
+        trial_end: null,
       };
     }
 
-    return result.rows[0];
+    const subscription = result.rows[0];
+    
+    // Auto-expire expired trials
+    if (subscription.status === 'trial' && subscription.trial_end) {
+      const now = new Date();
+      const trialEndDate = new Date(subscription.trial_end);
+      
+      if (now >= trialEndDate) {
+        // Trial expired, update to expired status
+        await query(
+          `UPDATE user_subscriptions 
+           SET status = 'expired', updated_at = CURRENT_TIMESTAMP
+           WHERE user_id = $1 AND id = $2`,
+          [userId, subscription.id]
+        );
+        
+        // Return free plan
+        return {
+          plan_type: 'free',
+          status: 'active',
+          seats: 1,
+          current_period_end: null,
+          trial_end: null,
+        };
+      }
+    }
+
+    return subscription;
   } catch (error) {
     console.error('Get user subscription error:', error);
     return {
       plan_type: 'free',
       status: 'active',
       seats: 1,
+      trial_end: null,
     };
   }
 }
 
 /**
  * Get organization's current subscription
+ * Auto-expires trials that have passed
  */
 export async function getOrganizationSubscription(organizationId) {
   try {
@@ -154,16 +206,44 @@ export async function getOrganizationSubscription(organizationId) {
         plan_type: 'free',
         status: 'active',
         seats: 0,
+        trial_end: null,
       };
     }
 
-    return result.rows[0];
+    const subscription = result.rows[0];
+    
+    // Auto-expire expired trials
+    if (subscription.status === 'trial' && subscription.trial_end) {
+      const now = new Date();
+      const trialEndDate = new Date(subscription.trial_end);
+      
+      if (now >= trialEndDate) {
+        // Trial expired, update to expired status
+        await query(
+          `UPDATE organization_subscriptions 
+           SET status = 'expired', updated_at = CURRENT_TIMESTAMP
+           WHERE organization_id = $1 AND id = $2`,
+          [organizationId, subscription.id]
+        );
+        
+        // Return free plan
+        return {
+          plan_type: 'free',
+          status: 'active',
+          seats: 0,
+          trial_end: null,
+        };
+      }
+    }
+
+    return subscription;
   } catch (error) {
     console.error('Get organization subscription error:', error);
     return {
       plan_type: 'free',
       status: 'active',
       seats: 0,
+      trial_end: null,
     };
   }
 }
@@ -180,7 +260,8 @@ export async function hasFeatureAccess(userId, feature, organizationId = null) {
     subscription = await getUserSubscription(userId);
   }
 
-  if (subscription.status !== 'active') {
+  // Check if subscription is active (including valid trials)
+  if (!isActiveStatus(subscription.status, subscription.trial_end)) {
     return false;
   }
 
@@ -200,7 +281,8 @@ export async function canCreateProject(userId, organizationId = null) {
     subscription = await getUserSubscription(userId);
   }
 
-  if (subscription.status !== 'active') {
+  // Check if subscription is active (including valid trials)
+  if (!isActiveStatus(subscription.status, subscription.trial_end)) {
     return false;
   }
 
@@ -224,17 +306,28 @@ export async function canCreateProject(userId, organizationId = null) {
 
 /**
  * Check if user can add team members
+ * For Team plans, also enforces purchased seats limit
  */
 export async function canAddTeamMember(organizationId, currentMemberCount) {
   const subscription = await getOrganizationSubscription(organizationId);
 
-  if (subscription.status !== 'active') {
+  // Check if subscription is active (including valid trials)
+  if (!isActiveStatus(subscription.status, subscription.trial_end)) {
     return false;
   }
 
+  // Team features require team_starter plan
   const plan = SUBSCRIPTION_PLANS[subscription.plan_type] || SUBSCRIPTION_PLANS.free;
-  const maxMembers = plan.features.teamMembers;
+  if (!plan.features.teamFeatures) {
+    return false; // Not a team plan
+  }
 
+  // For team plans, enforce purchased seats
+  if (subscription.seats && currentMemberCount >= subscription.seats) {
+    return false; // Reached purchased seat limit
+  }
+
+  const maxMembers = plan.features.teamMembers;
   if (maxMembers === -1) {
     return true; // Unlimited
   }
@@ -294,11 +387,11 @@ export async function createRazorpaySubscription(userId, planType, billingCycle 
 
 /**
  * Verify Razorpay webhook signature
+ * IMPORTANT: Must use raw body buffer, not JSON.stringify(req.body)
  */
-export function verifyWebhookSignature(webhookBody, signature, secret) {
-  const crypto = require('crypto');
+export function verifyWebhookSignature(rawBody, signature, secret) {
   const hmac = crypto.createHmac('sha256', secret);
-  hmac.update(JSON.stringify(webhookBody));
+  hmac.update(rawBody); // Use raw buffer, not JSON string
   const generatedSignature = hmac.digest('hex');
   return generatedSignature === signature;
 }

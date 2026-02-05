@@ -34,7 +34,12 @@ export default function Pricing() {
       });
       if (response.ok) {
         const data = await response.json();
-        setPlans(data.plans);
+        // Filter to only show: free, premium (Starter), team_starter (Team)
+        // Hide team_pro and enterprise or show as "Contact Sales"
+        const visiblePlans = data.plans.filter(p => 
+          p.id === 'free' || p.id === 'premium' || p.id === 'team_starter'
+        );
+        setPlans(visiblePlans);
       }
     } catch (error) {
       console.error('Failed to fetch plans:', error);
@@ -54,6 +59,47 @@ export default function Pricing() {
       console.error('Failed to fetch subscription:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleStartTrial = async (planId) => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    setSelectedPlan(planId);
+    
+    // Check if it's a team plan
+    const plan = plans.find(p => p.id === planId);
+    const isTeamPlan = plan && plan.features.teamMembers > 0;
+
+    try {
+      const response = await fetch('/api/subscriptions/start-trial', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          planType: planId,
+          seats: isTeamPlan ? teamSeats : 1,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        alert('7-day trial started! Enjoy full access.');
+        // Refresh subscription and redirect
+        await fetchCurrentSubscription();
+        navigate('/dashboard');
+      } else {
+        const error = await response.json();
+        alert(error.error || 'Failed to start trial');
+      }
+    } catch (error) {
+      console.error('Start trial error:', error);
+      alert('Network error. Please try again.');
+    } finally {
+      setSelectedPlan(null);
     }
   };
 
@@ -88,16 +134,18 @@ export default function Pricing() {
       } else {
         const error = await response.json();
         alert(error.error || 'Failed to create subscription');
+        setSelectedPlan(null);
       }
     } catch (error) {
       console.error('Subscribe error:', error);
       alert('Network error. Please try again.');
+      setSelectedPlan(null);
     }
   };
 
   const initiateRazorpayPayment = (subscriptionData) => {
     const options = {
-      key: process.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_1DP5mmOlF5G5ag', // Replace with your Razorpay key
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_1DP5mmOlF5G5ag',
       subscription_id: subscriptionData.razorpay.subscriptionId,
       name: 'OFA Platform',
       description: `${subscriptionData.subscription.plan_type} Subscription`,
@@ -299,29 +347,38 @@ export default function Pricing() {
                   )}
                 </ul>
 
-                {/* CTA Button */}
-                {isCurrentPlan && currentSubscription.status === 'active' ? (
+                {/* CTA Buttons */}
+                {isCurrentPlan && (currentSubscription.status === 'active' || currentSubscription.status === 'trial') ? (
                   <button
                     disabled
                     className="w-full px-4 py-2 bg-gray-100 text-gray-500 rounded-lg cursor-not-allowed"
                   >
-                    Current Plan
+                    {currentSubscription.status === 'trial' ? 'Trial Active' : 'Current Plan'}
                   </button>
-                ) : plan.id === 'enterprise' ? (
+                ) : plan.id === 'free' ? (
                   <button
-                    onClick={() => window.location.href = 'mailto:sales@yourdomain.com?subject=Enterprise Plan Inquiry'}
+                    onClick={() => navigate('/signup')}
                     className="w-full px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
                   >
-                    Contact Sales
+                    Get Started
                   </button>
                 ) : (
-                  <button
-                    onClick={() => handleSubscribe(plan.id)}
-                    disabled={selectedPlan === plan.id}
-                    className="w-full px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50"
-                  >
-                    {selectedPlan === plan.id ? 'Processing...' : plan.id === 'free' ? 'Get Started' : 'Subscribe'}
-                  </button>
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => handleStartTrial(plan.id)}
+                      disabled={selectedPlan === plan.id}
+                      className="w-full px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50"
+                    >
+                      {selectedPlan === plan.id ? 'Processing...' : 'Start 7-Day Trial'}
+                    </button>
+                    <button
+                      onClick={() => handleSubscribe(plan.id)}
+                      disabled={selectedPlan === plan.id}
+                      className="w-full px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 text-sm"
+                    >
+                      {selectedPlan === plan.id ? 'Processing...' : 'Subscribe'}
+                    </button>
+                  </div>
                 )}
 
                 {/* Team Plan Seats Selector */}
@@ -357,7 +414,7 @@ export default function Pricing() {
             </div>
             <div className="bg-white border border-gray-200 rounded-lg p-6">
               <h3 className="font-medium text-gray-900 mb-2">Is there a free trial?</h3>
-              <p className="text-sm text-gray-600">The Free plan is available forever. Paid plans start with a 14-day trial period.</p>
+              <p className="text-sm text-gray-600">The Free plan is available forever. Paid plans (Starter and Team) include a 7-day free trial.</p>
             </div>
             <div className="bg-white border border-gray-200 rounded-lg p-6">
               <h3 className="font-medium text-gray-900 mb-2">Can I cancel anytime?</h3>

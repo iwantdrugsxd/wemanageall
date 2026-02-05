@@ -105,6 +105,7 @@ router.get('/:id/members', requireAuth, async (req, res) => {
 /**
  * POST /api/organizations/:id/invite
  * Invite user to organization
+ * Requires Team plan (team_starter) with active subscription or valid trial
  */
 router.post('/:id/invite', requireAuth, async (req, res) => {
   try {
@@ -118,6 +119,37 @@ router.post('/:id/invite', requireAuth, async (req, res) => {
     const member = await isOrganizationMember(req.user.id, req.params.id);
     if (!member || (member.role !== 'owner' && member.role !== 'admin')) {
       return res.status(403).json({ error: 'Insufficient permissions.' });
+    }
+
+    // Check if user has Team plan with active subscription or valid trial
+    const { getUserSubscription } = await import('../services/subscription.js');
+    const subscription = await getUserSubscription(req.user.id);
+    
+    // Check if subscription is active (including valid trials)
+    const isActive = subscription.status === 'active' || 
+                     (subscription.status === 'trial' && subscription.trial_end && new Date(subscription.trial_end) > new Date());
+    
+    if (!isActive || subscription.plan_type !== 'team_starter') {
+      return res.status(403).json({ 
+        error: 'Upgrade to Team plan to invite members.',
+        upgradeRequired: true 
+      });
+    }
+
+    // Count current active organization members
+    const memberCountResult = await query(
+      `SELECT COUNT(*) as count FROM organization_members 
+       WHERE organization_id = $1 AND status = 'active'`,
+      [req.params.id]
+    );
+    const currentMemberCount = parseInt(memberCountResult.rows[0].count) || 0;
+
+    // Enforce seat limit (purchased seats)
+    if (subscription.seats && currentMemberCount >= subscription.seats) {
+      return res.status(403).json({ 
+        error: `You have reached your seat limit (${subscription.seats}). Upgrade to add more members.`,
+        upgradeRequired: true 
+      });
     }
     
     const invitation = await inviteToOrganization(req.params.id, email, role, req.user.id);

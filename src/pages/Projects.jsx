@@ -470,7 +470,14 @@ export default function Projects() {
         }, 300);
       } else {
         // Handle error response
-        setError(data.error || 'Failed to create project. Please try again.');
+        if (data.upgradeRequired) {
+          // Redirect to pricing page
+          navigate('/pricing', { 
+            state: { message: data.error || 'Upgrade required to create more projects.' } 
+          });
+        } else {
+          setError(data.error || 'Failed to create project. Please try again.');
+        }
       }
     } catch (error) {
       console.error('Failed to create project:', error);

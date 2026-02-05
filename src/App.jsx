@@ -18,6 +18,8 @@ import Notifications from './pages/Notifications';
 import Library from './pages/Library';
 import Lists from './pages/Lists';
 import Pricing from './pages/Pricing';
+import Work from './pages/Work';
+import Docs from './pages/Docs';
 import Layout from './components/Layout';
 
 // Loading spinner component
@@ -53,7 +55,7 @@ function ProtectedRoute({ children, requireOnboarding = false }) {
 
   // If onboarding completed but trying to access onboarding page
   if (!requireOnboarding && user.onboardingCompleted && window.location.pathname === '/onboarding') {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/home" replace />;
   }
 
   return children;
@@ -70,8 +72,8 @@ function AuthRoute({ children }) {
   if (user) {
     // Redirect based on onboarding status
     if (user.onboardingCompleted) {
-      // Go to dashboard after onboarding is completed
-      return <Navigate to="/dashboard" replace />;
+      // Go to home after onboarding is completed
+      return <Navigate to="/home" replace />;
     } else {
       return <Navigate to="/onboarding" replace />;
     }
@@ -125,13 +127,44 @@ function App() {
       />
       
       {/* Main app routes (with layout) */}
+      {/* New primary routes */}
       <Route 
-        path="/dashboard" 
+        path="/home" 
         element={
           <ProtectedRoute requireOnboarding>
             <Layout>
               <Dashboard />
             </Layout>
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/work" 
+        element={
+          <ProtectedRoute requireOnboarding>
+            <Layout>
+              <Work />
+            </Layout>
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/docs" 
+        element={
+          <ProtectedRoute requireOnboarding>
+            <Layout>
+              <Docs />
+            </Layout>
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Legacy route redirects */}
+      <Route 
+        path="/dashboard" 
+        element={
+          <ProtectedRoute requireOnboarding>
+            <Navigate to="/home" replace />
           </ProtectedRoute>
         } 
       />
@@ -155,13 +188,12 @@ function App() {
           </ProtectedRoute>
         } 
       />
+      {/* Legacy route redirects - Calendar */}
       <Route 
         path="/calendar" 
         element={
           <ProtectedRoute requireOnboarding>
-            <Layout>
-              <Calendar />
-            </Layout>
+            <Navigate to="/work?view=calendar" replace />
           </ProtectedRoute>
         } 
       />
@@ -195,13 +227,12 @@ function App() {
           </ProtectedRoute>
         } 
       />
+      {/* Legacy route redirects - Notifications */}
       <Route 
         path="/notifications" 
         element={
           <ProtectedRoute requireOnboarding>
-            <Layout>
-              <Notifications />
-            </Layout>
+            <Navigate to="/work?view=notifications" replace />
           </ProtectedRoute>
         } 
       />
@@ -215,13 +246,12 @@ function App() {
           </ProtectedRoute>
         } 
       />
+      {/* Legacy route redirects - Library */}
       <Route 
         path="/library" 
         element={
           <ProtectedRoute requireOnboarding>
-            <Layout>
-              <Library />
-            </Layout>
+            <Navigate to="/docs?view=library" replace />
           </ProtectedRoute>
         } 
       />
@@ -233,13 +263,12 @@ function App() {
           </ProtectedRoute>
         } 
       />
+      {/* Legacy route redirects - Lists */}
       <Route 
         path="/lists" 
         element={
           <ProtectedRoute requireOnboarding>
-            <Layout>
-              <Lists />
-            </Layout>
+            <Navigate to="/docs?view=lists" replace />
           </ProtectedRoute>
         } 
       />

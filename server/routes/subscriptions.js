@@ -94,6 +94,103 @@ router.get('/organization/:id', requireAuth, async (req, res) => {
   }
 });
 
+// POST /api/subscriptions/start-trial - Start 7-day trial
+router.post('/start-trial', requireAuth, async (req, res) => {
+  try {
+    const { planType, seats = 1 } = req.body;
+
+    if (!planType || !SUBSCRIPTION_PLANS[planType]) {
+      return res.status(400).json({ error: 'Invalid plan type.' });
+    }
+
+    // Only allow premium and team_starter trials
+    if (planType !== 'premium' && planType !== 'team_starter') {
+      return res.status(400).json({ error: 'Trial not available for this plan.' });
+    }
+
+    // Check if user has already used a trial
+    const existingSub = await query(
+      `SELECT trial_end FROM user_subscriptions 
+       WHERE user_id = $1 AND trial_end IS NOT NULL
+       ORDER BY created_at DESC LIMIT 1`,
+      [req.user.id]
+    );
+
+    if (existingSub.rows.length > 0 && existingSub.rows[0].trial_end) {
+      return res.status(400).json({ 
+        error: 'You have already used your free trial. Please subscribe to continue.' 
+      });
+    }
+
+    const plan = SUBSCRIPTION_PLANS[planType];
+
+    // Validate seats for team plans
+    if (planType === 'team_starter') {
+      if (seats < plan.minSeats) {
+        return res.status(400).json({ error: `Minimum ${plan.minSeats} seats required for Team plan.` });
+      }
+      if (seats > plan.maxSeats) {
+        return res.status(400).json({ error: `Maximum ${plan.maxSeats} seats allowed for Team plan.` });
+      }
+    }
+
+    // Calculate trial end (7 days from now)
+    const trialEnd = new Date();
+    trialEnd.setDate(trialEnd.getDate() + 7);
+
+    // Create or update subscription with trial
+    const subscriptionResult = await query(
+      `INSERT INTO user_subscriptions 
+       (user_id, plan_type, status, trial_end, current_period_end, seats, max_seats)
+       VALUES ($1, $2, 'trial', $3, $4, $5, $6)
+       ON CONFLICT (user_id) 
+       DO UPDATE SET 
+         plan_type = $2,
+         status = 'trial',
+         trial_end = $3,
+         current_period_end = $4,
+         seats = $5,
+         max_seats = $6,
+         updated_at = CURRENT_TIMESTAMP
+       RETURNING *`,
+      [
+        req.user.id,
+        planType,
+        trialEnd,
+        trialEnd,
+        planType === 'team_starter' ? seats : 1,
+        plan.maxSeats || 1,
+      ]
+    );
+
+    // Update user subscription status
+    await query(
+      `UPDATE users SET subscription_plan = $1, subscription_status = 'trial' WHERE id = $2`,
+      [planType, req.user.id]
+    );
+
+    const subscription = subscriptionResult.rows[0];
+    const planData = SUBSCRIPTION_PLANS[planType];
+
+    res.json({
+      success: true,
+      subscription: {
+        ...subscription,
+        plan: {
+          name: planData.name,
+          features: planData.features,
+        },
+      },
+    });
+  } catch (error) {
+    console.error('Start trial error:', error);
+    res.status(500).json({
+      error: 'Failed to start trial.',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined,
+    });
+  }
+});
+
 // POST /api/subscriptions/create - Create subscription (initiate payment)
 router.post('/create', requireAuth, async (req, res) => {
   try {
@@ -103,11 +200,8 @@ router.post('/create', requireAuth, async (req, res) => {
       return res.status(400).json({ error: 'Invalid plan type.' });
     }
 
-    // Check if plan requires organization
     const plan = SUBSCRIPTION_PLANS[planType];
-    if (plan.features.teamMembers > 0 && !organizationId) {
-      return res.status(400).json({ error: 'Team plans require an organization.' });
-    }
+    // Remove hard requirement for organization - Team plans can be user-level subscriptions
 
     // Validate seats for team plans
     if (plan.minSeats && seats < plan.minSeats) {
@@ -134,84 +228,45 @@ router.post('/create', requireAuth, async (req, res) => {
       periodEnd.setMonth(periodEnd.getMonth() + 1);
     }
 
-    // Save subscription to database (pending payment)
-    let subscriptionResult;
-    if (organizationId) {
-      subscriptionResult = await query(
-        `INSERT INTO organization_subscriptions 
-         (organization_id, plan_type, status, razorpay_subscription_id, razorpay_plan_id, 
-          billing_cycle, amount_per_seat, total_amount, seats, max_seats, current_period_end)
-         VALUES ($1, $2, 'trial', $3, $4, $5, $6, $7, $8, $9, $10)
-         ON CONFLICT (organization_id) 
-         DO UPDATE SET 
-           plan_type = $2,
-           razorpay_subscription_id = $3,
-           razorpay_plan_id = $4,
-           billing_cycle = $5,
-           amount_per_seat = $6,
-           total_amount = $7,
-           seats = $8,
-           max_seats = $9,
-           current_period_end = $10,
-           updated_at = CURRENT_TIMESTAMP
-         RETURNING *`,
-        [
-          organizationId,
-          planType,
-          razorpayData.razorpaySubscriptionId,
-          razorpayData.razorpayPlanId,
-          billingCycle,
-          plan.price,
-          razorpayData.amount * seats,
-          seats,
-          plan.maxSeats || seats,
-          periodEnd,
-        ]
-      );
-    } else {
-      subscriptionResult = await query(
-        `INSERT INTO user_subscriptions 
-         (user_id, plan_type, status, razorpay_subscription_id, razorpay_plan_id, 
-          billing_cycle, amount, seats, max_seats, current_period_end)
-         VALUES ($1, $2, 'trial', $3, $4, $5, $6, $7, $8, $9)
-         ON CONFLICT (user_id) 
-         DO UPDATE SET 
-           plan_type = $2,
-           razorpay_subscription_id = $3,
-           razorpay_plan_id = $4,
-           billing_cycle = $5,
-           amount = $6,
-           seats = $7,
-           max_seats = $8,
-           current_period_end = $9,
-           updated_at = CURRENT_TIMESTAMP
-         RETURNING *`,
-        [
-          req.user.id,
-          planType,
-          razorpayData.razorpaySubscriptionId,
-          razorpayData.razorpayPlanId,
-          billingCycle,
-          razorpayData.amount,
-          seats,
-          plan.maxSeats || 1,
-          periodEnd,
-        ]
-      );
-    }
+    // Save subscription to database (status = 'expired' until webhook activates it)
+    // This ensures access is NOT granted until payment is confirmed
+    const subscriptionResult = await query(
+      `INSERT INTO user_subscriptions 
+       (user_id, plan_type, status, razorpay_subscription_id, razorpay_plan_id, 
+        billing_cycle, amount, seats, max_seats, current_period_end, trial_end)
+       VALUES ($1, $2, 'expired', $3, $4, $5, $6, $7, $8, $9, NULL)
+       ON CONFLICT (user_id) 
+       DO UPDATE SET 
+         plan_type = $2,
+         status = 'expired',
+         razorpay_subscription_id = $3,
+         razorpay_plan_id = $4,
+         billing_cycle = $5,
+         amount = $6,
+         seats = $7,
+         max_seats = $8,
+         current_period_end = $9,
+         trial_end = NULL,
+         updated_at = CURRENT_TIMESTAMP
+       RETURNING *`,
+      [
+        req.user.id,
+        planType,
+        razorpayData.razorpaySubscriptionId,
+        razorpayData.razorpayPlanId,
+        billingCycle,
+        razorpayData.amount,
+        seats,
+        plan.maxSeats || 1,
+        periodEnd,
+      ]
+    );
 
-    // Update user/organization subscription status
-    if (organizationId) {
-      await query(
-        `UPDATE organizations SET subscription_plan = $1, subscription_status = 'trial' WHERE id = $2`,
-        [planType, organizationId]
-      );
-    } else {
-      await query(
-        `UPDATE users SET subscription_plan = $1, subscription_status = 'trial' WHERE id = $2`,
-        [planType, req.user.id]
-      );
-    }
+    // Update user subscription status (but keep as expired until webhook)
+    await query(
+      `UPDATE users SET subscription_plan = $1, subscription_status = 'expired' WHERE id = $2`,
+      [planType, req.user.id]
+    );
 
     res.json({
       success: true,
@@ -232,136 +287,8 @@ router.post('/create', requireAuth, async (req, res) => {
   }
 });
 
-// POST /api/subscriptions/webhook - Razorpay webhook handler
-router.post('/webhook', async (req, res) => {
-  try {
-    const signature = req.headers['x-razorpay-signature'];
-    const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
-
-    if (!webhookSecret) {
-      console.error('Razorpay webhook secret not configured');
-      return res.status(500).json({ error: 'Webhook not configured' });
-    }
-
-    // Get raw body for signature verification
-    const rawBody = JSON.stringify(req.body);
-    const event = req.body.event;
-    const payload = req.body.payload;
-
-    // Verify webhook signature
-    const crypto = require('crypto');
-    const hmac = crypto.createHmac('sha256', webhookSecret);
-    hmac.update(rawBody);
-    const generatedSignature = hmac.digest('hex');
-
-    if (generatedSignature !== signature) {
-      console.error('Invalid webhook signature');
-      console.error('Expected:', signature);
-      console.error('Generated:', generatedSignature);
-      return res.status(400).json({ error: 'Invalid signature' });
-    }
-
-    // Handle different webhook events
-    switch (event) {
-      case 'subscription.activated':
-      case 'subscription.charged':
-        await handleSubscriptionActivated(payload.subscription.entity);
-        break;
-
-      case 'subscription.cancelled':
-        await handleSubscriptionCancelled(payload.subscription.entity);
-        break;
-
-      case 'subscription.paused':
-        await handleSubscriptionPaused(payload.subscription.entity);
-        break;
-
-      case 'payment.failed':
-        await handlePaymentFailed(payload.payment.entity);
-        break;
-
-      default:
-        console.log(`Unhandled webhook event: ${event}`);
-    }
-
-    res.json({ received: true });
-  } catch (error) {
-    console.error('Webhook error:', error);
-    res.status(500).json({ error: 'Webhook processing failed' });
-  }
-});
-
-// Helper functions for webhook handlers
-async function handleSubscriptionActivated(subscription) {
-  const subscriptionId = subscription.id;
-  const notes = subscription.notes || {};
-
-  if (notes.organization_id) {
-    await query(
-      `UPDATE organization_subscriptions 
-       SET status = 'active', current_period_end = $1, updated_at = CURRENT_TIMESTAMP
-       WHERE razorpay_subscription_id = $2`,
-      [new Date(subscription.end_at * 1000), subscriptionId]
-    );
-
-    await query(
-      `UPDATE organizations SET subscription_status = 'active' 
-       WHERE id = (SELECT organization_id FROM organization_subscriptions WHERE razorpay_subscription_id = $1)`,
-      [subscriptionId]
-    );
-  } else {
-    await query(
-      `UPDATE user_subscriptions 
-       SET status = 'active', current_period_end = $1, updated_at = CURRENT_TIMESTAMP
-       WHERE razorpay_subscription_id = $2`,
-      [new Date(subscription.end_at * 1000), subscriptionId]
-    );
-
-    await query(
-      `UPDATE users SET subscription_status = 'active' 
-       WHERE id = (SELECT user_id FROM user_subscriptions WHERE razorpay_subscription_id = $1)`,
-      [subscriptionId]
-    );
-  }
-
-  // Log to history
-  await query(
-    `INSERT INTO subscription_history (user_id, action, new_plan, amount, razorpay_payment_id)
-     VALUES ($1, 'renewed', $2, $3, $4)`,
-    [notes.user_id, notes.plan_type, subscription.amount / 100, subscription.id]
-  );
-}
-
-async function handleSubscriptionCancelled(subscription) {
-  const subscriptionId = subscription.id;
-
-  await query(
-    `UPDATE user_subscriptions SET status = 'cancelled', cancelled_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
-     WHERE razorpay_subscription_id = $1`,
-    [subscriptionId]
-  );
-
-  await query(
-    `UPDATE organization_subscriptions SET status = 'cancelled', cancelled_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
-     WHERE razorpay_subscription_id = $1`,
-    [subscriptionId]
-  );
-}
-
-async function handleSubscriptionPaused(subscription) {
-  const subscriptionId = subscription.id;
-
-  await query(
-    `UPDATE user_subscriptions SET status = 'expired', updated_at = CURRENT_TIMESTAMP
-     WHERE razorpay_subscription_id = $1`,
-    [subscriptionId]
-  );
-}
-
-async function handlePaymentFailed(payment) {
-  console.log('Payment failed:', payment);
-  // Could send notification to user, retry logic, etc.
-}
+// NOTE: Webhook route is handled in server/index.js with raw body capture
+// This ensures proper signature verification using the raw Buffer
 
 // POST /api/subscriptions/cancel - Cancel subscription
 router.post('/cancel', requireAuth, async (req, res) => {

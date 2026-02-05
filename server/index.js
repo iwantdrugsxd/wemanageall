@@ -76,6 +76,8 @@ app.use(cors({
 }));
 
 // Body parsing
+// IMPORTANT: Webhook route must capture raw body BEFORE express.json()
+// This is set up in the webhook route handler below
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -261,6 +263,143 @@ app.use('/api/calendar', calendarRoutes);
 app.use('/api/insights', insightsRoutes);
 app.use('/api/resources', resourcesRoutes);
 app.use('/api/lists', listsRoutes);
+
+// Webhook route must capture raw body for signature verification
+// CRITICAL: This route must be BEFORE the general subscriptions router
+// to capture raw body buffer before JSON parsing
+app.post('/api/subscriptions/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+  try {
+    const signature = req.headers['x-razorpay-signature'];
+    const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
+
+    if (!webhookSecret) {
+      console.error('Razorpay webhook secret not configured');
+      return res.status(500).json({ error: 'Webhook not configured' });
+    }
+
+    // CRITICAL: Use raw body buffer for signature verification
+    const rawBody = req.body; // This is a Buffer from express.raw()
+    
+    // Parse JSON for processing
+    let body;
+    try {
+      body = JSON.parse(rawBody.toString());
+    } catch (e) {
+      return res.status(400).json({ error: 'Invalid JSON' });
+    }
+
+    const event = body.event;
+    const payload = body.payload;
+
+    // Verify webhook signature using raw body buffer
+    const { verifyWebhookSignature } = await import('./services/subscription.js');
+    const isValid = verifyWebhookSignature(rawBody, signature, webhookSecret);
+
+    if (!isValid) {
+      console.error('Invalid webhook signature');
+      return res.status(400).json({ error: 'Invalid signature' });
+    }
+
+    // Import webhook handler functions
+    const { query } = await import('./db/config.js');
+
+    // Handle different webhook events
+    switch (event) {
+      case 'subscription.activated':
+      case 'subscription.charged':
+        await handleSubscriptionActivated(payload.subscription.entity, query);
+        break;
+
+      case 'subscription.cancelled':
+        await handleSubscriptionCancelled(payload.subscription.entity, query);
+        break;
+
+      case 'subscription.paused':
+        await handleSubscriptionPaused(payload.subscription.entity, query);
+        break;
+
+      case 'payment.failed':
+        console.log('Payment failed:', payload.payment.entity);
+        break;
+
+      default:
+        console.log(`Unhandled webhook event: ${event}`);
+    }
+
+    res.json({ received: true });
+  } catch (error) {
+    console.error('Webhook error:', error);
+    res.status(500).json({ error: 'Webhook processing failed' });
+  }
+});
+
+// Webhook handler functions
+async function handleSubscriptionActivated(subscription, query) {
+  const subscriptionId = subscription.id;
+  const notes = subscription.notes || {};
+
+  if (notes.organization_id) {
+    await query(
+      `UPDATE organization_subscriptions 
+       SET status = 'active', current_period_end = $1, updated_at = CURRENT_TIMESTAMP
+       WHERE razorpay_subscription_id = $2`,
+      [new Date(subscription.end_at * 1000), subscriptionId]
+    );
+
+    await query(
+      `UPDATE organizations SET subscription_status = 'active' 
+       WHERE id = (SELECT organization_id FROM organization_subscriptions WHERE razorpay_subscription_id = $1)`,
+      [subscriptionId]
+    );
+  } else {
+    await query(
+      `UPDATE user_subscriptions 
+       SET status = 'active', current_period_end = $1, updated_at = CURRENT_TIMESTAMP
+       WHERE razorpay_subscription_id = $2`,
+      [new Date(subscription.end_at * 1000), subscriptionId]
+    );
+
+    await query(
+      `UPDATE users SET subscription_status = 'active' 
+       WHERE id = (SELECT user_id FROM user_subscriptions WHERE razorpay_subscription_id = $1)`,
+      [subscriptionId]
+    );
+  }
+
+  // Log to history
+  await query(
+    `INSERT INTO subscription_history (user_id, action, new_plan, amount, razorpay_payment_id)
+     VALUES ($1, 'renewed', $2, $3, $4)`,
+    [notes.user_id, notes.plan_type, subscription.amount / 100, subscription.id]
+  );
+}
+
+async function handleSubscriptionCancelled(subscription, query) {
+  const subscriptionId = subscription.id;
+
+  await query(
+    `UPDATE user_subscriptions SET status = 'cancelled', cancelled_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+     WHERE razorpay_subscription_id = $1`,
+    [subscriptionId]
+  );
+
+  await query(
+    `UPDATE organization_subscriptions SET status = 'cancelled', cancelled_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+     WHERE razorpay_subscription_id = $1`,
+    [subscriptionId]
+  );
+}
+
+async function handleSubscriptionPaused(subscription, query) {
+  const subscriptionId = subscription.id;
+
+  await query(
+    `UPDATE user_subscriptions SET status = 'expired', updated_at = CURRENT_TIMESTAMP
+     WHERE razorpay_subscription_id = $1`,
+    [subscriptionId]
+  );
+}
+
 app.use('/api/subscriptions', subscriptionsRoutes);
 app.use('/api/upload', uploadRoutes);
 
