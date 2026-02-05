@@ -32,9 +32,9 @@ function useScrollAnimation() {
 }
 
 // Preview Shell Component
-function PreviewShell({ title, children }) {
+function PreviewShell({ title, children, large = false }) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+    <div className={`bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden ${large ? 'shadow-xl' : ''}`}>
       {/* Browser Chrome */}
       <div className="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-3 py-2 flex items-center gap-2">
         <div className="flex gap-1.5">
@@ -43,11 +43,11 @@ function PreviewShell({ title, children }) {
           <div className="w-2.5 h-2.5 rounded-full bg-green-400"></div>
         </div>
         <div className="flex-1 bg-white dark:bg-gray-800 rounded px-2 py-1 text-[10px] text-gray-500 dark:text-gray-400 ml-2 border border-gray-200 dark:border-gray-700">
-          wemanageall.in/{title.toLowerCase().replace(' ', '')}
+          wemanageall.in/{title.toLowerCase().replace(/\s+/g, '')}
         </div>
       </div>
       {/* Content */}
-      <div className="p-4 bg-white dark:bg-gray-800">
+      <div className={`bg-white dark:bg-gray-800 ${large ? 'p-6' : 'p-4'}`}>
         {children}
       </div>
     </div>
@@ -57,7 +57,7 @@ function PreviewShell({ title, children }) {
 // Dashboard Preview (Today)
 function DashboardPreview() {
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {/* Header */}
       <div className="mb-4">
         <h3 className="text-lg font-semibold text-black dark:text-white mb-1">Today</h3>
@@ -66,10 +66,15 @@ function DashboardPreview() {
 
       {/* KPI Strip */}
       <div className="grid grid-cols-4 gap-2 mb-4">
-        {['3/5', '4h', '2h', '2'].map((val, i) => (
+        {[
+          { label: 'Objectives', value: '3/5' },
+          { label: 'Planned', value: '4h' },
+          { label: 'Spent', value: '2h' },
+          { label: 'Upcoming', value: '2' }
+        ].map((kpi, i) => (
           <div key={i} className="bg-gray-50 dark:bg-gray-900/50 rounded-md p-2 border border-gray-200 dark:border-gray-800">
-            <div className="text-[10px] text-gray-500 dark:text-gray-400 mb-0.5">Objectives</div>
-            <div className="text-sm font-semibold text-black dark:text-white">{val}</div>
+            <div className="text-[10px] text-gray-500 dark:text-gray-400 mb-0.5">{kpi.label}</div>
+            <div className="text-sm font-semibold text-black dark:text-white">{kpi.value}</div>
           </div>
         ))}
       </div>
@@ -160,7 +165,7 @@ function ProjectWorkspacePreview() {
       <div className="mb-4">
         <h3 className="text-lg font-semibold text-black dark:text-white mb-1">Q1 Launch</h3>
         <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-          <span>Board</span>
+          <span className="font-semibold text-black dark:text-white">Board</span>
           <span>•</span>
           <span>List</span>
           <span>•</span>
@@ -216,7 +221,7 @@ function CalendarPreview() {
       <div className="mb-4">
         <h3 className="text-lg font-semibold text-black dark:text-white mb-1">Calendar</h3>
         <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-          <span className="px-2 py-0.5 bg-black dark:bg-white text-white dark:text-black rounded">Week</span>
+          <span className="px-2 py-0.5 bg-black dark:bg-white text-white dark:text-black rounded font-semibold">Week</span>
           <span>Day</span>
           <span>Month</span>
         </div>
@@ -259,7 +264,7 @@ function ResourcesPreview() {
       <div className="mb-4">
         <h3 className="text-lg font-semibold text-black dark:text-white mb-1">Resources</h3>
         <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-          <span className="border-b-2 border-black dark:border-white">All</span>
+          <span className="border-b-2 border-black dark:border-white font-semibold text-black dark:text-white">All</span>
           <span>Programming</span>
           <span>Design</span>
         </div>
@@ -295,7 +300,7 @@ function ListsPreview() {
       <div className="mb-4">
         <h3 className="text-lg font-semibold text-black dark:text-white mb-1">Lists</h3>
         <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-          <span className="border-b-2 border-black dark:border-white">All Lists</span>
+          <span className="border-b-2 border-black dark:border-white font-semibold text-black dark:text-white">All Lists</span>
           <span>Recent</span>
           <span>Pinned</span>
         </div>
@@ -368,13 +373,20 @@ function Navbar() {
 
 // Hero Section
 function Hero() {
+  const [ref, isVisible] = useScrollAnimation();
+  
   return (
-    <section className="min-h-screen flex items-center px-6 lg:px-12 pt-24 pb-20 bg-white dark:bg-gray-900 transition-colors">
+    <section 
+      ref={ref}
+      className={`min-h-screen flex items-center px-6 lg:px-12 pt-24 pb-20 bg-white dark:bg-gray-900 transition-colors ${
+        isVisible ? 'opacity-100' : 'opacity-0'
+      }`}
+    >
       <div className="max-w-7xl mx-auto w-full">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Left: Editorial Text */}
           <div>
-            <h1 className="text-5xl md:text-6xl font-semibold text-black dark:text-white mb-6 leading-tight">
+            <h1 className="text-5xl md:text-6xl font-display font-semibold text-black dark:text-white mb-6 leading-tight">
               Run your startup from one operating system.
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-xl">
@@ -401,25 +413,10 @@ function Hero() {
             </p>
           </div>
 
-          {/* Right: Product Preview Strip */}
-          <div className="grid grid-cols-2 gap-4">
-            <PreviewShell title="Dashboard">
+          {/* Right: Large Dashboard Preview */}
+          <div className="hidden lg:block">
+            <PreviewShell title="Dashboard" large>
               <DashboardPreview />
-            </PreviewShell>
-            <PreviewShell title="Projects">
-              <ProjectsPreview />
-            </PreviewShell>
-            <PreviewShell title="Workspace">
-              <ProjectWorkspacePreview />
-            </PreviewShell>
-            <PreviewShell title="Calendar">
-              <CalendarPreview />
-            </PreviewShell>
-            <PreviewShell title="Resources">
-              <ResourcesPreview />
-            </PreviewShell>
-            <PreviewShell title="Lists">
-              <ListsPreview />
             </PreviewShell>
           </div>
         </div>
@@ -457,8 +454,8 @@ function FeaturePillars() {
       }`}
       id="features"
     >
-      <div className="max-w-6xl mx-auto">
-        <h2 className="text-4xl md:text-5xl font-semibold text-black dark:text-white mb-12 text-center">
+      <div className="max-w-7xl mx-auto">
+        <h2 className="text-4xl md:text-5xl font-display font-semibold text-black dark:text-white mb-12 text-center">
           Everything your team needs, in one place.
         </h2>
         
@@ -482,88 +479,184 @@ function FeaturePillars() {
   );
 }
 
-// Deep Dive Sections
-function DeepDive() {
-  const modules = [
-    {
-      title: 'Dashboard',
-      subtitle: 'Start your day with clarity, not chaos.',
-      description: 'Today\'s intention, daily objectives, time allocation, and schedule in one view.',
-      component: DashboardPreview
-    },
-    {
-      title: 'Projects',
-      subtitle: 'Every meaningful outcome starts as a project.',
-      description: 'Break down complex work into actionable steps. See progress at a glance.',
-      component: ProjectsPreview
-    },
-    {
-      title: 'Project Workspace',
-      subtitle: 'Board, list, timeline, and notes in one view.',
-      description: 'Visualize tasks, track progress, and collaborate seamlessly.',
-      component: ProjectWorkspacePreview
-    },
-    {
-      title: 'Calendar',
-      subtitle: 'Your time and your tasks finally live together.',
-      description: 'Tasks appear in your calendar. Time blocks protect deep work.',
-      component: CalendarPreview
-    },
-    {
-      title: 'Resources',
-      subtitle: 'Your second brain, built into your workflow.',
-      description: 'Store articles, books, notes. Link to projects. Build knowledge over time.',
-      component: ResourcesPreview
-    },
-    {
-      title: 'Lists',
-      subtitle: 'Capture everything. Structure later.',
-      description: 'Quick capture for ideas, errands, goals. Organize when you\'re ready.',
-      component: ListsPreview
-    }
-  ];
-
+// Projects + Workspace Section
+function ProjectsWorkspaceSection() {
+  const [ref1, isVisible1] = useScrollAnimation();
+  const [ref2, isVisible2] = useScrollAnimation();
+  
   return (
-    <section className="py-24 md:py-32 px-6 lg:px-12 bg-white dark:bg-gray-900 transition-colors">
+    <section className="py-24 md:py-32 px-6 lg:px-12 bg-white dark:bg-gray-900 transition-colors border-t border-gray-200 dark:border-gray-800">
       <div className="max-w-7xl mx-auto">
-        <div className="space-y-24">
-          {modules.map((module, index) => {
-            const [ref, isVisible] = useScrollAnimation();
-            const PreviewComponent = module.component;
-            const isEven = index % 2 === 0;
-            
-            return (
-              <div 
-                key={index} 
-                ref={ref}
-                className={`grid md:grid-cols-2 gap-12 items-center transition-all duration-700 ${
-                  isVisible 
-                    ? 'opacity-100 translate-y-0' 
-                    : 'opacity-0 translate-y-8'
-                }`}
-              >
-                {/* Text Content */}
-                <div className={isEven ? '' : 'md:order-2'}>
-                  <h3 className="text-3xl md:text-4xl font-semibold text-black dark:text-white mb-4 leading-tight">
-                    {module.subtitle}
-                  </h3>
-                  <p className="text-lg text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
-                    {module.description}
-                  </p>
-                  <div className="text-sm text-gray-500 dark:text-gray-500 uppercase tracking-wider">
-                    {module.title}
-                  </div>
-                </div>
+        {/* Projects Section */}
+        <div 
+          ref={ref1}
+          className={`grid md:grid-cols-2 gap-12 items-center mb-24 transition-all duration-700 ${
+            isVisible1 
+              ? 'opacity-100 translate-y-0' 
+              : 'opacity-0 translate-y-8'
+          }`}
+        >
+          {/* Preview */}
+          <div>
+            <PreviewShell title="Projects">
+              <ProjectsPreview />
+            </PreviewShell>
+          </div>
 
-                {/* UI Preview */}
-                <div className={isEven ? '' : 'md:order-1'}>
-                  <PreviewShell title={module.title}>
-                    <PreviewComponent />
-                  </PreviewShell>
-                </div>
-              </div>
-            );
-          })}
+          {/* Copy */}
+          <div>
+            <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-4 font-semibold">
+              PROJECTS
+            </div>
+            <h3 className="text-3xl md:text-4xl font-display font-semibold text-black dark:text-white mb-4 leading-tight">
+              Every meaningful outcome starts as a project.
+            </h3>
+            <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
+              Break down complex work into actionable steps. See progress at a glance.
+            </p>
+          </div>
+        </div>
+
+        {/* Workspace Section */}
+        <div 
+          ref={ref2}
+          className={`grid md:grid-cols-2 gap-12 items-center transition-all duration-700 ${
+            isVisible2 
+              ? 'opacity-100 translate-y-0' 
+              : 'opacity-0 translate-y-8'
+          }`}
+        >
+          {/* Copy */}
+          <div className="md:order-2">
+            <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-4 font-semibold">
+              PROJECT WORKSPACE
+            </div>
+            <h3 className="text-3xl md:text-4xl font-display font-semibold text-black dark:text-white mb-4 leading-tight">
+              Board, list, timeline, and notes in one view.
+            </h3>
+            <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
+              Visualize tasks, track progress, and collaborate seamlessly.
+            </p>
+          </div>
+
+          {/* Preview */}
+          <div className="md:order-1">
+            <PreviewShell title="Workspace">
+              <ProjectWorkspacePreview />
+            </PreviewShell>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// Calendar + Resources Section
+function CalendarResourcesSection() {
+  const [ref1, isVisible1] = useScrollAnimation();
+  const [ref2, isVisible2] = useScrollAnimation();
+  
+  return (
+    <section className="py-24 md:py-32 px-6 lg:px-12 bg-gray-50 dark:bg-gray-950 transition-colors border-t border-gray-200 dark:border-gray-800">
+      <div className="max-w-7xl mx-auto">
+        {/* Calendar Section */}
+        <div 
+          ref={ref1}
+          className={`grid md:grid-cols-2 gap-12 items-center mb-24 transition-all duration-700 ${
+            isVisible1 
+              ? 'opacity-100 translate-y-0' 
+              : 'opacity-0 translate-y-8'
+          }`}
+        >
+          {/* Preview */}
+          <div>
+            <PreviewShell title="Calendar">
+              <CalendarPreview />
+            </PreviewShell>
+          </div>
+
+          {/* Copy */}
+          <div>
+            <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-4 font-semibold">
+              CALENDAR
+            </div>
+            <h3 className="text-3xl md:text-4xl font-display font-semibold text-black dark:text-white mb-4 leading-tight">
+              Your time and your tasks finally live together.
+            </h3>
+            <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
+              Tasks appear in your calendar. Time blocks protect deep work.
+            </p>
+          </div>
+        </div>
+
+        {/* Resources Section */}
+        <div 
+          ref={ref2}
+          className={`grid md:grid-cols-2 gap-12 items-center transition-all duration-700 ${
+            isVisible2 
+              ? 'opacity-100 translate-y-0' 
+              : 'opacity-0 translate-y-8'
+          }`}
+        >
+          {/* Copy */}
+          <div className="md:order-2">
+            <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-4 font-semibold">
+              RESOURCES
+            </div>
+            <h3 className="text-3xl md:text-4xl font-display font-semibold text-black dark:text-white mb-4 leading-tight">
+              Your second brain, built into your workflow.
+            </h3>
+            <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
+              Store articles, books, notes. Link to projects. Build knowledge over time.
+            </p>
+          </div>
+
+          {/* Preview */}
+          <div className="md:order-1">
+            <PreviewShell title="Resources">
+              <ResourcesPreview />
+            </PreviewShell>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// Lists Section
+function ListsSection() {
+  const [ref, isVisible] = useScrollAnimation();
+  
+  return (
+    <section className="py-24 md:py-32 px-6 lg:px-12 bg-white dark:bg-gray-900 transition-colors border-t border-gray-200 dark:border-gray-800">
+      <div className="max-w-7xl mx-auto">
+        <div 
+          ref={ref}
+          className={`grid md:grid-cols-2 gap-12 items-center transition-all duration-700 ${
+            isVisible 
+              ? 'opacity-100 translate-y-0' 
+              : 'opacity-0 translate-y-8'
+          }`}
+        >
+          {/* Preview */}
+          <div>
+            <PreviewShell title="Lists">
+              <ListsPreview />
+            </PreviewShell>
+          </div>
+
+          {/* Copy */}
+          <div>
+            <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-4 font-semibold">
+              LISTS
+            </div>
+            <h3 className="text-3xl md:text-4xl font-display font-semibold text-black dark:text-white mb-4 leading-tight">
+              Capture everything. Structure later.
+            </h3>
+            <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
+              Quick capture for ideas, errands, goals. Organize when you're ready.
+            </p>
+          </div>
         </div>
       </div>
     </section>
@@ -572,10 +665,17 @@ function DeepDive() {
 
 // Final CTA Section
 function FinalCTA() {
+  const [ref, isVisible] = useScrollAnimation();
+  
   return (
-    <section className="py-24 md:py-32 px-6 lg:px-12 bg-gray-50 dark:bg-gray-950 transition-colors">
+    <section 
+      ref={ref}
+      className={`py-24 md:py-32 px-6 lg:px-12 bg-gray-50 dark:bg-gray-950 transition-colors border-t border-gray-200 dark:border-gray-800 ${
+        isVisible ? 'opacity-100' : 'opacity-0'
+      }`}
+    >
       <div className="max-w-4xl mx-auto text-center">
-        <h2 className="text-4xl md:text-5xl font-semibold text-black dark:text-white mb-6">
+        <h2 className="text-4xl md:text-5xl font-display font-semibold text-black dark:text-white mb-6">
           Ready to unify your workflow?
         </h2>
         <p className="text-xl text-gray-600 dark:text-gray-400 mb-10 max-w-2xl mx-auto">
@@ -605,7 +705,7 @@ function FinalCTA() {
 function Footer() {
   return (
     <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 py-16 px-6 lg:px-12 transition-colors">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <div className="grid md:grid-cols-4 gap-12 mb-12">
           {/* Brand */}
           <div>
@@ -649,8 +749,8 @@ function Footer() {
           </div>
         </div>
         
-        <div className="pt-8 border-t border-gray-200 dark:border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-gray-500 dark:text-gray-500">
+        <div className="pt-8 border-t border-gray-200 dark:border-gray-800">
+          <p className="text-sm text-gray-500 dark:text-gray-500 text-center">
             © 2024 WeManageAll. All rights reserved.
           </p>
         </div>
@@ -666,7 +766,9 @@ export default function Landing() {
       <Navbar />
       <Hero />
       <FeaturePillars />
-      <DeepDive />
+      <ProjectsWorkspaceSection />
+      <CalendarResourcesSection />
+      <ListsSection />
       <FinalCTA />
       <Footer />
     </div>
