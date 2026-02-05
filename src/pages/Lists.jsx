@@ -13,6 +13,7 @@ export default function Lists({ embedded = false }) {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [error, setError] = useState(null);
 
   // Create list form state
   const [listName, setListName] = useState('');
@@ -43,6 +44,8 @@ export default function Lists({ embedded = false }) {
 
   const fetchLists = async () => {
     try {
+      setError(null);
+      setLoading(true);
       const filterParam = filter === 'all' ? '' : filter;
       const searchParam = searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : '';
       const url = `/api/lists${filterParam ? `?filter=${filterParam}` : ''}${searchParam ? (filterParam ? '&' : '?') + searchParam.replace('&', '') : ''}`;
@@ -54,16 +57,18 @@ export default function Lists({ embedded = false }) {
         const data = await response.json();
         setLists(data.lists || []);
       } else {
+        const errorText = await response.text();
+        setError(`Failed to load lists: ${response.status} ${response.statusText}`);
         console.error('Failed to fetch lists:', response.status, response.statusText);
         // If 404, the route might not be registered - show helpful message
         if (response.status === 404) {
-          const text = await response.text();
-          if (text.includes('<!DOCTYPE')) {
-            console.error('API route not found. Please restart the server.');
+          if (errorText.includes('<!DOCTYPE')) {
+            setError('API route not found. Please restart the server.');
           }
         }
       }
     } catch (error) {
+      setError(`Network error: ${error.message}. Please check your connection and try again.`);
       console.error('Failed to fetch lists:', error);
     } finally {
       setLoading(false);
@@ -300,8 +305,10 @@ export default function Lists({ embedded = false }) {
           </button>
         ))}
       </div>
+      )}
 
-      {/* Controls */}
+      {/* Controls - only show if no error */}
+      {!error && (
       <div className="flex items-center justify-between mb-6">
         <p className="text-gray-600 text-sm">
           Showing {filteredLists.length} {filteredLists.length === 1 ? 'list' : 'lists'}
@@ -345,9 +352,10 @@ export default function Lists({ embedded = false }) {
           />
         </div>
       </div>
+      )}
 
-      {/* Lists Grid */}
-      {filteredLists.length === 0 ? (
+      {/* Lists Grid - only show if no error */}
+      {!error && filteredLists.length === 0 ? (
         <div className="text-center py-16">
           <div className="text-6xl mb-4">⭐</div>
           <p className="text-gray-600 text-lg mb-2">Start a new collection</p>

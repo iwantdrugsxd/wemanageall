@@ -278,12 +278,14 @@ function App() {
           </ProtectedRoute>
         } 
       />
-      {/* Legacy route redirects - Library */}
+      {/* Library routes */}
       <Route 
         path="/library" 
         element={
           <ProtectedRoute requireOnboarding>
-            <Navigate to="/docs?view=library" replace />
+            <Layout>
+              <Library />
+            </Layout>
           </ProtectedRoute>
         } 
       />
@@ -291,16 +293,20 @@ function App() {
         path="/library/:id" 
         element={
           <ProtectedRoute requireOnboarding>
-            <Library />
+            <Layout>
+              <Library />
+            </Layout>
           </ProtectedRoute>
         } 
       />
-      {/* Legacy route redirects - Lists */}
+      {/* Lists routes */}
       <Route 
         path="/lists" 
         element={
           <ProtectedRoute requireOnboarding>
-            <Navigate to="/docs?view=lists" replace />
+            <Layout>
+              <Lists />
+            </Layout>
           </ProtectedRoute>
         } 
       />
@@ -310,6 +316,27 @@ function App() {
           <ProtectedRoute requireOnboarding>
             <Layout>
               <Lists />
+            </Layout>
+          </ProtectedRoute>
+        } 
+      />
+      {/* Resources route (alias to Library) */}
+      <Route 
+        path="/resources" 
+        element={
+          <ProtectedRoute requireOnboarding>
+            <Layout>
+              <Library />
+            </Layout>
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/resources/:id" 
+        element={
+          <ProtectedRoute requireOnboarding>
+            <Layout>
+              <Library />
             </Layout>
           </ProtectedRoute>
         } 

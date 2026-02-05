@@ -7,6 +7,8 @@ export default function Library({ embedded = false }) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { id } = useParams();
+  const location = useLocation();
+  const isResourcesRoute = location.pathname.startsWith('/resources');
   const [resources, setResources] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -26,6 +28,7 @@ export default function Library({ embedded = false }) {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState(null);
+  const [error, setError] = useState(null);
   
   // Upload form state
   const [uploadFile, setUploadFile] = useState(null);
@@ -44,6 +47,8 @@ export default function Library({ embedded = false }) {
 
   const fetchResources = async () => {
     try {
+      setError(null);
+      setLoading(true);
       const params = new URLSearchParams();
       if (selectedCategory !== 'all') params.append('category', selectedCategory);
       if (selectedFolder !== 'all' && selectedFolder) params.append('folder', selectedFolder);
@@ -63,8 +68,13 @@ export default function Library({ embedded = false }) {
         }
         
         setResources(filtered);
+      } else {
+        const errorText = await response.text();
+        setError(`Failed to load resources: ${response.status} ${response.statusText}`);
+        console.error('Failed to fetch resources:', response.status, errorText);
       }
     } catch (error) {
+      setError(`Network error: ${error.message}. Please check your connection and try again.`);
       console.error('Failed to fetch resources:', error);
     } finally {
       setLoading(false);
@@ -80,8 +90,12 @@ export default function Library({ embedded = false }) {
       if (response.ok) {
         const data = await response.json();
         setCategories(data.categories || []);
+      } else {
+        // Categories failure is non-critical, log but don't block UI
+        console.error('Failed to fetch categories:', response.status);
       }
     } catch (error) {
+      // Categories failure is non-critical, log but don't block UI
       console.error('Failed to fetch categories:', error);
     }
   };
@@ -298,8 +312,9 @@ export default function Library({ embedded = false }) {
         </div>
       )}
 
-      {/* Search and Filters */}
-      <div className="mb-6 space-y-4">
+      {/* Search and Filters - only show if no error */}
+      {!error && (
+        <div className="mb-6 space-y-4">
         <div className="flex items-center gap-4">
           <input
             type="text"
@@ -330,8 +345,10 @@ export default function Library({ embedded = false }) {
           </select>
         </div>
       </div>
+      )}
 
-      {/* Category Navigation */}
+      {/* Category Navigation - only show if no error */}
+      {!error && (
       <div className="flex items-center gap-6 mb-8 border-b border-gray-300 pb-4">
         {allCategories.map((cat) => {
           const isActive = (cat === 'All Resources' && selectedCategory === 'all') || 
@@ -351,9 +368,10 @@ export default function Library({ embedded = false }) {
           );
         })}
       </div>
+      )}
 
-      {/* Continue Reading Section */}
-      {continueReading.length > 0 && (
+      {/* Continue Reading Section - only show if no error */}
+      {!error && continueReading.length > 0 && (
         <div className="mb-12">
           <h2 className="font-display text-2xl text-black mb-4">Continue Reading</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -370,8 +388,9 @@ export default function Library({ embedded = false }) {
         </div>
       )}
 
-      {/* Resources by Category */}
-      {selectedCategory === 'all' ? (
+      {/* Resources by Category - only show if no error */}
+      {!error && (
+      selectedCategory === 'all' ? (
         Object.keys(groupedResources).map((category) => (
           <div key={category} className="mb-12">
             <h2 className="font-display text-3xl text-black mb-6">{category}</h2>
@@ -403,9 +422,11 @@ export default function Library({ embedded = false }) {
               ))}
           </div>
         </div>
+      )
       )}
 
-      {resources.length === 0 && (
+      {/* Empty State - only show if no error */}
+      {!error && resources.length === 0 && (
         <div className="text-center py-16">
           <p className="text-gray-600 text-lg mb-4">No resources yet.</p>
           <button
