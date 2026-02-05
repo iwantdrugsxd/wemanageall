@@ -8,6 +8,7 @@ import Signup from './pages/Signup';
 import Onboarding from './pages/Onboarding';
 import Welcome from './pages/Welcome';
 import Dashboard from './pages/Dashboard';
+import Home from './pages/Home';
 import Projects from './pages/Projects';
 import ProjectWorkspace from './pages/ProjectWorkspace';
 import Calendar from './pages/Calendar';
@@ -134,7 +135,7 @@ function App() {
         element={
           <ProtectedRoute requireOnboarding>
             <Layout>
-              <Dashboard />
+              <Home />
             </Layout>
           </ProtectedRoute>
         } 
