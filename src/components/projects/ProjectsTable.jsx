@@ -3,6 +3,9 @@
  * Enterprise table view for projects
  */
 import { useNavigate } from 'react-router-dom';
+import IconButton from '../ui/IconButton';
+import Badge from '../ui/Badge';
+import { cn } from '../../lib/cn';
 
 export default function ProjectsTable({
   projects,
@@ -19,16 +22,7 @@ export default function ProjectsTable({
 }) {
   const navigate = useNavigate();
 
-  // Filter projects by search query
-  const filteredProjects = projects.filter(project => {
-    if (!searchQuery) return true;
-    const query = searchQuery.toLowerCase();
-    return (
-      project.name?.toLowerCase().includes(query) ||
-      project.description?.toLowerCase().includes(query) ||
-      project.tags?.some(tag => tag.toLowerCase().includes(query))
-    );
-  });
+  // Note: Projects are already filtered by searchQuery in parent component
 
   const getStatusColor = (progress) => {
     if (progress >= 75) return 'text-green-600';
@@ -37,12 +31,8 @@ export default function ProjectsTable({
     return 'text-gray-600';
   };
 
-  if (filteredProjects.length === 0) {
-    return (
-      <div className="text-center py-12" style={{ color: 'var(--text-muted)' }}>
-        <p>No projects found</p>
-      </div>
-    );
+  if (projects.length === 0) {
+    return null; // Empty state handled by parent
   }
 
   return (
@@ -63,7 +53,7 @@ export default function ProjectsTable({
           </tr>
         </thead>
         <tbody>
-          {filteredProjects.map((project) => (
+          {projects.map((project) => (
             <tr
               key={project.id}
               onClick={() => navigate(`/projects/${project.id}`)}
@@ -112,15 +102,9 @@ export default function ProjectsTable({
                 </div>
               </td>
               <td className="py-3 px-4">
-                <span 
-                  className="text-sm px-2 py-1 rounded"
-                  style={{
-                    backgroundColor: project.archived ? 'var(--bg-surface)' : 'var(--bg-card)',
-                    color: 'var(--text-muted)'
-                  }}
-                >
+                <Badge variant={project.archived ? 'neutral' : 'success'}>
                   {project.archived ? 'Archived' : 'Active'}
-                </span>
+                </Badge>
               </td>
               <td className="py-3 px-4">
                 <div className="flex items-center gap-2">
@@ -171,113 +155,77 @@ export default function ProjectsTable({
               </td>
               <td className="py-3 px-4">
                 <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
-                  <button
+                  <IconButton
+                    variant="ghost"
+                    size="sm"
                     onClick={() => onHealth(project.id)}
-                    className="p-1.5 rounded hover:bg-opacity-50 transition-colors"
-                    style={{ backgroundColor: 'transparent' }}
-                    onMouseEnter={(e) => {
-                      e.target.style.backgroundColor = 'var(--bg-surface)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = 'transparent';
-                    }}
-                    title="View health"
+                    aria-label="View health"
                   >
-                    <svg className="w-4 h-4" style={{ color: 'var(--text-muted)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
-                  </button>
-                  <button
+                  </IconButton>
+                  <IconButton
+                    variant="ghost"
+                    size="sm"
                     onClick={() => onActivity(project.id)}
-                    className="p-1.5 rounded hover:bg-opacity-50 transition-colors"
-                    style={{ backgroundColor: 'transparent' }}
-                    onMouseEnter={(e) => {
-                      e.target.style.backgroundColor = 'var(--bg-surface)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = 'transparent';
-                    }}
-                    title="View activity"
+                    aria-label="View activity"
                   >
-                    <svg className="w-4 h-4" style={{ color: 'var(--text-muted)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                  </button>
-                  <button
+                  </IconButton>
+                  <IconButton
+                    variant="ghost"
+                    size="sm"
                     onClick={() => onEdit(project)}
-                    className="p-1.5 rounded hover:bg-opacity-50 transition-colors"
-                    style={{ backgroundColor: 'transparent' }}
-                    onMouseEnter={(e) => {
-                      e.target.style.backgroundColor = 'var(--bg-surface)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = 'transparent';
-                    }}
-                    title="Edit project"
+                    aria-label="Edit project"
                   >
-                    <svg className="w-4 h-4" style={{ color: 'var(--text-muted)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
-                  </button>
+                  </IconButton>
                   {showArchived ? (
-                    <button
+                    <IconButton
+                      variant="ghost"
+                      size="sm"
                       onClick={() => onUnarchive(project.id)}
-                      className="p-1.5 rounded hover:bg-opacity-50 transition-colors"
-                      style={{ backgroundColor: 'transparent' }}
-                      onMouseEnter={(e) => {
-                        e.target.style.backgroundColor = 'var(--bg-surface)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.backgroundColor = 'transparent';
-                      }}
-                      title="Unarchive project"
+                      aria-label="Unarchive project"
                     >
-                      <svg className="w-4 h-4" style={{ color: 'var(--text-muted)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                       </svg>
-                    </button>
+                    </IconButton>
                   ) : (
-                    <button
+                    <IconButton
+                      variant="ghost"
+                      size="sm"
                       onClick={() => {
                         if (confirm('Archive this project?')) {
                           onArchive(project.id);
                         }
                       }}
-                      className="p-1.5 rounded hover:bg-opacity-50 transition-colors"
-                      style={{ backgroundColor: 'transparent' }}
-                      onMouseEnter={(e) => {
-                        e.target.style.backgroundColor = 'var(--bg-surface)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.backgroundColor = 'transparent';
-                      }}
-                      title="Archive project"
+                      aria-label="Archive project"
                     >
-                      <svg className="w-4 h-4" style={{ color: 'var(--text-muted)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                       </svg>
-                    </button>
+                    </IconButton>
                   )}
-                  <button
+                  <IconButton
+                    variant="ghost"
+                    size="sm"
                     onClick={() => {
                       if (confirm(`Delete project "${project.name}"? This cannot be undone.`)) {
                         onDelete(project.id, project.name);
                       }
                     }}
-                    className="p-1.5 rounded hover:bg-opacity-50 transition-colors"
-                    style={{ backgroundColor: 'transparent' }}
-                    onMouseEnter={(e) => {
-                      e.target.style.backgroundColor = 'var(--bg-surface)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = 'transparent';
-                    }}
-                    title="Delete project"
+                    aria-label="Delete project"
                   >
-                    <svg className="w-4 h-4" style={{ color: 'var(--text-muted)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
-                  </button>
+                  </IconButton>
                 </div>
               </td>
             </tr>

@@ -15,20 +15,9 @@ export default function ProjectWorkspace() {
   const [activeSection, setActiveSection] = useState('overview'); // overview, tasks, notes, activity, files
   const [activeView, setActiveView] = useState('board'); // list, board, timeline, notes (for backward compatibility)
 
-  // Map section to view
-  useEffect(() => {
-    const sectionToView = {
-      'overview': 'board',
-      'tasks': 'list',
-      'notes': 'notes',
-      'activity': 'timeline',
-      'files': 'board' // placeholder
-    };
-    setActiveView(sectionToView[activeSection] || 'board');
-  }, [activeSection]);
-
-  const handleSectionChange = (section) => {
-    setActiveSection(section);
+  // Direct view management (no section mapping needed)
+  const handleViewChange = (view) => {
+    setActiveView(view);
   };
 
   const handleEdit = () => {
@@ -619,82 +608,16 @@ export default function ProjectWorkspace() {
       <WorkspaceLayout
         project={project}
         userRole={userRole}
-        activeSection={activeSection}
-        onSectionChange={handleSectionChange}
-        onEdit={handleEdit}
-        onArchive={handleArchive}
+        activeView={activeView}
+        onViewChange={handleViewChange}
+        collaboratorsCount={collaborators.length}
         onShare={handleShare}
+        onToggleCollaborators={() => setShowCollaborators(!showCollaborators)}
+        onAddTask={() => setShowAddTask(true)}
+        onFilter={() => {}} // Placeholder
       >
-        {/* View-specific controls */}
-        {(activeSection === 'tasks' || activeSection === 'overview') && (
-          <div className="mb-4 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              {activeSection === 'tasks' && (
-                <>
-                  <button
-                    onClick={() => setActiveView('list')}
-                    className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
-                      activeView === 'list' ? '' : ''
-                    }`}
-                    style={activeView === 'list' ? {
-                      backgroundColor: 'var(--accent)',
-                      color: 'var(--bg-base)'
-                    } : {
-                      backgroundColor: 'var(--bg-surface)',
-                      color: 'var(--text-muted)'
-                    }}
-                  >
-                    List
-                  </button>
-                  <button
-                    onClick={() => setActiveView('board')}
-                    className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
-                      activeView === 'board' ? '' : ''
-                    }`}
-                    style={activeView === 'board' ? {
-                      backgroundColor: 'var(--accent)',
-                      color: 'var(--bg-base)'
-                    } : {
-                      backgroundColor: 'var(--bg-surface)',
-                      color: 'var(--text-muted)'
-                    }}
-                  >
-                    Board
-                  </button>
-                </>
-              )}
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setShowCollaborators(!showCollaborators)}
-                className="px-3 py-1.5 rounded-lg text-sm transition-colors border"
-                style={{
-                  backgroundColor: 'var(--bg-card)',
-                  borderColor: 'var(--border-subtle)',
-                  color: 'var(--text-primary)'
-                }}
-              >
-                <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-                {collaborators.length + 1}
-              </button>
-              <button
-                onClick={() => setShowAddTask(true)}
-                className="px-3 py-1.5 rounded-lg text-sm transition-colors"
-                style={{
-                  backgroundColor: 'var(--accent)',
-                  color: 'var(--bg-base)'
-                }}
-              >
-                + Add Task
-              </button>
-            </div>
-          </div>
-        )}
-
       {/* Board View */}
-      {activeView === 'board' && (activeSection === 'overview' || activeSection === 'tasks') && (
+      {activeView === 'board' && (
         <div className="grid grid-cols-3 gap-6">
           {['todo', 'in_progress', 'done'].map((status) => (
             <div
@@ -806,7 +729,7 @@ export default function ProjectWorkspace() {
       )}
 
       {/* Timeline View */}
-      {activeView === 'timeline' && activeSection === 'activity' && (
+      {activeView === 'timeline' && (
         <div className="bg-white rounded-xl border border-gray-300">
           <div className="p-6 border-b border-gray-300 flex items-center justify-between">
             <h3 className="font-display text-lg font-semibold text-black">Timeline</h3>
@@ -947,16 +870,8 @@ export default function ProjectWorkspace() {
         </div>
       )}
 
-      {/* Files Section (Placeholder) */}
-      {activeSection === 'files' && (
-        <div className="text-center py-12" style={{ color: 'var(--text-muted)' }}>
-          <p className="text-lg mb-2">Files</p>
-          <p className="text-sm">File management coming soon</p>
-        </div>
-      )}
-
       {/* Notes View */}
-      {activeView === 'notes' && activeSection === 'notes' && (
+      {activeView === 'notes' && (
         <div className="space-y-4">
           <div className="bg-white rounded-xl border border-gray-300 p-6">
             <div className="flex items-center justify-between mb-4">

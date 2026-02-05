@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import Page from '../components/layout/Page';
 import ProjectsHeader from '../components/projects/ProjectsHeader';
-import ProjectsFilters from '../components/projects/ProjectsFilters';
+import ProjectsToolbar from '../components/projects/ProjectsToolbar';
 import ProjectsTable from '../components/projects/ProjectsTable';
 import ProjectsGrid from '../components/projects/ProjectsGrid';
 import UpgradeGate from '../components/UpgradeGate';
+import EmptyState from '../components/ui/EmptyState';
+import Button from '../components/ui/Button';
 
 export default function Projects() {
   const { user } = useAuth();
@@ -500,93 +503,72 @@ export default function Projects() {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase();
   };
 
+  // Client-side search filtering
+  const filteredProjects = projects.filter(project => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      project.name?.toLowerCase().includes(query) ||
+      project.description?.toLowerCase().includes(query) ||
+      project.tags?.some(tag => tag.toLowerCase().includes(query))
+    );
+  });
+
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12 text-center">
-        <div className="text-gray-600">Loading projects...</div>
-      </div>
+      <Page>
+        <div className="text-center py-12">
+          <div className="transition-colors" style={{ color: 'var(--text-muted)' }}>Loading projects...</div>
+        </div>
+      </Page>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
+    <Page>
       {/* Header */}
       <ProjectsHeader
         projects={projects}
         showFavoritesOnly={showFavoritesOnly}
         showArchived={showArchived}
         onNewProject={() => setShowCreateModal(true)}
-        onShowTemplates={() => setShowTemplates(true)}
+        onJoinProject={() => setShowJoinModal(true)}
       />
 
-      {/* Filters */}
-      <ProjectsFilters
-        showFavoritesOnly={showFavoritesOnly}
-        setShowFavoritesOnly={setShowFavoritesOnly}
-        filterTag={filterTag}
-        setFilterTag={setFilterTag}
-        showArchived={showArchived}
-        setShowArchived={setShowArchived}
-        availableTags={availableTags}
+      {/* Toolbar */}
+      <ProjectsToolbar
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
+        showFavoritesOnly={showFavoritesOnly}
+        setShowFavoritesOnly={setShowFavoritesOnly}
+        showArchived={showArchived}
+        setShowArchived={setShowArchived}
+        filterTag={filterTag}
+        setFilterTag={setFilterTag}
+        availableTags={availableTags}
+        viewMode={viewMode}
+        setViewMode={setViewMode}
         onFilterChange={() => setTimeout(fetchProjects, 100)}
       />
 
       {/* Upgrade Gate */}
       <UpgradeGate message="Upgrade to unlock unlimited projects and advanced features" />
 
-      {/* View Toggle & Join Button */}
-      <div className="mb-6 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-            <button
-            onClick={() => setViewMode('table')}
-            className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
-              viewMode === 'table' ? '' : ''
-            }`}
-            style={viewMode === 'table' ? {
-              backgroundColor: 'var(--accent)',
-              color: 'var(--bg-base)'
-            } : {
-              backgroundColor: 'var(--bg-surface)',
-              color: 'var(--text-muted)'
-            }}
-          >
-            Table
-            </button>
-            <button
-            onClick={() => setViewMode('grid')}
-            className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
-              viewMode === 'grid' ? '' : ''
-            }`}
-            style={viewMode === 'grid' ? {
-              backgroundColor: 'var(--accent)',
-              color: 'var(--bg-base)'
-            } : {
-              backgroundColor: 'var(--bg-surface)',
-              color: 'var(--text-muted)'
-            }}
-          >
-            Grid
-            </button>
-        </div>
-            <button
-              onClick={() => setShowJoinModal(true)}
-          className="px-4 py-2 rounded-lg text-sm transition-colors flex items-center gap-2"
-          style={{
-            backgroundColor: 'var(--accent)',
-            color: 'var(--bg-base)'
-          }}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              Join Project
-            </button>
-        </div>
-
       {/* Projects View */}
-      {viewMode === 'table' ? (
+      {filteredProjects.length === 0 ? (
+        <EmptyState
+          title={searchQuery ? "No projects found" : "No projects yet"}
+          description={searchQuery ? "Try adjusting your search or filters" : "Create your first project to get started"}
+          action={
+            <Button
+              variant="primary"
+              onClick={() => setShowCreateModal(true)}
+            >
+              Create Project
+            </Button>
+          }
+        />
+      ) : viewMode === 'table' ? (
         <div 
           className="rounded-lg border overflow-hidden"
           style={{
@@ -595,7 +577,7 @@ export default function Projects() {
           }}
         >
           <ProjectsTable
-            projects={projects}
+            projects={filteredProjects}
             showArchived={showArchived}
             searchQuery={searchQuery}
             onToggleFavorite={handleToggleFavorite}
@@ -607,8 +589,8 @@ export default function Projects() {
             onActivity={handleFetchActivity}
             formatDate={formatDate}
           />
-                  </div>
-                ) : (
+        </div>
+      ) : (
         <div>
           {/* Create New Project Card (only in grid view) */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
@@ -632,14 +614,14 @@ export default function Projects() {
                   style={{ backgroundColor: 'var(--bg-surface)' }}
                 >
                   <span className="text-2xl" style={{ color: 'var(--text-primary)' }}>+</span>
-                    </div>
+                </div>
                 <h3 className="text-base mb-1" style={{ color: 'var(--text-primary)' }}>Create New Project</h3>
                 <p className="text-xs text-center" style={{ color: 'var(--text-muted)' }}>Start from scratch</p>
-                  </div>
-                </div>
-                      </div>
+              </div>
+            </div>
+          </div>
           <ProjectsGrid
-            projects={projects}
+            projects={filteredProjects}
             showArchived={showArchived}
             searchQuery={searchQuery}
             onToggleFavorite={handleToggleFavorite}
@@ -650,8 +632,8 @@ export default function Projects() {
             onHealth={handleFetchHealth}
             onActivity={handleFetchActivity}
           />
-                  </div>
-                )}
+        </div>
+      )}
 
       {/* Create Project Modal */}
       {showCreateModal && (
@@ -660,27 +642,32 @@ export default function Projects() {
           onClick={() => {
             if (!creating) {
               setShowCreateModal(false);
-              setNewProject({ name: '', description: '', start_date: new Date().toISOString().split('T')[0] });
+              setNewProject({ name: '', description: '', start_date: new Date().toISOString().split('T')[0], color: '#000000', icon: '📋', tags: [], cover_image_url: null });
+              setImagePreview(null);
               setError(null);
             }
           }}
         >
           <div
-            className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md"
+            className="rounded-2xl shadow-2xl p-8 w-full max-w-md border transition-colors"
+            style={{
+              backgroundColor: 'var(--bg-modal)',
+              borderColor: 'var(--border-subtle)'
+            }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="font-display text-2xl font-semibold text-black mb-2">Create New Project</h3>
-                <p className="text-sm text-gray-600">Start a new focus area for your work.</p>
+                <h3 className="text-2xl font-semibold mb-2 transition-colors" style={{ color: 'var(--text-primary)' }}>Create New Project</h3>
+                <p className="text-sm transition-colors" style={{ color: 'var(--text-muted)' }}>Start a new focus area for your work.</p>
               </div>
-              <button
-                type="button"
+              <Button
+                variant="secondary"
+                size="sm"
                 onClick={() => setShowTemplates(!showTemplates)}
-                className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
               >
                 {showTemplates ? 'Hide' : 'Use'} Templates
-              </button>
+              </Button>
             </div>
             
             {showTemplates && templates.length > 0 && (
@@ -1184,6 +1171,6 @@ export default function Projects() {
           </div>
         </div>
       )}
-    </div>
+    </Page>
   );
 }

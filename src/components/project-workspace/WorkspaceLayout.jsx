@@ -1,45 +1,50 @@
+import Page from '../layout/Page';
+import WorkspaceNav from './WorkspaceSidebar';
+import WorkspaceHeader from './WorkspaceHeader';
+
 /**
  * Workspace Layout Component
  * 2-pane layout wrapper for project workspace
  */
-import WorkspaceSidebar from './WorkspaceSidebar';
-import WorkspaceHeader from './WorkspaceHeader';
-
 export default function WorkspaceLayout({
   project,
   userRole,
-  activeSection,
-  onSectionChange,
-  onEdit,
-  onArchive,
+  activeView,
+  onViewChange,
+  collaboratorsCount,
   onShare,
+  onToggleCollaborators,
+  onAddTask,
+  onFilter,
   children
 }) {
   return (
     <div className="flex h-full">
-      {/* Left Sidebar */}
-      <WorkspaceSidebar
-        activeSection={activeSection}
-        onSectionChange={onSectionChange}
+      {/* Left Internal Nav */}
+      <WorkspaceNav
+        activeView={activeView}
+        onViewChange={onViewChange}
       />
 
       {/* Right Content */}
       <div className="flex-1 overflow-auto">
-        <div className="p-6">
+        <Page>
           {/* Header */}
           <WorkspaceHeader
             project={project}
             userRole={userRole}
-            onEdit={onEdit}
-            onArchive={onArchive}
+            collaboratorsCount={collaboratorsCount}
             onShare={onShare}
+            onToggleCollaborators={onToggleCollaborators}
+            onAddTask={onAddTask}
+            onFilter={onFilter}
           />
 
           {/* Content */}
           <div>
             {children}
           </div>
-        </div>
+        </Page>
       </div>
     </div>
   );
