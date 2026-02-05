@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 
-export default function Notifications() {
+export default function Notifications({ embedded = false } = {}) {
   const { user } = useAuth();
   const [insights, setInsights] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -180,9 +180,283 @@ export default function Notifications() {
   const unreadCount = insights.filter(i => !i.seen_at).length;
 
   if (loading) {
+    if (embedded) {
+      return (
+        <div className="py-6 text-center transition-colors" style={{ color: 'var(--text-muted)' }}>
+          Loading notifications...
+        </div>
+      );
+    }
     return (
       <div className="max-w-4xl mx-auto px-6 lg:px-8 py-12">
         <div className="text-center text-gray-600">Loading notifications...</div>
+      </div>
+    );
+  }
+
+  if (embedded) {
+    return (
+      <div>
+        {/* Compact Header */}
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-sm font-medium transition-colors" style={{ color: 'var(--text-primary)' }}>
+            Notifications
+          </h2>
+          <button
+            onClick={handleGenerateFeedback}
+            disabled={generatingFeedback}
+            className="px-3 py-1.5 rounded-lg text-sm transition-colors disabled:opacity-50"
+            style={{
+              backgroundColor: 'var(--accent)',
+              color: 'var(--bg-base)'
+            }}
+          >
+            {generatingFeedback ? 'Generating...' : 'Get AI Feedback'}
+          </button>
+        </div>
+
+        {/* Filter Tabs */}
+        <div className="flex gap-2 mb-4 border-b" style={{ borderColor: 'var(--border-subtle)' }}>
+          <button
+            onClick={() => setFilter('all')}
+            className={`px-4 py-2 text-sm font-medium transition-colors ${
+              filter === 'all'
+                ? 'text-[var(--text-primary)] border-b-2'
+                : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+            }`}
+            style={filter === 'all' ? { borderColor: 'var(--accent)' } : {}}
+          >
+            All {insights.length > 0 && `(${insights.length})`}
+          </button>
+          <button
+            onClick={() => setFilter('unread')}
+            className={`px-4 py-2 text-sm font-medium transition-colors relative ${
+              filter === 'unread'
+                ? 'text-[var(--text-primary)] border-b-2'
+                : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+            }`}
+            style={filter === 'unread' ? { borderColor: 'var(--accent)' } : {}}
+          >
+            Unread
+            {unreadCount > 0 && (
+              <span className="ml-2 px-2 py-0.5 text-xs rounded-full" style={{ backgroundColor: 'var(--accent)', color: 'var(--bg-base)' }}>
+                {unreadCount}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={() => setFilter('read')}
+            className={`px-4 py-2 text-sm font-medium transition-colors ${
+              filter === 'read'
+                ? 'text-[var(--text-primary)] border-b-2'
+                : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+            }`}
+            style={filter === 'read' ? { borderColor: 'var(--accent)' } : {}}
+          >
+            Read
+          </button>
+        </div>
+
+        {/* Notifications List */}
+        {filteredInsights.length === 0 ? (
+          <div className="text-center py-12">
+          <div className="text-6xl mb-4">🔔</div>
+          <p className="text-gray-600 text-lg mb-2">
+            {filter === 'unread' 
+              ? 'No unread notifications' 
+              : filter === 'read'
+              ? 'No read notifications'
+              : 'No notifications yet'}
+          </p>
+          <p className="text-gray-500 text-sm">
+            {filter === 'all' 
+              ? 'Your Personal Knowledge Engine will show insights here as patterns emerge.'
+              : 'Try switching to another filter.'}
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-1 bg-white rounded-xl border border-gray-300 overflow-hidden">
+          {filteredInsights.map((insight) => {
+            const isUnread = !insight.seen_at;
+            
+            return (
+              <div
+                key={insight.id}
+                className={`p-4 border-b border-gray-300 last:border-b-0 transition-colors ${
+                  isUnread ? 'bg-black/5' : 'bg-white'
+                } hover:bg-gray-100`}
+                onClick={() => {
+                  if (isUnread) {
+                    handleSeen(insight.id);
+                  }
+                }}
+              >
+                <div className="flex items-start gap-3">
+                  {/* Icon/Avatar */}
+                  <div className={`flex-shrink-0 w-10 h-10 rounded-full ${getScopeColor(insight.scope)} flex items-center justify-center text-lg`}>
+                    {getScopeIcon(insight.scope)}
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2 mb-1">
+                      <div className="flex-1">
+                        <h3 className={`text-sm font-medium ${isUnread ? 'text-black' : 'text-gray-600'}`}>
+                          {insight.title}
+                        </h3>
+                        <p className="text-sm text-gray-600 mt-1 leading-relaxed">
+                          {insight.body}
+                        </p>
+                      </div>
+                      
+                      {/* Actions */}
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <span className="text-xs text-gray-500 whitespace-nowrap">
+                          {formatTimeAgo(insight.created_at)}
+                        </span>
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleMute(insight.id, insight.scope);
+                            }}
+                            className="p-1.5 hover:bg-gray-200 rounded-full transition-colors"
+                            title="Mute this type"
+                          >
+                            <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDismiss(insight.id);
+                            }}
+                            className="p-1.5 hover:bg-gray-200 rounded-full transition-colors"
+                            title="Dismiss"
+                          >
+                            <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Scope Badge */}
+                    <div className="flex items-center gap-2 mt-2">
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${getScopeColor(insight.scope)}`}>
+                        {insight.scope}
+                      </span>
+                      {isUnread && (
+                        <span className="w-2 h-2 bg-black rounded-full"></span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+        {/* Empty State for specific filters */}
+        {filteredInsights.length === 0 && filter !== 'all' && (
+          <div className="mt-8 text-center">
+            <button
+              onClick={() => setFilter('all')}
+              className="text-sm font-medium transition-colors"
+              style={{ color: 'var(--text-primary)' }}
+            >
+              View all notifications
+            </button>
+          </div>
+        )}
+
+        {/* Account Feedback Modal */}
+        {showFeedbackModal && accountFeedback && (
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setShowFeedbackModal(false)}
+        >
+          <div
+            className="bg-white rounded-lg border border-gray-200 shadow-xl w-full max-w-2xl max-h-[80vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6">
+              {/* Header */}
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <h2 className="text-xl text-black mb-1" style={{ color: '#000000' }}>{accountFeedback.title}</h2>
+                  <p className="text-xs text-black" style={{ color: '#000000', opacity: 0.5 }}>
+                    Generated {new Date(accountFeedback.generated_at).toLocaleString()}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowFeedbackModal(false)}
+                  className="text-black hover:bg-gray-100 rounded p-1 transition-colors"
+                  style={{ color: '#000000' }}
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Feedback Content */}
+              <div className="mb-6">
+                {formatFeedbackBody(accountFeedback.body)}
+              </div>
+
+              {/* Stats Summary */}
+              {accountFeedback.stats && (
+                <div className="pt-4 border-t border-gray-200">
+                  <h3 className="text-sm text-black mb-3" style={{ color: '#000000' }}>Account Statistics</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div className="p-2 bg-gray-50 rounded">
+                      <div className="text-xs text-black mb-1" style={{ color: '#000000', opacity: 0.6 }}>Projects</div>
+                      <div className="text-base text-black" style={{ color: '#000000' }}>{accountFeedback.stats.projects?.total || 0}</div>
+                    </div>
+                    <div className="p-2 bg-gray-50 rounded">
+                      <div className="text-xs text-black mb-1" style={{ color: '#000000', opacity: 0.6 }}>Tasks</div>
+                      <div className="text-base text-black" style={{ color: '#000000' }}>{accountFeedback.stats.tasks?.total || 0}</div>
+                    </div>
+                    <div className="p-2 bg-gray-50 rounded">
+                      <div className="text-xs text-black mb-1" style={{ color: '#000000', opacity: 0.6 }}>Expenses</div>
+                      <div className="text-base text-black" style={{ color: '#000000' }}>{accountFeedback.stats.expenses?.count || 0}</div>
+                    </div>
+                    <div className="p-2 bg-gray-50 rounded">
+                      <div className="text-xs text-black mb-1" style={{ color: '#000000', opacity: 0.6 }}>Lists</div>
+                      <div className="text-base text-black" style={{ color: '#000000' }}>{accountFeedback.stats.lists || 0}</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
+                <button
+                  onClick={() => setShowFeedbackModal(false)}
+                  className="px-4 py-2 text-sm text-black hover:bg-gray-100 rounded transition-colors"
+                  style={{ color: '#000000' }}
+                >
+                  Close
+                </button>
+                <button
+                  onClick={() => {
+                    setShowFeedbackModal(false);
+                    handleGenerateFeedback();
+                  }}
+                  className="px-4 py-2 text-sm bg-black text-white rounded hover:bg-black/90 transition-colors"
+                  style={{ backgroundColor: '#000000' }}
+                >
+                  Refresh Feedback
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        )}
       </div>
     );
   }

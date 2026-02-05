@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { format, startOfWeek, addDays, addWeeks, subWeeks, startOfDay, addHours, isSameDay, isToday, isPast, setHours, setMinutes, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameWeek, startOfYear, endOfYear, eachWeekOfInterval, getWeek } from 'date-fns';
 import { useAuth } from '../context/AuthContext';
 
-export default function Calendar() {
+export default function Calendar({ embedded = false } = {}) {
   const { user } = useAuth();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [view, setView] = useState('day'); // 'day' | 'week' | 'month' | 'timeline'
@@ -1206,9 +1206,109 @@ export default function Calendar() {
   };
 
   if (loading) {
+    if (embedded) {
+      return (
+        <div className="py-6 text-center transition-colors" style={{ color: 'var(--text-muted)' }}>
+          Loading calendar...
+        </div>
+      );
+    }
     return (
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
         <div className="text-center text-gray-600">Loading calendar...</div>
+      </div>
+    );
+  }
+
+  if (embedded) {
+    return (
+      <div>
+        {/* Compact Toolbar */}
+        <div className="mb-4 flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handlePrev}
+              className="px-3 py-1.5 rounded-lg text-sm transition-colors border"
+              style={{
+                backgroundColor: 'var(--bg-card)',
+                borderColor: 'var(--border-subtle)',
+                color: 'var(--text-primary)'
+              }}
+            >
+              ←
+            </button>
+            <button
+              onClick={handleToday}
+              className="px-3 py-1.5 rounded-lg text-sm transition-colors border"
+              style={{
+                backgroundColor: 'var(--bg-card)',
+                borderColor: 'var(--border-subtle)',
+                color: 'var(--text-primary)'
+              }}
+            >
+              Today
+            </button>
+            <button
+              onClick={handleNext}
+              className="px-3 py-1.5 rounded-lg text-sm transition-colors border"
+              style={{
+                backgroundColor: 'var(--bg-card)',
+                borderColor: 'var(--border-subtle)',
+                color: 'var(--text-primary)'
+              }}
+            >
+              →
+            </button>
+            <span className="px-3 py-1.5 text-sm transition-colors" style={{ color: 'var(--text-primary)' }}>
+              {view === 'week' && format(currentDate, 'MMMM yyyy')}
+              {view === 'day' && format(currentDate, 'EEEE, MMMM d, yyyy')}
+              {view === 'month' && format(currentDate, 'MMMM yyyy')}
+              {view === 'timeline' && (() => {
+                const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
+                return `Week of ${format(weekStart, 'MMM d')}`;
+              })()}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            {['day', 'week', 'month', 'timeline'].map((v) => (
+              <button
+                key={v}
+                onClick={() => setView(v)}
+                className={`px-3 py-1.5 rounded-lg text-sm capitalize transition-colors ${
+                  view === v ? '' : ''
+                }`}
+                style={view === v ? {
+                  backgroundColor: 'var(--accent)',
+                  color: 'var(--bg-base)'
+                } : {
+                  backgroundColor: 'var(--bg-surface)',
+                  color: 'var(--text-muted)'
+                }}
+              >
+                {v}
+              </button>
+            ))}
+            <button
+              onClick={handleExportEvents}
+              className="px-3 py-1.5 rounded-lg text-sm transition-colors border"
+              style={{
+                backgroundColor: 'var(--bg-card)',
+                borderColor: 'var(--border-subtle)',
+                color: 'var(--text-primary)'
+              }}
+            >
+              Export
+            </button>
+          </div>
+        </div>
+
+        {/* Calendar Views */}
+        <div className="mt-4">
+          {view === 'day' && renderDayView()}
+          {view === 'week' && renderWeekView()}
+          {view === 'month' && renderMonthView()}
+          {view === 'timeline' && renderTimelineView()}
+        </div>
       </div>
     );
   }

@@ -19,7 +19,7 @@ import Notifications from './pages/Notifications';
 import Library from './pages/Library';
 import Lists from './pages/Lists';
 import Pricing from './pages/Pricing';
-import WorkHub from './pages/WorkHub';
+import Work from './pages/Work';
 import DocsHub from './pages/DocsHub';
 import Admin from './pages/Admin';
 import Layout from './components/Layout';
@@ -145,7 +145,7 @@ function App() {
         element={
           <ProtectedRoute requireOnboarding>
             <Layout>
-              <WorkHub />
+              <Work />
             </Layout>
           </ProtectedRoute>
         } 
@@ -200,6 +200,16 @@ function App() {
         } 
       />
       <Route 
+        path="/calendar/legacy" 
+        element={
+          <ProtectedRoute requireOnboarding>
+            <Layout>
+              <Calendar />
+            </Layout>
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
         path="/emotions" 
         element={
           <ProtectedRoute requireOnboarding>
@@ -245,6 +255,16 @@ function App() {
         element={
           <ProtectedRoute requireOnboarding>
             <Navigate to="/work?view=notifications" replace />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/notifications/legacy" 
+        element={
+          <ProtectedRoute requireOnboarding>
+            <Layout>
+              <Notifications />
+            </Layout>
           </ProtectedRoute>
         } 
       />
