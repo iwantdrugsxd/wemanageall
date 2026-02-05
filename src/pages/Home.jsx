@@ -190,7 +190,6 @@ export default function Home() {
       const intentionsData = Array.isArray(data.intentions) ? data.intentions : [];
       setIntentions(intentionsData);
       setTodayThoughts(data.thinkingSpace || []);
-      setCalendarEvents(data.calendarEvents || []);
       setReflection(data.reflection || '');
       setReflectionMood(data.mood ?? null);
       
@@ -201,10 +200,34 @@ export default function Home() {
       }
       
       fetchRecentIntentions();
+      
+      // Fetch events from new Events API
+      await fetchEvents();
     } catch (error) {
       console.error('Failed to fetch today:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchEvents = async () => {
+    try {
+      const response = await fetch('/api/events?range=today', {
+        credentials: 'include',
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        // Map new API format (start_at, end_at) to existing format (start_time, end_time) for compatibility
+        const mappedEvents = (data.events || []).map(event => ({
+          ...event,
+          start_time: event.start_at,
+          end_time: event.end_at,
+        }));
+        setCalendarEvents(mappedEvents);
+      }
+    } catch (error) {
+      console.error('Failed to fetch events:', error);
     }
   };
 
@@ -642,24 +665,22 @@ export default function Home() {
         return;
       }
 
-      const response = await fetch('/api/calendar/events', {
+      const response = await fetch('/api/events', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({
           title: newEvent.title.trim(),
           description: newEvent.description || null,
-          start_time: startTime.toISOString(),
-          end_time: endTime.toISOString(),
+          start_at: startTime.toISOString(),
+          end_at: endTime.toISOString(),
           type: newEvent.type,
-          color: '#3B6E5C'
         }),
       });
 
       if (response.ok) {
-        const data = await response.json();
-        // Refresh today's data to get updated calendar events
-        fetchToday();
+        // Refresh events to get updated list
+        await fetchEvents();
         setShowAddEvent(false);
         setNewEvent({
           title: '',
@@ -668,7 +689,6 @@ export default function Home() {
           description: '',
           type: 'event'
         });
-        await fetchToday();
       } else {
         const errorData = await response.json();
         setEventError(errorData.error || 'Failed to create event');
@@ -687,16 +707,14 @@ export default function Home() {
     if (!confirm('Delete this event?')) return;
     
     try {
-      const response = await fetch(`/api/calendar/events/${eventId}`, {
+      const response = await fetch(`/api/events/${eventId}`, {
         method: 'DELETE',
         credentials: 'include',
       });
       
       if (response.ok) {
-        // Remove from local state immediately for better UX
-        setCalendarEvents(calendarEvents.filter(e => e.id !== eventId));
-        // Refresh to ensure consistency
-        await fetchToday();
+        // Refresh events to get updated list
+        await fetchEvents();
       } else {
         const errorData = await response.json();
         alert(errorData.error || 'Failed to delete event');

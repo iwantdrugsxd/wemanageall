@@ -54,32 +54,39 @@ export default function Calendar({ embedded = false } = {}) {
     
     setLoading(true);
     try {
-      let start, end;
+      let range;
       
       if (view === 'day') {
-        start = startOfDay(currentDate);
-        end = addHours(start, 24);
+        range = 'today';
       } else if (view === 'week') {
-        start = startOfWeek(currentDate, { weekStartsOn: 1 });
-        end = addDays(start, 7);
+        range = 'week';
       } else if (view === 'month') {
-        start = startOfMonth(currentDate);
-        end = endOfMonth(currentDate);
+        range = 'month';
       } else {
-        start = startOfWeek(currentDate, { weekStartsOn: 1 });
-        end = addDays(start, 7);
+        range = 'week';
       }
       
-      const response = await fetch(
-        `/api/calendar/events?start_date=${start.toISOString()}&end_date=${end.toISOString()}`,
-        { credentials: 'include' }
-      );
+      // Use range parameter for day/week/month, or start/end for custom ranges
+      let url = `/api/events?range=${range}`;
+      if (view !== 'day' && view !== 'week' && view !== 'month') {
+        const start = startOfWeek(currentDate, { weekStartsOn: 1 });
+        const end = addDays(start, 7);
+        url = `/api/events?start=${start.toISOString()}&end=${end.toISOString()}`;
+      }
+      
+      const response = await fetch(url, { credentials: 'include' });
       
       if (response.ok) {
         const data = await response.json();
         const baseEvents = data.events || [];
-        // Expand recurring events for display
-        const expanded = expandRecurringEvents(baseEvents, start, end);
+        // Map new API format (start_at, end_at) to existing format (start_time, end_time) for compatibility
+        const mappedEvents = baseEvents.map(event => ({
+          ...event,
+          start_time: event.start_at,
+          end_time: event.end_at,
+        }));
+        // Expand recurring events for display (if any)
+        const expanded = expandRecurringEvents(mappedEvents, startOfDay(currentDate), addDays(currentDate, 7));
         setEvents(expanded);
       }
     } catch (error) {
@@ -292,31 +299,28 @@ export default function Calendar({ embedded = false } = {}) {
     }
     
     try {
-      const response = await fetch('/api/calendar/events', {
+      const response = await fetch('/api/events', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({
           title: newEventData.title.trim(),
           description: newEventData.description || null,
-          start_time: startTime.toISOString(),
-          end_time: endTime.toISOString(),
+          start_at: startTime.toISOString(),
+          end_at: endTime.toISOString(),
           type: newEventData.type,
-          color: newEventData.color,
-          timezone: newEventData.timezone,
-          reminder_minutes: newEventData.reminder_minutes || null,
-          recurrence_rule: newEventData.recurrence_freq !== 'none' ? {
-            freq: newEventData.recurrence_freq,
-            interval: 1
-          } : null,
-          recurrence_end_date: newEventData.recurrence_end_date || null,
-          recurrence_count: newEventData.recurrence_count ? parseInt(newEventData.recurrence_count) : null
         }),
       });
       
       if (response.ok) {
         const data = await response.json();
-        setEvents([...events, data.event]);
+        // Map response format to existing format
+        const mappedEvent = {
+          ...data.event,
+          start_time: data.event.start_at,
+          end_time: data.event.end_at,
+        };
+        setEvents([...events, mappedEvent]);
         setQuickAddSlot(null);
         setNewEventData({ 
           title: '', 
@@ -345,15 +349,25 @@ export default function Calendar({ embedded = false } = {}) {
     if (!editingEvent || !editFormData.title?.trim()) return;
     
     try {
-      const response = await fetch(`/api/calendar/events/${editingEvent.id}`, {
-        method: 'PATCH',
+      // Map editFormData to new API format
+      const updateData = { ...editFormData };
+      if (updateData.start_time) {
+        updateData.start_at = updateData.start_time;
+        delete updateData.start_time;
+      }
+      if (updateData.end_time) {
+        updateData.end_at = updateData.end_time;
+        delete updateData.end_time;
+      }
+      
+      const response = await fetch(`/api/events/${editingEvent.id}`, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify(editFormData),
+        body: JSON.stringify(updateData),
       });
       
       if (response.ok) {
-        const data = await response.json();
         fetchEvents(); // Refresh to get updated events
         setEditingEvent(null);
         setEditFormData({});
@@ -375,7 +389,7 @@ export default function Calendar({ embedded = false } = {}) {
     if (!confirm('Delete this event?')) return;
     
     try {
-      const response = await fetch(`/api/calendar/events/${actualEventId}`, {
+      const response = await fetch(`/api/events/${actualEventId}`, {
         method: 'DELETE',
         credentials: 'include',
       });
@@ -402,22 +416,16 @@ export default function Calendar({ embedded = false } = {}) {
       const newStart = addDays(start, 1);
       const newEnd = new Date(newStart.getTime() + duration);
       
-      const response = await fetch('/api/calendar/events', {
+      const response = await fetch('/api/events', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({
           title: `${event.title} (Copy)`,
           description: event.description || null,
-          start_time: newStart.toISOString(),
-          end_time: newEnd.toISOString(),
+          start_at: newStart.toISOString(),
+          end_at: newEnd.toISOString(),
           type: event.type,
-          color: event.color,
-          timezone: event.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
-          reminder_minutes: event.reminder_minutes || null,
-          recurrence_rule: event.recurrence_rule ? (typeof event.recurrence_rule === 'string' ? JSON.parse(event.recurrence_rule) : event.recurrence_rule) : null,
-          recurrence_end_date: event.recurrence_end_date || null,
-          recurrence_count: event.recurrence_count || null
         }),
       });
       
@@ -435,14 +443,19 @@ export default function Calendar({ embedded = false } = {}) {
   // Export events to ICS
   const handleExportEvents = async () => {
     try {
-      const response = await fetch('/api/calendar/events', {
+      const response = await fetch('/api/events', {
         credentials: 'include'
       });
       
       if (!response.ok) return;
       
       const data = await response.json();
-      const allEvents = data.events || [];
+      // Map events to use start_time/end_time for compatibility
+      const allEvents = (data.events || []).map(event => ({
+        ...event,
+        start_time: event.start_at,
+        end_time: event.end_at,
+      }));
       
       // Generate ICS content
       let icsContent = 'BEGIN:VCALENDAR\n';
@@ -483,19 +496,25 @@ export default function Calendar({ embedded = false } = {}) {
   // Move event (for drag)
   const handleMoveEvent = async (eventId, newStartTime, newEndTime) => {
     try {
-      const response = await fetch(`/api/calendar/events/${eventId}/move`, {
-        method: 'PATCH',
+      const response = await fetch(`/api/events/${eventId}`, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({
-          start_time: newStartTime.toISOString(),
-          end_time: newEndTime.toISOString(),
+          start_at: newStartTime.toISOString(),
+          end_at: newEndTime.toISOString(),
         }),
       });
       
       if (response.ok) {
         const data = await response.json();
-        setEvents(events.map(e => e.id === eventId ? data.event : e));
+        // Map response to existing format
+        const mappedEvent = {
+          ...data.event,
+          start_time: data.event.start_at,
+          end_time: data.event.end_at,
+        };
+        setEvents(events.map(e => e.id === eventId ? mappedEvent : e));
       }
     } catch (error) {
       console.error('Failed to move event:', error);
@@ -684,34 +703,46 @@ export default function Calendar({ embedded = false } = {}) {
             
             try {
               if (resizeType === 'bottom' && newTime > start) {
-                const response = await fetch(`/api/calendar/events/${resizingEvent.id}`, {
-                  method: 'PATCH',
+                const response = await fetch(`/api/events/${resizingEvent.id}`, {
+                  method: 'PUT',
                   headers: { 'Content-Type': 'application/json' },
                   credentials: 'include',
                   body: JSON.stringify({
-                    end_time: newTime.toISOString()
+                    end_at: newTime.toISOString()
                   }),
                 });
                 
                 if (response.ok) {
                   const data = await response.json();
-                  setEvents(prevEvents => prevEvents.map(ev => ev.id === resizingEvent.id ? data.event : ev));
+                  // Map response to existing format
+                  const mappedEvent = {
+                    ...data.event,
+                    start_time: data.event.start_at,
+                    end_time: data.event.end_at,
+                  };
+                  setEvents(prevEvents => prevEvents.map(ev => ev.id === resizingEvent.id ? mappedEvent : ev));
                   resized = true;
                   break;
                 }
               } else if (resizeType === 'top' && newTime < end) {
-                const response = await fetch(`/api/calendar/events/${resizingEvent.id}`, {
-                  method: 'PATCH',
+                const response = await fetch(`/api/events/${resizingEvent.id}`, {
+                  method: 'PUT',
                   headers: { 'Content-Type': 'application/json' },
                   credentials: 'include',
                   body: JSON.stringify({
-                    start_time: newTime.toISOString()
+                    start_at: newTime.toISOString()
                   }),
                 });
                 
                 if (response.ok) {
                   const data = await response.json();
-                  setEvents(prevEvents => prevEvents.map(ev => ev.id === resizingEvent.id ? data.event : ev));
+                  // Map response to existing format
+                  const mappedEvent = {
+                    ...data.event,
+                    start_time: data.event.start_at,
+                    end_time: data.event.end_at,
+                  };
+                  setEvents(prevEvents => prevEvents.map(ev => ev.id === resizingEvent.id ? mappedEvent : ev));
                   resized = true;
                   break;
                 }

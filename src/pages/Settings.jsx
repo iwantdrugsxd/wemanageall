@@ -71,7 +71,7 @@ export default function Settings() {
         subtitle="Manage your account, preferences, and workspace"
       />
 
-      <div className="space-y-6">
+        <div className="space-y-6">
         {/* Account Section */}
         <Panel
           title="Account"
@@ -147,12 +147,12 @@ export default function Settings() {
                   Theme
                 </label>
                 <div className="flex items-center gap-3">
-                  <button
+              <button
                     onClick={toggleTheme}
                     className="px-4 py-2 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-primary)] text-sm hover:bg-[var(--bg-elevated)] transition-colors"
-                  >
+              >
                     {theme === 'light' ? '☀️ Light' : '🌙 Dark'}
-                  </button>
+              </button>
                   <span className="text-xs text-[var(--text-muted)]">
                     Current: {theme === 'light' ? 'Light' : 'Dark'}
                   </span>

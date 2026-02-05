@@ -33,6 +33,8 @@ import resourcesRoutes from './routes/resources.js';
 import listsRoutes from './routes/lists.js';
 import subscriptionsRoutes from './routes/subscriptions.js';
 import uploadRoutes from './routes/upload.js';
+import eventsRoutes from './routes/events.js';
+import paymentsRoutes from './routes/payments.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -263,6 +265,7 @@ app.use('/api/calendar', calendarRoutes);
 app.use('/api/insights', insightsRoutes);
 app.use('/api/resources', resourcesRoutes);
 app.use('/api/lists', listsRoutes);
+app.use('/api/events', eventsRoutes);
 
 // Webhook route must capture raw body for signature verification
 // CRITICAL: This route must be BEFORE the general subscriptions router
@@ -318,8 +321,13 @@ app.post('/api/subscriptions/webhook', express.raw({ type: 'application/json' })
         await handleSubscriptionPaused(payload.subscription.entity, query);
         break;
 
+      case 'payment.captured':
+        await handlePaymentCaptured(payload.payment.entity, query);
+        break;
+
       case 'payment.failed':
         console.log('Payment failed:', payload.payment.entity);
+        await handlePaymentFailed(payload.payment.entity, query);
         break;
 
       default:
@@ -400,7 +408,101 @@ async function handleSubscriptionPaused(subscription, query) {
   );
 }
 
+async function handlePaymentCaptured(payment, query) {
+  try {
+    const paymentId = payment.id;
+    const orderId = payment.order_id;
+    const amountInPaise = payment.amount;
+    const amountInr = amountInPaise / 100;
+    const notes = payment.notes || {};
+
+    // Check if payment already exists
+    const existingPayment = await query(
+      `SELECT id FROM payments WHERE razorpay_payment_id = $1`,
+      [paymentId]
+    );
+
+    if (existingPayment.rows.length === 0) {
+      // Insert payment record
+      await query(
+        `INSERT INTO payments 
+         (user_id, razorpay_payment_id, razorpay_order_id, amount_inr, currency, status, payment_type, metadata)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        [
+          notes.user_id || null,
+          paymentId,
+          orderId,
+          amountInr,
+          payment.currency || 'INR',
+          'captured',
+          notes.plan_id ? 'one_time' : 'subscription',
+          JSON.stringify(payment),
+        ]
+      );
+
+      // If it's a one-time payment and user_id is provided, upgrade user
+      if (notes.user_id && notes.plan_id) {
+        const planResult = await query(
+          `SELECT * FROM plans WHERE id = $1`,
+          [notes.plan_id]
+        );
+
+        if (planResult.rows.length > 0) {
+          const plan = planResult.rows[0];
+          if (plan.interval === 'one_time') {
+            await query(
+              `UPDATE users 
+               SET is_pro = true, plan_status = 'pro', plan_id = $1
+               WHERE id = $2`,
+              [notes.plan_id, notes.user_id]
+            );
+          }
+        }
+      }
+    } else {
+      // Update existing payment
+      await query(
+        `UPDATE payments 
+         SET status = 'captured', updated_at = CURRENT_TIMESTAMP
+         WHERE razorpay_payment_id = $1`,
+        [paymentId]
+      );
+    }
+  } catch (error) {
+    console.error('Handle payment captured error:', error);
+  }
+}
+
+async function handlePaymentFailed(payment, query) {
+  try {
+    const paymentId = payment.id;
+    const notes = payment.notes || {};
+
+    // Update payment status
+    await query(
+      `INSERT INTO payments 
+       (user_id, razorpay_payment_id, razorpay_order_id, amount_inr, currency, status, payment_type, metadata)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       ON CONFLICT (razorpay_payment_id) 
+       DO UPDATE SET status = 'failed', updated_at = CURRENT_TIMESTAMP`,
+      [
+        notes.user_id || null,
+        paymentId,
+        payment.order_id || null,
+        (payment.amount || 0) / 100,
+        payment.currency || 'INR',
+        'failed',
+        notes.plan_id ? 'one_time' : 'subscription',
+        JSON.stringify(payment),
+      ]
+    );
+  } catch (error) {
+    console.error('Handle payment failed error:', error);
+  }
+}
+
 app.use('/api/subscriptions', subscriptionsRoutes);
+app.use('/api/payments', paymentsRoutes);
 app.use('/api/upload', uploadRoutes);
 
 // Waitlist endpoint
