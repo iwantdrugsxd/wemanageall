@@ -131,6 +131,26 @@ const ensureSessionTable = async () => {
 // Initialize session table before using it
 ensureSessionTable();
 
+// Cookie configuration for development vs production
+const isProduction = process.env.NODE_ENV === 'production';
+const cookieConfig = {
+  httpOnly: true,
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  path: '/', // Cookie available for all paths
+};
+
+// In production, use domain and secure settings
+if (isProduction) {
+  cookieConfig.domain = process.env.COOKIE_DOMAIN || '.wemanageall.in';
+  cookieConfig.secure = true;
+  cookieConfig.sameSite = process.env.SESSION_SAMESITE || 'none';
+} else {
+  // In development, don't set domain (works with localhost)
+  // Use 'lax' for SameSite (works without Secure)
+  cookieConfig.secure = false;
+  cookieConfig.sameSite = 'lax';
+}
+
 const sessionConfig = {
   store: new PgSession({
     pool: pool,
@@ -142,14 +162,7 @@ const sessionConfig = {
   resave: true, // Force save session back to store even if not modified
   saveUninitialized: false, // Don't save uninitialized sessions
   name: 'ofa.sid', // Custom session name
-  cookie: {
-    domain: process.env.COOKIE_DOMAIN || '.wemanageall.in', // Allow subdomain sharing (leading dot)
-    secure: process.env.NODE_ENV === 'production', // Must be true in production for SameSite=None
-    httpOnly: true,
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    sameSite: process.env.SESSION_SAMESITE || 'none', // 'none' allows cross-site AJAX (requires Secure)
-    path: '/', // Cookie available for all paths
-  },
+  cookie: cookieConfig,
   // Keep session alive on activity
   rolling: true, // Reset expiration on every request (keeps active users logged in)
 };

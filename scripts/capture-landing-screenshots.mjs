@@ -66,14 +66,49 @@ async function captureScreenshots() {
     // Step 1: Login
     console.log('📝 Logging in...');
     await page.goto(`${BASE_URL}/login`, { waitUntil: 'networkidle' });
+    await page.waitForTimeout(1000); // Wait for page to load
     
-    // Fill login form
-    await page.fill('input[type="email"], input[name="email"]', EMAIL);
-    await page.fill('input[type="password"], input[name="password"]', PASSWORD);
-    await page.click('button[type="submit"], button:has-text("Sign in"), button:has-text("Login")');
+    // Fill login form - try multiple selectors
+    const emailInput = await page.$('input[type="email"], input[name="email"], input[id*="email"], input[placeholder*="email" i]');
+    const passwordInput = await page.$('input[type="password"], input[name="password"], input[id*="password"], input[placeholder*="password" i]');
     
-    // Wait for navigation after login
-    await page.waitForURL(/^\/(home|dashboard|projects)/, { timeout: 10000 });
+    if (emailInput) {
+      await emailInput.fill(EMAIL);
+    } else {
+      console.error('   ❌ Could not find email input field');
+      throw new Error('Email input not found');
+    }
+    
+    if (passwordInput) {
+      await passwordInput.fill(PASSWORD);
+    } else {
+      console.error('   ❌ Could not find password input field');
+      throw new Error('Password input not found');
+    }
+    
+    // Click submit button - try multiple selectors
+    const submitButton = await page.$('button[type="submit"], button:has-text("Sign in"), button:has-text("Login"), button:has-text("Log in")');
+    if (submitButton) {
+      await submitButton.click();
+    } else {
+      // Try pressing Enter
+      await passwordInput.press('Enter');
+    }
+    
+    // Wait for navigation after login - be more flexible
+    try {
+      await page.waitForURL(/^\/(home|dashboard|projects|$)/, { timeout: 15000 });
+    } catch (e) {
+      // If URL doesn't match, check if we're logged in by checking for common post-login elements
+      await page.waitForTimeout(3000);
+      const currentUrl = page.url();
+      if (!currentUrl.includes('/login')) {
+        console.log(`   ⚠️  Navigated to: ${currentUrl}`);
+      } else {
+        throw new Error('Login failed - still on login page');
+      }
+    }
+    
     await page.waitForTimeout(2000); // Wait for UI to settle
     
     console.log('✅ Logged in successfully\n');
@@ -84,12 +119,14 @@ async function captureScreenshots() {
       await page.goto(`${BASE_URL}/projects`, { waitUntil: 'networkidle' });
       await page.waitForTimeout(1000);
       
-      // Try to find first project link or ID
+      // Try to find first project link or ID (supports both UUID and numeric IDs)
       const projectLink = await page.$('a[href*="/projects/"]');
       if (projectLink) {
         const href = await projectLink.getAttribute('href');
-        const projectId = href.match(/\/projects\/(\d+)/)?.[1];
-        if (projectId) {
+        // Match UUID or numeric ID
+        const projectIdMatch = href.match(/\/projects\/([a-f0-9-]+|\d+)/i);
+        if (projectIdMatch) {
+          const projectId = projectIdMatch[1];
           workspacePath = `/projects/${projectId}`;
           console.log(`   Found project ID: ${projectId}\n`);
         }
