@@ -2,6 +2,83 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Marketing Landing Page Styles - Scoped to .landing */
+.landing {
+  /* Marketing color tokens */
+  --mk-bg: #ffffff;
+  --mk-surface: #fafafa;
+  --mk-ink: #000000;
+  --mk-ink-2: #1a1a1a;
+  --mk-hairline: #e5e5e5;
+  --mk-accent: #f97316;
+  
+  /* Typography */
+  --mk-h1-size: clamp(2.5rem, 5vw + 1rem, 4.5rem);
+  --mk-lead-size: clamp(1.125rem, 1.5vw + 0.5rem, 1.5rem);
+  --mk-section-pad: clamp(3rem, 6vw + 1rem, 6rem);
+}
+
+.dark .landing {
+  --mk-bg: #0a0a0a;
+  --mk-surface: #111111;
+  --mk-ink: #ffffff;
+  --mk-ink-2: #e5e5e5;
+  --mk-hairline: #2a2a2a;
+  --mk-accent: #fb923c;
+}
+
+@layer utilities {
+  /* Marketing utility classes */
+  .landing .mk-grid {
+    background-image: 
+      linear-gradient(var(--mk-hairline) 1px, transparent 1px),
+      linear-gradient(90deg, var(--mk-hairline) 1px, transparent 1px);
+    background-size: 24px 24px;
+    opacity: 0.3;
+  }
+  
+  .landing .mk-noise {
+    position: relative;
+  }
+  
+  .landing .mk-noise::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.02'/%3E%3C/svg%3E");
+    pointer-events: none;
+    opacity: 0.15;
+  }
+  
+  .landing .mk-h1 {
+    font-size: var(--mk-h1-size);
+    line-height: 1.1;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  
+  .landing .mk-lead {
+    font-size: var(--mk-lead-size);
+    line-height: 1.6;
+    color: var(--mk-ink-2);
+  }
+  
+  .landing .mk-section {
+    padding-top: var(--mk-section-pad);
+    padding-bottom: var(--mk-section-pad);
+  }
+  
+  .landing .mk-hairline {
+    border-color: var(--mk-hairline);
+    border-width: 1px;
+  }
+  
+  /* Motion defaults - premium easing */
+  .landing [data-motion] {
+    transition-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+}
+
 /* Dark Theme Palette - CSS Variables */
 :root {
   /* Light Theme (default) */
