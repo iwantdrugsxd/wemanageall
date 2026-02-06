@@ -1,18 +1,24 @@
 import { useState, useRef, useEffect } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion, AnimatePresence } from 'framer-motion';
 import { landingCopy } from './landingCopy';
 import HotspotOverlay from './HotspotOverlay';
 import HoverZoomLens from './HoverZoomLens';
 
-// Hotspot definitions for each step (percentages of image)
+// Map each step to a different feature screenshot
+const stepScreenshots = [
+  { name: 'projects', alt: 'Projects portfolio view' },      // Step 1: Portfolio
+  { name: 'workspace', alt: 'Project workspace view' },     // Step 2: Workspace
+  { name: 'calendar', alt: 'Calendar view' },               // Step 3: Calendar
+  { name: 'resources', alt: 'Resources library view' }      // Step 4: Resources
+];
+
+// Hotspot definitions for each step (optional - can be null if no hotspot needed)
 const hotspots = [
   { xPct: 5, yPct: 10, wPct: 90, hPct: 25 }, // Step 1: Portfolio table
   { xPct: 10, yPct: 30, wPct: 80, hPct: 60 }, // Step 2: Workspace context
-  { xPct: 60, yPct: 5, wPct: 35, hPct: 30 }, // Step 3: Calendar blocks
+  null, // Step 3: Calendar - no hotspot, show full image
   { xPct: 5, yPct: 60, wPct: 40, hPct: 35 }  // Step 4: Resources sidebar
 ];
-
-const pinnedImage = 'projects-light.png'; // Best representative screenshot
 
 export default function PinnedStory() {
   const shouldReduceMotion = useReducedMotion();
@@ -41,23 +47,24 @@ export default function PinnedStory() {
     };
   }, []);
   
-  // Transform image based on active step
-  // Calculate transforms based on active step
+  // Get current screenshot for active step
+  const currentScreenshot = stepScreenshots[activeStep] || stepScreenshots[0];
+  const imageSrc = `/landing/screens/${currentScreenshot.name}-light.png`;
+  
+  // Transform image based on active step (if hotspot exists)
   const getImageTransform = () => {
     if (shouldReduceMotion || !hotspots[activeStep]) {
       return { scale: 1, x: 0, y: 0 };
     }
     const hotspot = hotspots[activeStep];
     return {
-      scale: 1.2,
-      x: -(hotspot.xPct + hotspot.wPct / 2 - 50) * 0.3,
-      y: -(hotspot.yPct + hotspot.hPct / 2 - 50) * 0.3
+      scale: 1.15,
+      x: -(hotspot.xPct + hotspot.wPct / 2 - 50) * 0.2,
+      y: -(hotspot.yPct + hotspot.hPct / 2 - 50) * 0.2
     };
   };
   
   const imageTransform = getImageTransform();
-  
-  const imageSrc = `/landing/screens/${pinnedImage}`;
   
   return (
     <section
@@ -97,31 +104,45 @@ export default function PinnedStory() {
           {/* Right: Sticky pinned image */}
           <div className="lg:sticky lg:top-24 h-fit">
             <div className="relative aspect-[16/10] rounded-lg overflow-hidden mk-hairline shadow-2xl" style={{ borderWidth: '1px' }}>
-              <HoverZoomLens imageSrc={imageSrc} imageAlt="Projects workspace view">
+              <AnimatePresence mode="wait">
                 <motion.div
+                  key={activeStep}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 1.05 }}
+                  transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
                   className="absolute inset-0"
-                  animate={{
-                    scale: imageTransform.scale,
-                    x: imageTransform.x,
-                    y: imageTransform.y
-                  }}
-                  transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
-                  style={{
-                    transformOrigin: 'center center'
-                  }}
                 >
-                  <img
-                    src={imageSrc}
-                    srcSet={`${imageSrc} 1x, ${imageSrc.replace('-light.png', '-light.png')} 2x`}
-                    alt="Projects workspace view"
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                    decoding="async"
-                  />
+                  <HoverZoomLens imageSrc={imageSrc} imageAlt={currentScreenshot.alt}>
+                    <motion.div
+                      className="absolute inset-0"
+                      animate={{
+                        scale: imageTransform.scale,
+                        x: imageTransform.x,
+                        y: imageTransform.y
+                      }}
+                      transition={{ duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
+                      style={{
+                        transformOrigin: 'center center'
+                      }}
+                    >
+                      <img
+                        src={imageSrc}
+                        srcSet={`${imageSrc} 1x, ${imageSrc} 2x`}
+                        alt={currentScreenshot.alt}
+                        className="w-full h-full object-cover"
+                        loading={activeStep === 0 ? 'eager' : 'lazy'}
+                        fetchPriority={activeStep === 0 ? 'high' : 'auto'}
+                        decoding="async"
+                      />
+                    </motion.div>
+                  </HoverZoomLens>
+                  
+                  {hotspots[activeStep] && (
+                    <HotspotOverlay hotspot={hotspots[activeStep]} isActive={true} />
+                  )}
                 </motion.div>
-              </HoverZoomLens>
-              
-              <HotspotOverlay hotspot={hotspots[activeStep]} isActive={true} />
+              </AnimatePresence>
             </div>
           </div>
         </div>
