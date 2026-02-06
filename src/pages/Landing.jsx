@@ -88,16 +88,32 @@ function Navbar() {
   );
 }
 
-// Hero - Cinematic Screen Mosaic
+// Hero - Cinematic Screen Mosaic with Shuffling
 function Hero() {
   const shouldReduceMotion = useReducedMotion();
   const { scrollY } = useScroll();
   const containerRef = useRef(null);
+  const [activeScreen, setActiveScreen] = useState(0);
+  
+  const screens = [
+    { name: 'dashboard', title: 'Dashboard' },
+    { name: 'projects', title: 'Projects' },
+    { name: 'calendar', title: 'Calendar' }
+  ];
+  
+  // Shuffle between screens
+  useEffect(() => {
+    if (shouldReduceMotion) return;
+    
+    const interval = setInterval(() => {
+      setActiveScreen((prev) => (prev + 1) % screens.length);
+    }, 4000); // Change screen every 4 seconds
+    
+    return () => clearInterval(interval);
+  }, [shouldReduceMotion, screens.length]);
   
   // Parallax transforms
   const y1 = useTransform(scrollY, [0, 500], [0, 100]);
-  const y2 = useTransform(scrollY, [0, 500], [0, 80]);
-  const y3 = useTransform(scrollY, [0, 500], [0, 60]);
   const opacity = useTransform(scrollY, [0, 300], [1, 0.8]);
   
   // Pointer parallax
@@ -109,8 +125,8 @@ function Hero() {
       const rect = containerRef.current?.getBoundingClientRect();
       if (rect) {
         setMousePosition({
-          x: (e.clientX - rect.left - rect.width / 2) / rect.width * 20,
-          y: (e.clientY - rect.top - rect.height / 2) / rect.height * 20
+          x: (e.clientX - rect.left - rect.width / 2) / rect.width * 30,
+          y: (e.clientY - rect.top - rect.height / 2) / rect.height * 30
         });
       }
     };
@@ -184,54 +200,58 @@ function Hero() {
             </p>
           </motion.div>
 
-          {/* Right: Screen Mosaic */}
+          {/* Right: Large Screen Card with Shuffling */}
           <div 
             ref={containerRef}
-            className="hidden lg:block relative h-[600px]"
+            className="hidden lg:block relative h-[700px] lg:h-[800px]"
           >
-            {/* Main Dashboard Screen */}
             <motion.div
               style={{ 
                 y: shouldReduceMotion ? 0 : y1,
                 opacity: shouldReduceMotion ? 1 : opacity,
-                x: shouldReduceMotion ? 0 : mousePosition.x * 0.5,
-                rotateY: shouldReduceMotion ? 0 : mousePosition.x * 0.02
-              }}
-              className="absolute top-0 right-0 w-full max-w-md"
-            >
-              <BrowserFrame title="Dashboard">
-                <ScreenImage name="dashboard" alt="Dashboard view" priority className="w-full h-auto" />
-              </BrowserFrame>
-            </motion.div>
-            
-            {/* Projects Screen - Layered */}
-            <motion.div
-              style={{ 
-                y: shouldReduceMotion ? 0 : y2,
-                opacity: shouldReduceMotion ? 1 : opacity,
                 x: shouldReduceMotion ? 0 : mousePosition.x * 0.3,
-                rotateY: shouldReduceMotion ? 0 : mousePosition.x * 0.01
+                y: shouldReduceMotion ? 0 : mousePosition.y * 0.3,
+                rotateY: shouldReduceMotion ? 0 : mousePosition.x * 0.03,
+                rotateX: shouldReduceMotion ? 0 : -mousePosition.y * 0.02,
+                scale: shouldReduceMotion ? 1 : 1 + (Math.abs(mousePosition.x) + Math.abs(mousePosition.y)) * 0.001
               }}
-              className="absolute top-16 right-8 w-full max-w-sm -z-10 opacity-90"
+              className="absolute inset-0 w-full"
             >
-              <BrowserFrame title="Projects">
-                <ScreenImage name="projects" alt="Projects view" className="w-full h-auto" />
-              </BrowserFrame>
-            </motion.div>
-            
-            {/* Calendar Screen - Depth Layer */}
-            <motion.div
-              style={{ 
-                y: shouldReduceMotion ? 0 : y3,
-                opacity: shouldReduceMotion ? 0.7 : opacity,
-                x: shouldReduceMotion ? 0 : mousePosition.x * 0.2,
-                rotateY: shouldReduceMotion ? 0 : mousePosition.x * 0.005
-              }}
-              className="absolute top-32 right-16 w-full max-w-xs -z-20 opacity-70"
-            >
-              <BrowserFrame title="Calendar">
-                <ScreenImage name="calendar" alt="Calendar view" className="w-full h-auto" />
-              </BrowserFrame>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeScreen}
+                  initial={shouldReduceMotion ? {} : { opacity: 0, scale: 0.95, y: 20 }}
+                  animate={shouldReduceMotion ? {} : { opacity: 1, scale: 1, y: 0 }}
+                  exit={shouldReduceMotion ? {} : { opacity: 0, scale: 1.05, y: -20 }}
+                  transition={{ duration: 0.6, ease: "easeInOut" }}
+                  className="absolute inset-0"
+                >
+                  <BrowserFrame title={screens[activeScreen].title} className="h-full w-full">
+                    <ScreenImage 
+                      name={screens[activeScreen].name} 
+                      alt={`${screens[activeScreen].title} view`} 
+                      priority 
+                      className="w-full h-full object-cover" 
+                    />
+                  </BrowserFrame>
+                </motion.div>
+              </AnimatePresence>
+              
+              {/* Floating animation overlay */}
+              {!shouldReduceMotion && (
+                <motion.div
+                  className="absolute -inset-4 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-2xl blur-2xl -z-10"
+                  animate={{
+                    scale: [1, 1.1, 1],
+                    rotate: [0, 5, 0],
+                  }}
+                  transition={{
+                    duration: 8,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                />
+              )}
             </motion.div>
           </div>
         </div>
