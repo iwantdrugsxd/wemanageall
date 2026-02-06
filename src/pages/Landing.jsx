@@ -3,178 +3,207 @@ import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { motion, useScroll, useTransform, useMotionValueEvent, useReducedMotion, AnimatePresence } from 'framer-motion';
 
-// Preview Shell Component
-function PreviewShell({ title, children, large = false }) {
+// RealScreenFrame - Browser chrome wrapper
+function RealScreenFrame({ title, children, scale = 1 }) {
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden ${large ? 'shadow-xl' : ''}`}>
+    <div 
+      className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden"
+      style={{ transform: `scale(${scale})`, transformOrigin: 'top left' }}
+    >
       {/* Browser Chrome */}
       <div className="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-3 py-2 flex items-center gap-2">
         <div className="flex gap-1.5">
           <div className="w-2.5 h-2.5 rounded-full bg-red-400"></div>
           <div className="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
           <div className="w-2.5 h-2.5 rounded-full bg-green-400"></div>
-            </div>
+      </div>
         <div className="flex-1 bg-white dark:bg-gray-800 rounded px-2 py-1 text-[10px] text-gray-500 dark:text-gray-400 ml-2 border border-gray-200 dark:border-gray-700">
           wemanageall.in/{title.toLowerCase().replace(/\s+/g, '')}
-      </div>
-      </div>
+        </div>
+        </div>
       {/* Content */}
-      <div className={`bg-white dark:bg-gray-800 ${large ? 'p-6' : 'p-4'}`}>
+      <div className="bg-white dark:bg-gray-800 p-6">
         {children}
       </div>
     </div>
   );
 }
 
-// Dashboard Preview (Today)
-function DashboardPreview() {
+// Full-fidelity Dashboard Screen
+function DashboardScreen() {
   return (
-    <div className="space-y-4">
+    <div className="space-y-6" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
       {/* Header */}
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold text-black dark:text-white mb-1">Today</h3>
-        <p className="text-xs text-gray-500 dark:text-gray-400">Good morning, there • Dec 19, 2024 • 9:42 AM</p>
+      <div className="mb-6">
+        <h1 className="text-3xl font-light text-black dark:text-white mb-2">Today</h1>
+        <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
+          <span>Good morning, there</span>
+          <span>•</span>
+          <span>MONDAY, DECEMBER 19, 2024</span>
+          <span>•</span>
+          <span className="px-2 py-0.5 rounded-md bg-gray-100 dark:bg-gray-800 text-xs font-medium">9:42 AM</span>
         </div>
-      
+        </div>
+
       {/* KPI Strip */}
-      <div className="grid grid-cols-4 gap-2 mb-4">
+      <div className="grid grid-cols-4 gap-3 mb-6">
         {[
-          { label: 'Objectives', value: '3/5' },
-          { label: 'Planned', value: '4h' },
-          { label: 'Spent', value: '2h' },
-          { label: 'Upcoming', value: '2' }
+          { label: 'Objectives', value: '3/5', subValue: '60%' },
+          { label: 'Planned', value: '4h', subValue: null },
+          { label: 'Spent', value: '2h', subValue: null },
+          { label: 'Upcoming', value: '2', subValue: 'events' }
         ].map((kpi, i) => (
-          <div key={i} className="bg-gray-50 dark:bg-gray-900/50 rounded-md p-2 border border-gray-200 dark:border-gray-800">
-            <div className="text-[10px] text-gray-500 dark:text-gray-400 mb-0.5">{kpi.label}</div>
-            <div className="text-sm font-semibold text-black dark:text-white">{kpi.value}</div>
+          <div key={i} className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3 border border-gray-200 dark:border-gray-800">
+            <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{kpi.label}</div>
+            <div className="text-lg font-semibold text-black dark:text-white">{kpi.value}</div>
+            {kpi.subValue && <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{kpi.subValue}</div>}
           </div>
         ))}
-        </div>
-      
-      {/* Today's Intention */}
-      <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3 border border-gray-200 dark:border-gray-800">
-        <div className="text-[10px] uppercase text-gray-500 dark:text-gray-400 mb-2 font-semibold">Today's Intention</div>
-        <p className="text-xs text-gray-700 dark:text-gray-200">Focus on shipping the new feature</p>
       </div>
 
+      {/* Today's Intention */}
+      <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 border border-gray-200 dark:border-gray-800">
+        <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3 font-semibold">Today's Intention</div>
+        <p className="text-sm text-gray-700 dark:text-gray-200">Focus on shipping the new feature</p>
+              </div>
+
       {/* Daily Objectives */}
-      <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3 border border-gray-200 dark:border-gray-800">
-        <div className="text-[10px] uppercase text-gray-500 dark:text-gray-400 mb-2 font-semibold">Daily Objectives</div>
-        <div className="space-y-1.5">
+      <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 border border-gray-200 dark:border-gray-800">
+        <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3 font-semibold">Daily Objectives</div>
+        <div className="space-y-2">
           {['Review PR feedback', 'Update documentation', 'Team standup'].map((task, i) => (
-            <div key={i} className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-200">
-              <div className="w-3 h-3 rounded border border-gray-300 dark:border-gray-600"></div>
+            <div key={i} className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-200">
+              <div className="w-4 h-4 rounded border border-gray-300 dark:border-gray-600"></div>
               <span>{task}</span>
             </div>
           ))}
           </div>
         </div>
 
-      {/* Schedule Widget */}
-      <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3 border border-gray-200 dark:border-gray-800">
-        <div className="text-[10px] uppercase text-gray-500 dark:text-gray-400 mb-2 font-semibold">Agenda</div>
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-2 text-xs">
-            <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+      {/* Agenda */}
+      <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 border border-gray-200 dark:border-gray-800">
+        <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3 font-semibold">Agenda</div>
+        <div className="space-y-2">
+          <div className="flex items-center gap-3 text-sm">
+            <div className="w-2 h-2 rounded-full bg-blue-500"></div>
             <span className="text-gray-700 dark:text-gray-200">10:00 AM - Team standup</span>
-            </div>
-          <div className="flex items-center gap-2 text-xs">
-            <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+                </div>
+          <div className="flex items-center gap-3 text-sm">
+            <div className="w-2 h-2 rounded-full bg-green-500"></div>
             <span className="text-gray-700 dark:text-gray-200">2:00 PM - Deep work session</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Projects Preview
-function ProjectsPreview() {
-  return (
-    <div className="space-y-3">
-      {/* Header */}
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold text-black dark:text-white mb-1">Projects</h3>
-        <p className="text-xs text-gray-500 dark:text-gray-400">Your project portfolio</p>
-        </div>
-
-      {/* Table Header */}
-      <div className="grid grid-cols-6 gap-2 text-[10px] uppercase text-gray-500 dark:text-gray-400 font-semibold mb-2 pb-2 border-b border-gray-200 dark:border-gray-700">
-        <div>Name</div>
-        <div>Status</div>
-        <div>Progress</div>
-        <div>Start</div>
-        <div>Tags</div>
-        <div></div>
-      </div>
-
-      {/* Project Rows */}
-      <div className="space-y-1.5">
-        {[
-          { name: 'Q1 Launch', status: 'In Progress', progress: '65%', start: 'Jan 1', tags: 'Product' },
-          { name: 'Website Redesign', status: 'Planning', progress: '20%', start: 'Jan 15', tags: 'Design' },
-          { name: 'Mobile App', status: 'In Progress', progress: '45%', start: 'Dec 1', tags: 'Engineering' }
-        ].map((project, i) => (
-          <div key={i} className="grid grid-cols-6 gap-2 items-center py-1.5 hover:bg-gray-50 dark:hover:bg-gray-900/50 rounded text-xs">
-            <div className="font-medium text-black dark:text-white">{project.name}</div>
-            <div className="text-gray-600 dark:text-gray-400">{project.status}</div>
-            <div className="text-gray-600 dark:text-gray-400">{project.progress}</div>
-            <div className="text-gray-600 dark:text-gray-400">{project.start}</div>
-            <div className="text-gray-600 dark:text-gray-400">{project.tags}</div>
-            <div className="text-right">⋯</div>
               </div>
-        ))}
+              </div>
+              </div>
+            </div>
+  );
+}
+
+// Full-fidelity Projects Screen
+function ProjectsScreen() {
+  return (
+    <div className="space-y-4" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+      {/* Header */}
+      <div className="mb-6">
+        <h1 className="text-3xl font-light text-black dark:text-white mb-2">Projects</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400">Your project portfolio</p>
+              </div>
+
+      {/* Table */}
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 dark:text-gray-400">Name</th>
+              <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 dark:text-gray-400">Status</th>
+              <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 dark:text-gray-400">Progress</th>
+              <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 dark:text-gray-400">Start Date</th>
+              <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 dark:text-gray-400">Tags</th>
+            </tr>
+          </thead>
+          <tbody>
+            {[
+              { name: 'Q1 Launch', status: 'In Progress', progress: '65%', start: 'Jan 1, 2024', tags: 'Product' },
+              { name: 'Website Redesign', status: 'Planning', progress: '20%', start: 'Jan 15, 2024', tags: 'Design' },
+              { name: 'Mobile App', status: 'In Progress', progress: '45%', start: 'Dec 1, 2024', tags: 'Engineering' }
+            ].map((project, i) => (
+              <tr key={i} className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900/50">
+                <td className="py-3 px-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-base">PROJ</span>
+              <div>
+                      <div className="font-medium text-sm text-black dark:text-white">{project.name}</div>
+              </div>
+              </div>
+                </td>
+                <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">{project.status}</td>
+                <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">{project.progress}</td>
+                <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">{project.start}</td>
+                <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">{project.tags}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
 }
 
-// Project Workspace Preview (Board View)
-function ProjectWorkspacePreview() {
+// Full-fidelity Workspace Screen (Board View)
+function WorkspaceScreen() {
   return (
-    <div className="space-y-3">
+    <div className="space-y-4" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
       {/* Header */}
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold text-black dark:text-white mb-1">Q1 Launch</h3>
-        <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-          <span className="font-semibold text-black dark:text-white">Board</span>
-          <span>•</span>
-          <span>List</span>
-          <span>•</span>
-          <span>Timeline</span>
-          <span>•</span>
-          <span>Notes</span>
+      <div className="mb-6">
+        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-2">
+          <span>Projects</span>
+          <span>/</span>
+          <span className="text-black dark:text-white">Q1 Launch</span>
+      </div>
+        <h1 className="text-3xl font-light text-black dark:text-white mb-4">Q1 Launch</h1>
+        <div className="flex items-center gap-1 border-b border-gray-200 dark:border-gray-700">
+          {['Board', 'List', 'Timeline', 'Notes'].map((view, i) => (
+            <button
+              key={i}
+              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                i === 0
+                  ? 'text-black dark:text-white border-black dark:border-white'
+                  : 'text-gray-500 dark:text-gray-400 border-transparent hover:text-black dark:hover:text-white'
+              }`}
+            >
+              {view}
+          </button>
+          ))}
         </div>
       </div>
 
       {/* Board Columns */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-3 gap-4">
         {['To Do', 'In Progress', 'Done'].map((col, i) => (
-          <div key={i} className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-2 border border-gray-200 dark:border-gray-800">
-            <div className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">{col}</div>
+          <div key={i} className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3 border border-gray-200 dark:border-gray-800">
+            <div className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">{col}</div>
             <div className="space-y-2">
               {i === 0 && (
                 <>
-                  <div className="bg-white dark:bg-gray-800 rounded p-2 text-xs border border-gray-200 dark:border-gray-700">
+                  <div className="bg-white dark:bg-gray-800 rounded p-3 text-sm border border-gray-200 dark:border-gray-700">
                     <div className="font-medium text-black dark:text-white mb-1">Design mockups</div>
-                    <div className="text-gray-500 dark:text-gray-400 text-[10px]">Due: Jan 20</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">Due: Jan 20, 2024</div>
           </div>
-                  <div className="bg-white dark:bg-gray-800 rounded p-2 text-xs border border-gray-200 dark:border-gray-700">
+                  <div className="bg-white dark:bg-gray-800 rounded p-3 text-sm border border-gray-200 dark:border-gray-700">
                     <div className="font-medium text-black dark:text-white mb-1">User research</div>
-                    <div className="text-gray-500 dark:text-gray-400 text-[10px]">Due: Jan 22</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">Due: Jan 22, 2024</div>
             </div>
                 </>
               )}
               {i === 1 && (
-                <div className="bg-white dark:bg-gray-800 rounded p-2 text-xs border border-gray-200 dark:border-gray-700">
+                <div className="bg-white dark:bg-gray-800 rounded p-3 text-sm border border-gray-200 dark:border-gray-700">
                   <div className="font-medium text-black dark:text-white mb-1">API integration</div>
-                  <div className="text-gray-500 dark:text-gray-400 text-[10px]">Due: Jan 18</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">Due: Jan 18, 2024</div>
             </div>
               )}
               {i === 2 && (
-                <div className="bg-white dark:bg-gray-800 rounded p-2 text-xs border border-gray-200 dark:border-gray-700 opacity-60">
+                <div className="bg-white dark:bg-gray-800 rounded p-3 text-sm border border-gray-200 dark:border-gray-700 opacity-60">
                   <div className="font-medium text-black dark:text-white mb-1">Project setup</div>
-                  <div className="text-gray-500 dark:text-gray-400 text-[10px]">Completed</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">Completed</div>
           </div>
               )}
         </div>
@@ -185,40 +214,52 @@ function ProjectWorkspacePreview() {
   );
 }
 
-// Calendar Preview (Week View)
-function CalendarPreview() {
+// Full-fidelity Calendar Screen (Week View)
+function CalendarScreen() {
   return (
-    <div className="space-y-3">
+    <div className="space-y-4" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
       {/* Header */}
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold text-black dark:text-white mb-1">Calendar</h3>
-        <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-          <span className="px-2 py-0.5 bg-black dark:bg-white text-white dark:text-black rounded font-semibold">Week</span>
-          <span>Day</span>
-          <span>Month</span>
+      <div className="mb-6">
+        <h1 className="text-3xl font-light text-black dark:text-white mb-4">Calendar</h1>
+        <div className="flex items-center gap-2">
+          {['Week', 'Day', 'Month'].map((view, i) => (
+            <button
+              key={i}
+              className={`px-3 py-1 text-sm rounded ${
+                i === 0
+                  ? 'bg-black dark:bg-white text-white dark:text-black font-semibold'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white'
+              }`}
+            >
+              {view}
+            </button>
+          ))}
         </div>
                 </div>
       
       {/* Week Grid */}
-      <div className="grid grid-cols-7 gap-1 mb-2">
+      <div className="grid grid-cols-7 gap-1 mb-4">
         {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, i) => (
           <div key={i} className="text-center">
-            <div className="text-[10px] text-gray-500 dark:text-gray-400 mb-1">{day}</div>
-            <div className="text-xs font-semibold text-black dark:text-white">{19 + i}</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{day}</div>
+            <div className="text-sm font-semibold text-black dark:text-white">{19 + i}</div>
             </div>
           ))}
         </div>
 
       {/* Time Slots */}
-      <div className="space-y-1.5">
+      <div className="space-y-2">
         {[
-          { time: '9:00 AM', event: 'Team standup', color: 'bg-blue-100 dark:bg-blue-900' },
-          { time: '2:00 PM', event: 'Deep work', color: 'bg-green-100 dark:bg-green-900' },
-          { time: '4:00 PM', event: 'Client call', color: 'bg-purple-100 dark:bg-purple-900' }
+          { time: '9:00 AM', event: 'Team standup', color: '#3B6E5C' },
+          { time: '2:00 PM', event: 'Deep work', color: '#4A90E2' },
+          { time: '4:00 PM', event: 'Client call', color: '#F5A623' }
         ].map((item, i) => (
-          <div key={i} className="flex items-center gap-2 text-xs">
-            <div className="w-12 text-gray-500 dark:text-gray-400 text-[10px]">{item.time}</div>
-            <div className={`flex-1 rounded px-2 py-1 ${item.color} text-gray-700 dark:text-gray-200`}>
+          <div key={i} className="flex items-center gap-3 text-sm">
+            <div className="w-16 text-gray-500 dark:text-gray-400 text-xs">{item.time}</div>
+            <div 
+              className="flex-1 rounded px-3 py-2 text-gray-700 dark:text-gray-200"
+              style={{ backgroundColor: `${item.color}20` }}
+            >
               {item.event}
           </div>
         </div>
@@ -228,34 +269,34 @@ function CalendarPreview() {
   );
 }
 
-// Resources Preview
-function ResourcesPreview() {
+// Full-fidelity Resources Screen
+function ResourcesScreen() {
   return (
-    <div className="space-y-3">
+    <div className="space-y-4" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
       {/* Header */}
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold text-black dark:text-white mb-1">Resources</h3>
-        <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-          <span className="border-b-2 border-black dark:border-white font-semibold text-black dark:text-white">All</span>
-          <span>Programming</span>
-          <span>Design</span>
+      <div className="mb-6">
+        <h1 className="text-3xl font-light text-black dark:text-white mb-4">Resources</h1>
+        <div className="flex items-center gap-4 text-sm">
+          <span className="border-b-2 border-black dark:border-white font-semibold text-black dark:text-white pb-1">All</span>
+          <span className="text-gray-500 dark:text-gray-400">Programming</span>
+          <span className="text-gray-500 dark:text-gray-400">Design</span>
           </div>
         </div>
 
       {/* Resource Cards */}
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-4">
         {[
-          { title: 'Clean Code', author: 'Robert C. Martin', progress: '33%' },
-          { title: 'React Patterns', author: 'Lars Grammel', progress: '15%' }
+          { title: 'Clean Code', author: 'Robert C. Martin', progress: 33 },
+          { title: 'React Patterns', author: 'Lars Grammel', progress: 15 }
         ].map((resource, i) => (
-          <div key={i} className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-2 border border-gray-200 dark:border-gray-800">
-            <div className="h-16 bg-gray-200 dark:bg-gray-700 rounded mb-2 flex items-center justify-center">
-              <span className="text-[10px] text-gray-500 dark:text-gray-400">PDF</span>
+          <div key={i} className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 border border-gray-200 dark:border-gray-800">
+            <div className="h-24 bg-gray-200 dark:bg-gray-700 rounded mb-3 flex items-center justify-center">
+              <span className="text-xs text-gray-500 dark:text-gray-400 uppercase">PDF</span>
                 </div>
-            <div className="text-xs font-semibold text-black dark:text-white mb-1">{resource.title}</div>
-            <div className="text-[10px] text-gray-500 dark:text-gray-400 mb-1">{resource.author}</div>
+            <div className="text-sm font-semibold text-black dark:text-white mb-1">{resource.title}</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">{resource.author}</div>
             <div className="h-1 bg-gray-200 dark:bg-gray-700 rounded overflow-hidden">
-              <div className="h-full bg-black dark:bg-white" style={{ width: resource.progress }}></div>
+              <div className="h-full bg-black dark:bg-white" style={{ width: `${resource.progress}%` }}></div>
               </div>
           </div>
         ))}
@@ -264,32 +305,32 @@ function ResourcesPreview() {
   );
 }
 
-// Lists Preview
-function ListsPreview() {
+// Full-fidelity Lists Screen
+function ListsScreen() {
   return (
-      <div className="space-y-3">
+    <div className="space-y-4" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
       {/* Header */}
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold text-black dark:text-white mb-1">Lists</h3>
-        <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-          <span className="border-b-2 border-black dark:border-white font-semibold text-black dark:text-white">All Lists</span>
-          <span>Recent</span>
-          <span>Pinned</span>
-            </div>
-          </div>
+      <div className="mb-6">
+        <h1 className="text-3xl font-light text-black dark:text-white mb-4">Lists</h1>
+        <div className="flex items-center gap-4 text-sm">
+          <span className="border-b-2 border-black dark:border-white font-semibold text-black dark:text-white pb-1">All Lists</span>
+          <span className="text-gray-500 dark:text-gray-400">Recent</span>
+          <span className="text-gray-500 dark:text-gray-400">Pinned</span>
+      </div>
+      </div>
 
       {/* List Cards */}
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-4">
         {[
-          { name: 'Movies to Watch', items: '12 items', progress: '33%' },
-          { name: 'Books to Read', items: '8 items', progress: '50%' }
+          { name: 'Movies to Watch', items: '12 items', progress: 33 },
+          { name: 'Books to Read', items: '8 items', progress: 50 }
         ].map((list, i) => (
-          <div key={i} className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-2 border border-gray-200 dark:border-gray-800">
-            <div className="h-12 bg-gradient-to-br from-gray-800 to-gray-600 rounded mb-2"></div>
-            <div className="text-xs font-semibold text-black dark:text-white mb-1">{list.name}</div>
-            <div className="flex items-center justify-between text-[10px] text-gray-500 dark:text-gray-400">
+          <div key={i} className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 border border-gray-200 dark:border-gray-800">
+            <div className="h-20 bg-gradient-to-br from-gray-800 to-gray-600 rounded mb-3"></div>
+            <div className="text-sm font-semibold text-black dark:text-white mb-1">{list.name}</div>
+            <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
               <span>{list.items}</span>
-              <span>{list.progress}</span>
+              <span>{list.progress}%</span>
             </div>
                 </div>
         ))}
@@ -343,15 +384,15 @@ function Navbar() {
   );
 }
 
-// Hero Section (Kinetic/Cinematic)
+// Hero Section
 function Hero() {
   const shouldReduceMotion = useReducedMotion();
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 500], [0, 150]);
   const y2 = useTransform(scrollY, [0, 500], [0, 100]);
-  const y3 = useTransform(scrollY, [0, 500], [0, 50]);
+  const y3 = useTransform(scrollY, [0, 300], [0, 50]);
   const opacity = useTransform(scrollY, [0, 300], [1, 0]);
-  
+
   return (
     <section className="relative min-h-screen flex items-center px-6 lg:px-12 pt-24 pb-20 bg-white dark:bg-gray-900 overflow-hidden">
       {/* Animated Background Layers */}
@@ -388,26 +429,26 @@ function Hero() {
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-display font-semibold text-black dark:text-white mb-6 leading-tight">
-              Run your startup from one living system.
-            </h1>
+              Run your startup from one operating system.
+          </h1>
             <p className="text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-xl leading-relaxed">
-              WeManageAll unifies projects, execution, calendar, and knowledge into one calm operating system.
+              WeManageAll unifies projects, resources, calendar, and execution into one calm command center.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 mb-6">
-              <Link 
-                to="/signup" 
+          <Link 
+            to="/signup" 
                 className="px-8 py-4 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-gray-900 dark:hover:bg-gray-100 transition-colors text-sm font-medium text-center"
-              >
+          >
                 Start free
-              </Link>
-              <a 
+            </Link>
+          <a 
                 href="#features" 
                 className="px-8 py-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-black dark:text-white rounded-lg hover:border-black dark:hover:border-white transition-colors text-sm font-medium text-center"
-              >
+          >
                 Book a demo
-              </a>
-            </div>
+            </a>
+          </div>
             
             <p className="text-sm text-gray-500 dark:text-gray-500">
               No credit card required.
@@ -423,9 +464,9 @@ function Hero() {
               }}
               className="absolute top-0 right-0 w-full max-w-md"
             >
-              <PreviewShell title="Dashboard" large>
-                <DashboardPreview />
-              </PreviewShell>
+              <RealScreenFrame title="Dashboard">
+                <DashboardScreen />
+              </RealScreenFrame>
             </motion.div>
             
             <motion.div
@@ -435,9 +476,9 @@ function Hero() {
               }}
               className="absolute top-20 right-10 w-full max-w-md -z-10 blur-sm"
             >
-              <PreviewShell title="Projects">
-                <ProjectsPreview />
-              </PreviewShell>
+              <RealScreenFrame title="Projects">
+                <ProjectsScreen />
+              </RealScreenFrame>
             </motion.div>
             
             <motion.div
@@ -447,9 +488,9 @@ function Hero() {
               }}
               className="absolute top-40 right-20 w-full max-w-md -z-20 blur-md opacity-50"
             >
-              <PreviewShell title="Calendar">
-                <CalendarPreview />
-              </PreviewShell>
+              <RealScreenFrame title="Calendar">
+                <CalendarScreen />
+              </RealScreenFrame>
             </motion.div>
           </div>
         </div>
@@ -458,8 +499,8 @@ function Hero() {
   );
 }
 
-// Product is Alive Band (Animated Stats + Marquee)
-function ProductAliveBand() {
+// System Overview Band
+function SystemOverviewBand() {
   const shouldReduceMotion = useReducedMotion();
   const [counters, setCounters] = useState({ teams: 0, tasks: 0, hours: 0 });
   
@@ -496,15 +537,30 @@ function ProductAliveBand() {
   }, [shouldReduceMotion]);
   
   const keywords = ['Projects', 'Calendar', 'Work', 'Docs', 'Resources', 'Lists', 'Execution', 'Knowledge'];
-  
+
   return (
-    <section className="py-16 px-6 lg:px-12 bg-black dark:bg-gray-950 text-white border-y border-gray-800">
+    <section className="py-20 px-6 lg:px-12 bg-gray-50 dark:bg-gray-950 border-y border-gray-200 dark:border-gray-800">
       <div className="max-w-7xl mx-auto">
+        <motion.div
+          className="text-center mb-12"
+          initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
+          whileInView={shouldReduceMotion ? {} : { opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <h2 className="text-3xl md:text-4xl font-display font-semibold text-black dark:text-white mb-4">
+            One system, every workflow.
+        </h2>
+          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            Execution, planning, and knowledge live on one shared spine. Nothing is lost.
+          </p>
+        </motion.div>
+
         {/* Animated Counters */}
         <div className="grid grid-cols-3 gap-8 mb-12">
           <div className="text-center">
             <motion.div 
-              className="text-4xl md:text-5xl font-display font-semibold mb-2"
+              className="text-4xl md:text-5xl font-display font-semibold mb-2 text-black dark:text-white"
               initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
               whileInView={shouldReduceMotion ? {} : { opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -512,11 +568,11 @@ function ProductAliveBand() {
             >
               {counters.teams.toLocaleString()}+
             </motion.div>
-            <div className="text-sm text-gray-400">Teams</div>
-          </div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">Teams</div>
+            </div>
           <div className="text-center">
             <motion.div 
-              className="text-4xl md:text-5xl font-display font-semibold mb-2"
+              className="text-4xl md:text-5xl font-display font-semibold mb-2 text-black dark:text-white"
               initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
               whileInView={shouldReduceMotion ? {} : { opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -524,11 +580,11 @@ function ProductAliveBand() {
             >
               {counters.tasks.toLocaleString()}
             </motion.div>
-            <div className="text-sm text-gray-400">Tasks completed</div>
-          </div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">Tasks completed</div>
+        </div>
           <div className="text-center">
             <motion.div 
-              className="text-4xl md:text-5xl font-display font-semibold mb-2"
+              className="text-4xl md:text-5xl font-display font-semibold mb-2 text-black dark:text-white"
               initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
               whileInView={shouldReduceMotion ? {} : { opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -536,8 +592,8 @@ function ProductAliveBand() {
             >
               {counters.hours.toLocaleString()}
             </motion.div>
-            <div className="text-sm text-gray-400">Hours tracked</div>
-          </div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">Hours tracked</div>
+      </div>
         </div>
         
         {/* Marquee */}
@@ -557,9 +613,9 @@ function ProductAliveBand() {
             }}
           >
             {[...keywords, ...keywords, ...keywords].map((keyword, i) => (
-              <div key={i} className="text-2xl md:text-3xl font-display font-light text-gray-400 whitespace-nowrap">
+              <div key={i} className="text-2xl md:text-3xl font-display font-light text-gray-400 dark:text-gray-500 whitespace-nowrap">
                 {keyword}
-              </div>
+        </div>
             ))}
           </motion.div>
         </div>
@@ -568,7 +624,7 @@ function ProductAliveBand() {
   );
 }
 
-// Sticky Scrollytelling Product Tour
+// Scrollytelling Product Tour
 function ScrollytellingTour() {
   const shouldReduceMotion = useReducedMotion();
   const containerRef = useRef(null);
@@ -581,29 +637,29 @@ function ScrollytellingTour() {
   
   const steps = [
     {
-      title: "Capture the day",
-      description: "Set your intention and daily objectives. Everything connects to your projects and calendar.",
-      preview: <DashboardPreview />
+      title: "Projects",
+      description: "Break down complex work into actionable steps. See progress at a glance.",
+      screen: <ProjectsScreen />
     },
     {
-      title: "Ship projects",
-      description: "Board, timeline, and ownership. Break down work into actionable steps.",
-      preview: <ProjectWorkspacePreview />
+      title: "Workspace",
+      description: "Board, timeline, and ownership. Visualize tasks and track progress.",
+      screen: <WorkspaceScreen />
     },
     {
-      title: "Protect time",
+      title: "Calendar",
       description: "Calendar with deep-work blocks. Tasks appear where you need them.",
-      preview: <CalendarPreview />
+      screen: <CalendarScreen />
     },
     {
-      title: "Build knowledge",
+      title: "Resources",
       description: "Resources and lists. Your second brain, built into your workflow.",
-      preview: <ResourcesPreview />
+      screen: <ResourcesScreen />
     },
     {
-      title: "Stay aligned",
+      title: "Lists",
       description: "Everything linked together. One system, one source of truth.",
-      preview: <ListsPreview />
+      screen: <ListsScreen />
     }
   ];
   
@@ -615,7 +671,7 @@ function ScrollytellingTour() {
     );
     setActiveStep(stepIndex);
   });
-  
+
   return (
     <section 
       ref={containerRef}
@@ -628,7 +684,7 @@ function ScrollytellingTour() {
           <div className="space-y-32">
             {steps.map((step, index) => (
               <motion.div
-                key={index}
+                key={index} 
                 className={`min-h-[400px] transition-opacity duration-500 ${
                   activeStep === index ? 'opacity-100' : 'opacity-30'
                 }`}
@@ -638,21 +694,21 @@ function ScrollytellingTour() {
                 transition={{ duration: 0.6 }}
               >
                 <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-4 font-semibold">
-                  Step {index + 1}
-                </div>
+                  {step.title}
+                    </div>
                 <h3 className="text-4xl md:text-5xl font-display font-semibold text-black dark:text-white mb-6 leading-tight">
                   {step.title}
-                </h3>
+                  </h3>
                 <p className="text-xl text-gray-600 dark:text-gray-400 leading-relaxed">
                   {step.description}
-                </p>
+                  </p>
               </motion.div>
             ))}
-          </div>
-          
+                </div>
+
           {/* Right: Sticky Preview */}
           <div className="lg:sticky lg:top-24 h-fit">
-            <div className="relative">
+                  <div className="relative">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeStep}
@@ -661,84 +717,12 @@ function ScrollytellingTour() {
                   exit={shouldReduceMotion ? {} : { opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.4 }}
                 >
-                  <PreviewShell title={steps[activeStep].title} large>
-                    {steps[activeStep].preview}
-                  </PreviewShell>
+                  <RealScreenFrame title={steps[activeStep].title}>
+                    {steps[activeStep].screen}
+                  </RealScreenFrame>
                 </motion.div>
               </AnimatePresence>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// Projects + Workspace Section
-function ProjectsWorkspaceSection() {
-  const [ref1, isVisible1] = useScrollAnimation();
-  const [ref2, isVisible2] = useScrollAnimation();
-
-  return (
-    <section className="py-24 md:py-32 px-6 lg:px-12 bg-white dark:bg-gray-900 transition-colors border-t border-gray-200 dark:border-gray-800">
-      <div className="max-w-7xl mx-auto">
-        {/* Projects Section */}
-        <div 
-          ref={ref1}
-          className={`grid md:grid-cols-2 gap-12 items-center mb-24 transition-all duration-700 ${
-            isVisible1 
-                    ? 'opacity-100 translate-y-0' 
-                    : 'opacity-0 translate-y-8'
-                }`}
-              >
-          {/* Preview */}
-                <div>
-            <PreviewShell title="Projects">
-              <ProjectsPreview />
-            </PreviewShell>
-        </div>
-
-          {/* Copy */}
-          <div>
-            <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-4 font-semibold">
-              PROJECTS
                       </div>
-            <h3 className="text-3xl md:text-4xl font-display font-semibold text-black dark:text-white mb-4 leading-tight">
-              Every meaningful outcome starts as a project.
-            </h3>
-            <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
-              Break down complex work into actionable steps. See progress at a glance.
-            </p>
-                      </div>
-                    </div>
-
-        {/* Workspace Section */}
-        <div 
-          ref={ref2}
-          className={`grid md:grid-cols-2 gap-12 items-center transition-all duration-700 ${
-            isVisible2 
-              ? 'opacity-100 translate-y-0' 
-              : 'opacity-0 translate-y-8'
-          }`}
-        >
-          {/* Copy */}
-          <div className="md:order-2">
-            <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-4 font-semibold">
-              PROJECT WORKSPACE
-                      </div>
-            <h3 className="text-3xl md:text-4xl font-display font-semibold text-black dark:text-white mb-4 leading-tight">
-              Board, list, timeline, and notes in one view.
-            </h3>
-            <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
-              Visualize tasks, track progress, and collaborate seamlessly.
-            </p>
-                    </div>
-
-          {/* Preview */}
-          <div className="md:order-1">
-            <PreviewShell title="Workspace">
-              <ProjectWorkspacePreview />
-            </PreviewShell>
                   </div>
         </div>
       </div>
@@ -746,48 +730,19 @@ function ProjectsWorkspaceSection() {
   );
 }
 
-// Core Modules Grid
-function CoreModulesGrid() {
+// Screen Gallery
+function ScreenGallery() {
   const shouldReduceMotion = useReducedMotion();
-  const modules = [
-    {
-      name: 'Projects',
-      description: 'Break down work into actionable steps',
-      icon: '📋',
-      preview: <ProjectsPreview />
-    },
-    {
-      name: 'Work',
-      description: 'Board, list, and timeline views',
-      icon: '⚡',
-      preview: <ProjectWorkspacePreview />
-    },
-    {
-      name: 'Calendar',
-      description: 'Time and tasks in one place',
-      icon: '📅',
-      preview: <CalendarPreview />
-    },
-    {
-      name: 'Resources',
-      description: 'Your second brain',
-      icon: '📚',
-      preview: <ResourcesPreview />
-    },
-    {
-      name: 'Lists',
-      description: 'Capture everything, structure later',
-      icon: '📝',
-      preview: <ListsPreview />
-    },
-    {
-      name: 'Docs',
-      description: 'Knowledge that connects',
-      icon: '📄',
-      preview: <div className="p-4 text-xs text-gray-500 dark:text-gray-400">Documentation preview</div>
-    }
-  ];
   
+  const screens = [
+    { title: 'Dashboard', screen: <DashboardScreen />, span: 'col-span-2' },
+    { title: 'Projects', screen: <ProjectsScreen />, span: 'col-span-1' },
+    { title: 'Workspace', screen: <WorkspaceScreen />, span: 'col-span-1' },
+    { title: 'Calendar', screen: <CalendarScreen />, span: 'col-span-2' },
+    { title: 'Resources', screen: <ResourcesScreen />, span: 'col-span-1' },
+    { title: 'Lists', screen: <ListsScreen />, span: 'col-span-1' }
+  ];
+
   return (
     <section className="py-32 px-6 lg:px-12 bg-gray-50 dark:bg-gray-950">
       <div className="max-w-7xl mx-auto">
@@ -798,106 +753,24 @@ function CoreModulesGrid() {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          Everything your team needs, in one place.
+          Every workflow, one system.
         </motion.h2>
         
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {modules.map((module, index) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {screens.map((item, index) => (
             <motion.div
               key={index}
-              className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl hover:shadow-black/5 dark:hover:shadow-black/20 hover:-translate-y-1 transition-all duration-300 cursor-pointer group"
+              className={item.span}
               initial={shouldReduceMotion ? {} : { opacity: 0, y: 30 }}
               whileInView={shouldReduceMotion ? {} : { opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
-              whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
             >
-              <div className="text-3xl mb-4">{module.icon}</div>
-              <h3 className="text-xl font-semibold text-black dark:text-white mb-2">
-                {module.name}
-              </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                {module.description}
-              </p>
-              <div className="mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <PreviewShell title={module.name}>
-                  {module.preview}
-                </PreviewShell>
-              </div>
+              <RealScreenFrame title={item.title}>
+                {item.screen}
+              </RealScreenFrame>
             </motion.div>
           ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// Calendar + Resources Section
-function CalendarResourcesSection() {
-  const [ref1, isVisible1] = useScrollAnimation();
-  const [ref2, isVisible2] = useScrollAnimation();
-  
-  return (
-    <section className="py-24 md:py-32 px-6 lg:px-12 bg-gray-50 dark:bg-gray-950 transition-colors border-t border-gray-200 dark:border-gray-800">
-      <div className="max-w-7xl mx-auto">
-        {/* Calendar Section */}
-        <div 
-          ref={ref1}
-          className={`grid md:grid-cols-2 gap-12 items-center mb-24 transition-all duration-700 ${
-            isVisible1 
-          ? 'opacity-100 translate-y-0' 
-          : 'opacity-0 translate-y-8'
-      }`}
-        >
-          {/* Preview */}
-          <div>
-            <PreviewShell title="Calendar">
-              <CalendarPreview />
-            </PreviewShell>
-        </div>
-
-          {/* Copy */}
-              <div>
-            <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-4 font-semibold">
-              CALENDAR
-                    </div>
-            <h3 className="text-3xl md:text-4xl font-display font-semibold text-black dark:text-white mb-4 leading-tight">
-              Your time and your tasks finally live together.
-            </h3>
-            <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
-              Tasks appear in your calendar. Time blocks protect deep work.
-            </p>
-                  </div>
-          </div>
-
-        {/* Resources Section */}
-        <div 
-          ref={ref2}
-          className={`grid md:grid-cols-2 gap-12 items-center transition-all duration-700 ${
-            isVisible2 
-                    ? 'opacity-100 translate-y-0' 
-                    : 'opacity-0 translate-y-8'
-                }`}
-              >
-          {/* Copy */}
-          <div className="md:order-2">
-            <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-4 font-semibold">
-              RESOURCES
-                    </div>
-            <h3 className="text-3xl md:text-4xl font-display font-semibold text-black dark:text-white mb-4 leading-tight">
-              Your second brain, built into your workflow.
-                  </h3>
-            <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
-              Store articles, books, notes. Link to projects. Build knowledge over time.
-                  </p>
-                </div>
-
-          {/* Preview */}
-          <div className="md:order-1">
-            <PreviewShell title="Resources">
-              <ResourcesPreview />
-            </PreviewShell>
-                      </div>
         </div>
       </div>
     </section>
@@ -910,10 +783,9 @@ function EnterpriseProof() {
   const features = [
     'Role-based access',
     'Audit-ready workflows',
-    'Privacy by design',
-    'Scales with teams and founders'
+    'Privacy by design'
   ];
-  
+
   return (
     <section className="py-32 px-6 lg:px-12 bg-black dark:bg-gray-950 text-white">
       <div className="max-w-7xl mx-auto">
@@ -927,7 +799,7 @@ function EnterpriseProof() {
           Enterprise-ready by default.
         </motion.h2>
         
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid md:grid-cols-3 gap-8">
           {features.map((feature, index) => (
             <motion.div
               key={index}
@@ -952,7 +824,7 @@ function PricingCTA() {
   const shouldReduceMotion = useReducedMotion();
   
   return (
-    <section className="py-32 px-6 lg:px-12 bg-white dark:bg-gray-900">
+    <section className="py-32 px-6 lg:px-12 bg-white dark:bg-gray-900" id="pricing">
       <div className="max-w-4xl mx-auto text-center">
         <motion.h2 
           className="text-4xl md:text-5xl font-display font-semibold text-black dark:text-white mb-6"
@@ -976,46 +848,6 @@ function PricingCTA() {
             View pricing
           </Link>
         </motion.div>
-      </div>
-    </section>
-  );
-}
-
-// Lists Section
-function ListsSection() {
-  const [ref, isVisible] = useScrollAnimation();
-
-  return (
-    <section className="py-24 md:py-32 px-6 lg:px-12 bg-white dark:bg-gray-900 transition-colors border-t border-gray-200 dark:border-gray-800">
-      <div className="max-w-7xl mx-auto">
-        <div 
-          ref={ref}
-          className={`grid md:grid-cols-2 gap-12 items-center transition-all duration-700 ${
-            isVisible 
-              ? 'opacity-100 translate-y-0' 
-              : 'opacity-0 translate-y-8'
-          }`}
-        >
-          {/* Preview */}
-                <div>
-            <PreviewShell title="Lists">
-              <ListsPreview />
-            </PreviewShell>
-                </div>
-
-          {/* Copy */}
-              <div>
-            <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-4 font-semibold">
-              LISTS
-              </div>
-            <h3 className="text-3xl md:text-4xl font-display font-semibold text-black dark:text-white mb-4 leading-tight">
-              Capture everything. Structure later.
-            </h3>
-            <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
-              Quick capture for ideas, errands, goals. Organize when you're ready.
-            </p>
-          </div>
-        </div>
       </div>
     </section>
   );
@@ -1056,13 +888,13 @@ function FinalCTA() {
         >
           <Link 
             to="/signup" 
-            className="px-8 py-4 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-gray-900 dark:hover:bg-gray-100 transition-colors text-sm font-medium"
+              className="px-8 py-4 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-gray-900 dark:hover:bg-gray-100 transition-colors text-sm font-medium"
           >
             Start free
-          </Link>
+            </Link>
           <a 
             href="#features" 
-            className="px-8 py-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-black dark:text-white rounded-lg hover:border-black dark:hover:border-white transition-colors text-sm font-medium"
+              className="px-8 py-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-black dark:text-white rounded-lg hover:border-black dark:hover:border-white transition-colors text-sm font-medium"
           >
             Book a demo
           </a>
@@ -1136,9 +968,9 @@ export default function Landing() {
     <div className="overflow-x-hidden bg-white dark:bg-gray-900 transition-colors">
       <Navbar />
       <Hero />
-      <ProductAliveBand />
+      <SystemOverviewBand />
       <ScrollytellingTour />
-      <CoreModulesGrid />
+      <ScreenGallery />
       <EnterpriseProof />
       <PricingCTA />
       <FinalCTA />
