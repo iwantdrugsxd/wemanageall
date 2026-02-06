@@ -207,10 +207,9 @@ function Hero() {
           >
             <motion.div
               style={{ 
-                y: shouldReduceMotion ? 0 : y1,
+                y: shouldReduceMotion ? 0 : y1 + mousePosition.y * 0.3,
                 opacity: shouldReduceMotion ? 1 : opacity,
                 x: shouldReduceMotion ? 0 : mousePosition.x * 0.3,
-                y: shouldReduceMotion ? 0 : mousePosition.y * 0.3,
                 rotateY: shouldReduceMotion ? 0 : mousePosition.x * 0.03,
                 rotateX: shouldReduceMotion ? 0 : -mousePosition.y * 0.02,
                 scale: shouldReduceMotion ? 1 : 1 + (Math.abs(mousePosition.x) + Math.abs(mousePosition.y)) * 0.001
