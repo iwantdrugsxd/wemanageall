@@ -1,21 +1,16 @@
-import { useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { landingCopy } from './landingCopy';
-import HeroProductCard from './HeroProductCard';
-import ModulePills from './ModulePills';
+import HeroTabExplosion from './HeroTabExplosion';
 import MagneticButton from './MagneticButton';
 
 export default function Hero() {
   const shouldReduceMotion = useReducedMotion();
-  const [activeModule, setActiveModule] = useState('dashboard');
-  
-  const activeDescription = landingCopy.modules.descriptions[activeModule] || landingCopy.modules.descriptions.dashboard;
   
   return (
     <section className="relative min-h-screen flex items-center mk-section pt-24">
       <div className="max-w-7xl mx-auto w-full px-6 lg:px-10">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           {/* Left: Editorial Text */}
           <motion.div
             initial={shouldReduceMotion ? {} : { opacity: 0, y: 30 }}
@@ -26,26 +21,9 @@ export default function Hero() {
               {landingCopy.hero.title}
             </h1>
             
-            <p className="mk-lead mb-4 text-[var(--mk-ink-2)]">
+            <p className="mk-lead mb-8 text-[var(--mk-ink-2)]">
               {landingCopy.hero.subtitle}
             </p>
-            
-            {/* Module description - updates with active pill */}
-            <motion.p
-              key={activeModule}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3 }}
-              className="text-sm text-[var(--mk-ink-2)] mb-8"
-            >
-              {activeDescription}
-            </motion.p>
-            
-            {/* Module Pills */}
-            <div className="mb-8">
-              <ModulePills activeModule={activeModule} onModuleChange={setActiveModule} />
-            </div>
             
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row gap-4 mb-6">
@@ -78,9 +56,9 @@ export default function Hero() {
             </p>
           </motion.div>
 
-          {/* Right: Premium Product Card */}
+          {/* Right: Tab Explosion Visualization */}
           <div className="w-full">
-            <HeroProductCard activeModule={activeModule} />
+            <HeroTabExplosion />
           </div>
         </div>
       </div>
