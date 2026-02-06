@@ -38,28 +38,24 @@ export const landingCopy = {
   story: {
     steps: [
       {
-        title: 'Your command center',
+        title: 'Capture the day',
         description: 'Dashboard that shows tasks, intentions, and today\'s focus in one unified view.'
       },
       {
-        title: 'Portfolio that stays readable',
+        title: 'Ship projects',
         description: 'See status, owners, and progress in one table. Saved views keep everyone aligned.'
       },
       {
-        title: 'One-click context',
+        title: 'Run execution',
         description: 'Open a project and keep board, list, timeline, and notes together.'
       },
       {
-        title: 'Time that protects deep work',
+        title: 'Protect time',
         description: 'Schedule blocks live beside tasks so plans and execution stay in sync.'
       },
       {
-        title: 'Knowledge that links back to work',
+        title: 'Build knowledge',
         description: 'Resources and lists connect to projects so information becomes usable.'
-      },
-      {
-        title: 'Simple lists that stay organized',
-        description: 'Keep track of anything with lists that connect to your projects and workflow.'
       }
     ]
   },

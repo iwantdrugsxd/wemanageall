@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { landingCopy } from './landingCopy';
-import ScreenStack3D from './ScreenStack3D';
+import HeroProductCard from './HeroProductCard';
 import ModulePills from './ModulePills';
 import MagneticButton from './MagneticButton';
 
@@ -78,22 +78,9 @@ export default function Hero() {
             </p>
           </motion.div>
 
-          {/* Right: 3D Screen Stack */}
-          <div className="hidden lg:block">
-            <ScreenStack3D activeModule={activeModule} />
-          </div>
-          
-          {/* Mobile: Single image */}
-          <div className="lg:hidden">
-            <div className="relative w-full aspect-[16/10] rounded-lg overflow-hidden mk-hairline shadow-xl" style={{ borderWidth: '1px' }}>
-              <img
-                src={`/landing/screens/${activeModule}-light.png`}
-                alt={`${activeModule} view`}
-                className="w-full h-full object-cover"
-                loading="eager"
-                fetchPriority="high"
-              />
-            </div>
+          {/* Right: Premium Product Card */}
+          <div className="w-full">
+            <HeroProductCard activeModule={activeModule} />
           </div>
         </div>
       </div>

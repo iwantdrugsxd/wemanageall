@@ -1,7 +1,7 @@
 import LandingShell from '../components/landing/LandingShell';
 import LandingNavbar from '../components/landing/LandingNavbar';
 import Hero from '../components/landing/Hero';
-import PinnedStory from '../components/landing/PinnedStory';
+import StoryScroller from '../components/landing/StoryScroller';
 import TrustGeometry from '../components/landing/TrustGeometry';
 import PricingTeaser from '../components/landing/PricingTeaser';
 import FinalCTA from '../components/landing/FinalCTA';
@@ -19,7 +19,7 @@ export default function Landing() {
         {/* Module pills are in Hero, this section is for anchor */}
       </section>
       <div id="sentinel-system" className="absolute top-0 left-0 w-full h-1" aria-hidden="true" />
-      <PinnedStory />
+      <StoryScroller />
       <TrustGeometry />
       <div id="sentinel-pricing" className="absolute top-0 left-0 w-full h-1" aria-hidden="true" />
       <PricingTeaser />
