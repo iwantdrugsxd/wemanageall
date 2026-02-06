@@ -3,28 +3,18 @@ import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { motion, useScroll, useTransform, useMotionValueEvent, useReducedMotion, AnimatePresence } from 'framer-motion';
 
-// ScreenImage Component - Switches light/dark based on theme
+// ScreenImage Component - Uses only light screenshots
 function ScreenImage({ name, alt, className = '', priority = false }) {
-  const { theme } = useTheme();
-  const imagePath = `/landing/screens/${name}-${theme}.png`;
+  const imagePath = `/landing/screens/${name}-light.png`;
   
   return (
-    <picture>
-      <source srcSet={`/landing/screens/${name}-dark.png`} media="(prefers-color-scheme: dark)" />
-      <img
-        src={imagePath}
-        alt={alt}
-        className={className}
-        loading={priority ? 'eager' : 'lazy'}
-        fetchPriority={priority ? 'high' : 'auto'}
-        onError={(e) => {
-          // Fallback to light if dark doesn't exist
-          if (theme === 'dark') {
-            e.target.src = `/landing/screens/${name}-light.png`;
-          }
-        }}
-      />
-    </picture>
+    <img
+      src={imagePath}
+      alt={alt}
+      className={className}
+      loading={priority ? 'eager' : 'lazy'}
+      fetchPriority={priority ? 'high' : 'auto'}
+    />
   );
 }
 
