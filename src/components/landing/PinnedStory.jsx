@@ -4,20 +4,24 @@ import { landingCopy } from './landingCopy';
 import HotspotOverlay from './HotspotOverlay';
 import HoverZoomLens from './HoverZoomLens';
 
-// Map each step to a different feature screenshot
+// Map each step to a different feature screenshot - using all available screenshots
 const stepScreenshots = [
-  { name: 'projects', alt: 'Projects portfolio view' },      // Step 1: Portfolio
-  { name: 'workspace', alt: 'Project workspace view' },     // Step 2: Workspace
-  { name: 'calendar', alt: 'Calendar view' },               // Step 3: Calendar
-  { name: 'resources', alt: 'Resources library view' }      // Step 4: Resources
+  { name: 'dashboard', alt: 'Dashboard overview' },          // Step 1: Dashboard
+  { name: 'projects', alt: 'Projects portfolio view' },      // Step 2: Portfolio
+  { name: 'workspace', alt: 'Project workspace view' },     // Step 3: Workspace
+  { name: 'calendar', alt: 'Calendar view' },               // Step 4: Calendar
+  { name: 'resources', alt: 'Resources library view' },    // Step 5: Resources
+  { name: 'lists', alt: 'Lists view' }                     // Step 6: Lists
 ];
 
 // Hotspot definitions for each step (optional - can be null if no hotspot needed)
 const hotspots = [
-  { xPct: 5, yPct: 10, wPct: 90, hPct: 25 }, // Step 1: Portfolio table
-  { xPct: 10, yPct: 30, wPct: 80, hPct: 60 }, // Step 2: Workspace context
-  null, // Step 3: Calendar - no hotspot, show full image
-  { xPct: 5, yPct: 60, wPct: 40, hPct: 35 }  // Step 4: Resources sidebar
+  null, // Step 1: Dashboard - show full overview
+  { xPct: 5, yPct: 10, wPct: 90, hPct: 25 }, // Step 2: Portfolio table
+  { xPct: 10, yPct: 30, wPct: 80, hPct: 60 }, // Step 3: Workspace context
+  null, // Step 4: Calendar - no hotspot, show full image
+  { xPct: 5, yPct: 60, wPct: 40, hPct: 35 },  // Step 5: Resources sidebar
+  null  // Step 6: Lists - show full list view
 ];
 
 export default function PinnedStory() {

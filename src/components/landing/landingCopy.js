@@ -38,6 +38,10 @@ export const landingCopy = {
   story: {
     steps: [
       {
+        title: 'Your command center',
+        description: 'Dashboard that shows tasks, intentions, and today\'s focus in one unified view.'
+      },
+      {
         title: 'Portfolio that stays readable',
         description: 'See status, owners, and progress in one table. Saved views keep everyone aligned.'
       },
@@ -52,6 +56,10 @@ export const landingCopy = {
       {
         title: 'Knowledge that links back to work',
         description: 'Resources and lists connect to projects so information becomes usable.'
+      },
+      {
+        title: 'Simple lists that stay organized',
+        description: 'Keep track of anything with lists that connect to your projects and workflow.'
       }
     ]
   },
