@@ -3,337 +3,49 @@ import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { motion, useScroll, useTransform, useMotionValueEvent, useReducedMotion, AnimatePresence } from 'framer-motion';
 
-// RealScreenFrame - Browser chrome wrapper
-function RealScreenFrame({ title, children, scale = 1 }) {
+// ScreenImage Component - Switches light/dark based on theme
+function ScreenImage({ name, alt, className = '', priority = false }) {
+  const { theme } = useTheme();
+  const imagePath = `/landing/screens/${name}-${theme}.png`;
+  
   return (
-    <div 
-      className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden"
-      style={{ transform: `scale(${scale})`, transformOrigin: 'top left' }}
-    >
+    <picture>
+      <source srcSet={`/landing/screens/${name}-dark.png`} media="(prefers-color-scheme: dark)" />
+      <img
+        src={imagePath}
+        alt={alt}
+        className={className}
+        loading={priority ? 'eager' : 'lazy'}
+        fetchPriority={priority ? 'high' : 'auto'}
+        onError={(e) => {
+          // Fallback to light if dark doesn't exist
+          if (theme === 'dark') {
+            e.target.src = `/landing/screens/${name}-light.png`;
+          }
+        }}
+      />
+    </picture>
+  );
+}
+
+// BrowserFrame Component - Chrome wrapper for screenshots
+function BrowserFrame({ children, title, className = '' }) {
+  return (
+    <div className={`bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-xl overflow-hidden ${className}`}>
       {/* Browser Chrome */}
       <div className="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-3 py-2 flex items-center gap-2">
         <div className="flex gap-1.5">
           <div className="w-2.5 h-2.5 rounded-full bg-red-400"></div>
           <div className="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
           <div className="w-2.5 h-2.5 rounded-full bg-green-400"></div>
-      </div>
+        </div>
         <div className="flex-1 bg-white dark:bg-gray-800 rounded px-2 py-1 text-[10px] text-gray-500 dark:text-gray-400 ml-2 border border-gray-200 dark:border-gray-700">
           wemanageall.in/{title.toLowerCase().replace(/\s+/g, '')}
         </div>
-        </div>
+      </div>
       {/* Content */}
-      <div className="bg-white dark:bg-gray-800 p-6">
+      <div className="bg-white dark:bg-gray-800">
         {children}
-      </div>
-    </div>
-  );
-}
-
-// Full-fidelity Dashboard Screen
-function DashboardScreen() {
-  return (
-    <div className="space-y-6" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-3xl font-light text-black dark:text-white mb-2">Today</h1>
-        <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
-          <span>Good morning, there</span>
-          <span>•</span>
-          <span>MONDAY, DECEMBER 19, 2024</span>
-          <span>•</span>
-          <span className="px-2 py-0.5 rounded-md bg-gray-100 dark:bg-gray-800 text-xs font-medium">9:42 AM</span>
-        </div>
-        </div>
-
-      {/* KPI Strip */}
-      <div className="grid grid-cols-4 gap-3 mb-6">
-        {[
-          { label: 'Objectives', value: '3/5', subValue: '60%' },
-          { label: 'Planned', value: '4h', subValue: null },
-          { label: 'Spent', value: '2h', subValue: null },
-          { label: 'Upcoming', value: '2', subValue: 'events' }
-        ].map((kpi, i) => (
-          <div key={i} className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3 border border-gray-200 dark:border-gray-800">
-            <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{kpi.label}</div>
-            <div className="text-lg font-semibold text-black dark:text-white">{kpi.value}</div>
-            {kpi.subValue && <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{kpi.subValue}</div>}
-          </div>
-        ))}
-      </div>
-
-      {/* Today's Intention */}
-      <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 border border-gray-200 dark:border-gray-800">
-        <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3 font-semibold">Today's Intention</div>
-        <p className="text-sm text-gray-700 dark:text-gray-200">Focus on shipping the new feature</p>
-              </div>
-
-      {/* Daily Objectives */}
-      <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 border border-gray-200 dark:border-gray-800">
-        <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3 font-semibold">Daily Objectives</div>
-        <div className="space-y-2">
-          {['Review PR feedback', 'Update documentation', 'Team standup'].map((task, i) => (
-            <div key={i} className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-200">
-              <div className="w-4 h-4 rounded border border-gray-300 dark:border-gray-600"></div>
-              <span>{task}</span>
-            </div>
-          ))}
-          </div>
-        </div>
-
-      {/* Agenda */}
-      <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 border border-gray-200 dark:border-gray-800">
-        <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3 font-semibold">Agenda</div>
-        <div className="space-y-2">
-          <div className="flex items-center gap-3 text-sm">
-            <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-            <span className="text-gray-700 dark:text-gray-200">10:00 AM - Team standup</span>
-                </div>
-          <div className="flex items-center gap-3 text-sm">
-            <div className="w-2 h-2 rounded-full bg-green-500"></div>
-            <span className="text-gray-700 dark:text-gray-200">2:00 PM - Deep work session</span>
-              </div>
-              </div>
-              </div>
-            </div>
-  );
-}
-
-// Full-fidelity Projects Screen
-function ProjectsScreen() {
-  return (
-    <div className="space-y-4" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-3xl font-light text-black dark:text-white mb-2">Projects</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400">Your project portfolio</p>
-              </div>
-
-      {/* Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-gray-200 dark:border-gray-700">
-              <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 dark:text-gray-400">Name</th>
-              <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 dark:text-gray-400">Status</th>
-              <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 dark:text-gray-400">Progress</th>
-              <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 dark:text-gray-400">Start Date</th>
-              <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 dark:text-gray-400">Tags</th>
-            </tr>
-          </thead>
-          <tbody>
-            {[
-              { name: 'Q1 Launch', status: 'In Progress', progress: '65%', start: 'Jan 1, 2024', tags: 'Product' },
-              { name: 'Website Redesign', status: 'Planning', progress: '20%', start: 'Jan 15, 2024', tags: 'Design' },
-              { name: 'Mobile App', status: 'In Progress', progress: '45%', start: 'Dec 1, 2024', tags: 'Engineering' }
-            ].map((project, i) => (
-              <tr key={i} className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900/50">
-                <td className="py-3 px-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-base">PROJ</span>
-              <div>
-                      <div className="font-medium text-sm text-black dark:text-white">{project.name}</div>
-              </div>
-              </div>
-                </td>
-                <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">{project.status}</td>
-                <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">{project.progress}</td>
-                <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">{project.start}</td>
-                <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">{project.tags}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
-
-// Full-fidelity Workspace Screen (Board View)
-function WorkspaceScreen() {
-  return (
-    <div className="space-y-4" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-      {/* Header */}
-      <div className="mb-6">
-        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-2">
-          <span>Projects</span>
-          <span>/</span>
-          <span className="text-black dark:text-white">Q1 Launch</span>
-      </div>
-        <h1 className="text-3xl font-light text-black dark:text-white mb-4">Q1 Launch</h1>
-        <div className="flex items-center gap-1 border-b border-gray-200 dark:border-gray-700">
-          {['Board', 'List', 'Timeline', 'Notes'].map((view, i) => (
-            <button
-              key={i}
-              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-                i === 0
-                  ? 'text-black dark:text-white border-black dark:border-white'
-                  : 'text-gray-500 dark:text-gray-400 border-transparent hover:text-black dark:hover:text-white'
-              }`}
-            >
-              {view}
-          </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Board Columns */}
-      <div className="grid grid-cols-3 gap-4">
-        {['To Do', 'In Progress', 'Done'].map((col, i) => (
-          <div key={i} className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3 border border-gray-200 dark:border-gray-800">
-            <div className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">{col}</div>
-            <div className="space-y-2">
-              {i === 0 && (
-                <>
-                  <div className="bg-white dark:bg-gray-800 rounded p-3 text-sm border border-gray-200 dark:border-gray-700">
-                    <div className="font-medium text-black dark:text-white mb-1">Design mockups</div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">Due: Jan 20, 2024</div>
-          </div>
-                  <div className="bg-white dark:bg-gray-800 rounded p-3 text-sm border border-gray-200 dark:border-gray-700">
-                    <div className="font-medium text-black dark:text-white mb-1">User research</div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">Due: Jan 22, 2024</div>
-            </div>
-                </>
-              )}
-              {i === 1 && (
-                <div className="bg-white dark:bg-gray-800 rounded p-3 text-sm border border-gray-200 dark:border-gray-700">
-                  <div className="font-medium text-black dark:text-white mb-1">API integration</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">Due: Jan 18, 2024</div>
-            </div>
-              )}
-              {i === 2 && (
-                <div className="bg-white dark:bg-gray-800 rounded p-3 text-sm border border-gray-200 dark:border-gray-700 opacity-60">
-                  <div className="font-medium text-black dark:text-white mb-1">Project setup</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">Completed</div>
-          </div>
-              )}
-        </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// Full-fidelity Calendar Screen (Week View)
-function CalendarScreen() {
-  return (
-    <div className="space-y-4" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-3xl font-light text-black dark:text-white mb-4">Calendar</h1>
-        <div className="flex items-center gap-2">
-          {['Week', 'Day', 'Month'].map((view, i) => (
-            <button
-              key={i}
-              className={`px-3 py-1 text-sm rounded ${
-                i === 0
-                  ? 'bg-black dark:bg-white text-white dark:text-black font-semibold'
-                  : 'text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white'
-              }`}
-            >
-              {view}
-            </button>
-          ))}
-        </div>
-                </div>
-      
-      {/* Week Grid */}
-      <div className="grid grid-cols-7 gap-1 mb-4">
-        {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, i) => (
-          <div key={i} className="text-center">
-            <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{day}</div>
-            <div className="text-sm font-semibold text-black dark:text-white">{19 + i}</div>
-            </div>
-          ))}
-        </div>
-
-      {/* Time Slots */}
-      <div className="space-y-2">
-        {[
-          { time: '9:00 AM', event: 'Team standup', color: '#3B6E5C' },
-          { time: '2:00 PM', event: 'Deep work', color: '#4A90E2' },
-          { time: '4:00 PM', event: 'Client call', color: '#F5A623' }
-        ].map((item, i) => (
-          <div key={i} className="flex items-center gap-3 text-sm">
-            <div className="w-16 text-gray-500 dark:text-gray-400 text-xs">{item.time}</div>
-            <div 
-              className="flex-1 rounded px-3 py-2 text-gray-700 dark:text-gray-200"
-              style={{ backgroundColor: `${item.color}20` }}
-            >
-              {item.event}
-          </div>
-        </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// Full-fidelity Resources Screen
-function ResourcesScreen() {
-  return (
-    <div className="space-y-4" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-3xl font-light text-black dark:text-white mb-4">Resources</h1>
-        <div className="flex items-center gap-4 text-sm">
-          <span className="border-b-2 border-black dark:border-white font-semibold text-black dark:text-white pb-1">All</span>
-          <span className="text-gray-500 dark:text-gray-400">Programming</span>
-          <span className="text-gray-500 dark:text-gray-400">Design</span>
-          </div>
-        </div>
-
-      {/* Resource Cards */}
-      <div className="grid grid-cols-2 gap-4">
-        {[
-          { title: 'Clean Code', author: 'Robert C. Martin', progress: 33 },
-          { title: 'React Patterns', author: 'Lars Grammel', progress: 15 }
-        ].map((resource, i) => (
-          <div key={i} className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 border border-gray-200 dark:border-gray-800">
-            <div className="h-24 bg-gray-200 dark:bg-gray-700 rounded mb-3 flex items-center justify-center">
-              <span className="text-xs text-gray-500 dark:text-gray-400 uppercase">PDF</span>
-                </div>
-            <div className="text-sm font-semibold text-black dark:text-white mb-1">{resource.title}</div>
-            <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">{resource.author}</div>
-            <div className="h-1 bg-gray-200 dark:bg-gray-700 rounded overflow-hidden">
-              <div className="h-full bg-black dark:bg-white" style={{ width: `${resource.progress}%` }}></div>
-              </div>
-          </div>
-        ))}
-          </div>
-        </div>
-  );
-}
-
-// Full-fidelity Lists Screen
-function ListsScreen() {
-  return (
-    <div className="space-y-4" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-3xl font-light text-black dark:text-white mb-4">Lists</h1>
-        <div className="flex items-center gap-4 text-sm">
-          <span className="border-b-2 border-black dark:border-white font-semibold text-black dark:text-white pb-1">All Lists</span>
-          <span className="text-gray-500 dark:text-gray-400">Recent</span>
-          <span className="text-gray-500 dark:text-gray-400">Pinned</span>
-      </div>
-      </div>
-
-      {/* List Cards */}
-      <div className="grid grid-cols-2 gap-4">
-        {[
-          { name: 'Movies to Watch', items: '12 items', progress: 33 },
-          { name: 'Books to Read', items: '8 items', progress: 50 }
-        ].map((list, i) => (
-          <div key={i} className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 border border-gray-200 dark:border-gray-800">
-            <div className="h-20 bg-gradient-to-br from-gray-800 to-gray-600 rounded mb-3"></div>
-            <div className="text-sm font-semibold text-black dark:text-white mb-1">{list.name}</div>
-            <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-              <span>{list.items}</span>
-              <span>{list.progress}%</span>
-            </div>
-                </div>
-        ))}
       </div>
     </div>
   );
@@ -348,11 +60,12 @@ function Navbar() {
       <Link to="/" className="flex items-center">
         <div className="w-9 h-9 rounded-xl bg-black dark:bg-black flex items-center justify-center shadow-[0_8px_24px_rgba(0,0,0,0.6)] border border-gray-800/80">
           <span className="font-display text-white text-lg leading-none font-semibold">W</span>
-      </div>
-      </Link>
-      
+            </div>
+          </Link>
+          
       <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
-        <a href="#features" className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">Features</a>
+        <a href="#system" className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">System</a>
+        <a href="#modules" className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">Modules</a>
         <a href="#pricing" className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">Pricing</a>
       </nav>
       
@@ -361,6 +74,7 @@ function Navbar() {
           onClick={toggleTheme}
           className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+          aria-label="Toggle theme"
         >
           {theme === 'light' ? (
             <svg className="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -373,35 +87,60 @@ function Navbar() {
           )}
         </button>
       
-        <Link 
-          to="/signup" 
-          className="bg-black dark:bg-white text-white dark:text-black px-6 py-2.5 text-sm font-medium rounded-lg hover:bg-gray-900 dark:hover:bg-gray-100 transition-colors"
-        >
+      <Link 
+        to="/signup" 
+          className="bg-black dark:bg-white text-white dark:text-black px-6 py-2.5 text-sm font-medium rounded-lg hover:bg-gray-900 dark:hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white focus:ring-offset-2"
+      >
           Start free
-        </Link>
-          </div>
+            </Link>
+      </div>
     </header>
   );
 }
 
-// Hero Section
+// Hero - Cinematic Screen Mosaic
 function Hero() {
   const shouldReduceMotion = useReducedMotion();
   const { scrollY } = useScroll();
-  const y1 = useTransform(scrollY, [0, 500], [0, 150]);
-  const y2 = useTransform(scrollY, [0, 500], [0, 100]);
-  const y3 = useTransform(scrollY, [0, 300], [0, 50]);
-  const opacity = useTransform(scrollY, [0, 300], [1, 0]);
-
+  const containerRef = useRef(null);
+  
+  // Parallax transforms
+  const y1 = useTransform(scrollY, [0, 500], [0, 100]);
+  const y2 = useTransform(scrollY, [0, 500], [0, 80]);
+  const y3 = useTransform(scrollY, [0, 500], [0, 60]);
+  const opacity = useTransform(scrollY, [0, 300], [1, 0.8]);
+  
+  // Pointer parallax
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (shouldReduceMotion) return;
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (rect) {
+        setMousePosition({
+          x: (e.clientX - rect.left - rect.width / 2) / rect.width * 20,
+          y: (e.clientY - rect.top - rect.height / 2) / rect.height * 20
+        });
+      }
+    };
+    
+    const container = containerRef.current;
+    if (container) {
+      container.addEventListener('mousemove', handleMouseMove);
+      return () => container.removeEventListener('mousemove', handleMouseMove);
+    }
+  }, [shouldReduceMotion]);
+  
   return (
     <section className="relative min-h-screen flex items-center px-6 lg:px-12 pt-24 pb-20 bg-white dark:bg-gray-900 overflow-hidden">
       {/* Animated Background Layers */}
       <motion.div 
         className="absolute inset-0 pointer-events-none"
-        style={{ opacity: shouldReduceMotion ? 0.1 : 0.15 }}
+        style={{ opacity: shouldReduceMotion ? 0.05 : 0.1 }}
       >
         <motion.div 
-          className="absolute top-20 right-20 w-96 h-96 bg-blue-500/20 dark:bg-blue-400/10 rounded-full blur-3xl"
+          className="absolute top-20 right-20 w-96 h-96 bg-blue-500/10 dark:bg-blue-400/5 rounded-full blur-3xl"
           animate={shouldReduceMotion ? {} : {
             scale: [1, 1.2, 1],
             x: [0, 30, 0],
@@ -410,7 +149,7 @@ function Hero() {
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div 
-          className="absolute bottom-20 left-20 w-96 h-96 bg-purple-500/20 dark:bg-purple-400/10 rounded-full blur-3xl"
+          className="absolute bottom-20 left-20 w-96 h-96 bg-purple-500/10 dark:bg-purple-400/5 rounded-full blur-3xl"
           animate={shouldReduceMotion ? {} : {
             scale: [1, 1.3, 1],
             x: [0, -20, 0],
@@ -438,13 +177,13 @@ function Hero() {
             <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <Link 
             to="/signup" 
-                className="px-8 py-4 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-gray-900 dark:hover:bg-gray-100 transition-colors text-sm font-medium text-center"
+                className="px-8 py-4 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-gray-900 dark:hover:bg-gray-100 transition-colors text-sm font-medium text-center focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white focus:ring-offset-2"
           >
                 Start free
             </Link>
           <a 
-                href="#features" 
-                className="px-8 py-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-black dark:text-white rounded-lg hover:border-black dark:hover:border-white transition-colors text-sm font-medium text-center"
+                href="#pricing" 
+                className="px-8 py-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-black dark:text-white rounded-lg hover:border-black dark:hover:border-white transition-colors text-sm font-medium text-center focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white focus:ring-offset-2"
           >
                 Book a demo
             </a>
@@ -455,42 +194,54 @@ function Hero() {
             </p>
           </motion.div>
 
-          {/* Right: Floating Stack of Product Windows */}
-          <div className="hidden lg:block relative h-[600px]">
+          {/* Right: Screen Mosaic */}
+          <div 
+            ref={containerRef}
+            className="hidden lg:block relative h-[600px]"
+          >
+            {/* Main Dashboard Screen */}
             <motion.div
               style={{ 
                 y: shouldReduceMotion ? 0 : y1,
-                opacity: shouldReduceMotion ? 1 : opacity 
+                opacity: shouldReduceMotion ? 1 : opacity,
+                x: shouldReduceMotion ? 0 : mousePosition.x * 0.5,
+                rotateY: shouldReduceMotion ? 0 : mousePosition.x * 0.02
               }}
               className="absolute top-0 right-0 w-full max-w-md"
             >
-              <RealScreenFrame title="Dashboard">
-                <DashboardScreen />
-              </RealScreenFrame>
+              <BrowserFrame title="Dashboard">
+                <ScreenImage name="dashboard" alt="Dashboard view" priority className="w-full h-auto" />
+              </BrowserFrame>
             </motion.div>
             
+            {/* Projects Screen - Layered */}
             <motion.div
               style={{ 
                 y: shouldReduceMotion ? 0 : y2,
-                opacity: shouldReduceMotion ? 1 : opacity 
+                opacity: shouldReduceMotion ? 1 : opacity,
+                x: shouldReduceMotion ? 0 : mousePosition.x * 0.3,
+                rotateY: shouldReduceMotion ? 0 : mousePosition.x * 0.01
               }}
-              className="absolute top-20 right-10 w-full max-w-md -z-10 blur-sm"
+              className="absolute top-16 right-8 w-full max-w-sm -z-10 opacity-90"
             >
-              <RealScreenFrame title="Projects">
-                <ProjectsScreen />
-              </RealScreenFrame>
+              <BrowserFrame title="Projects">
+                <ScreenImage name="projects" alt="Projects view" className="w-full h-auto" />
+              </BrowserFrame>
             </motion.div>
             
+            {/* Calendar Screen - Depth Layer */}
             <motion.div
               style={{ 
                 y: shouldReduceMotion ? 0 : y3,
-                opacity: shouldReduceMotion ? 1 : opacity 
+                opacity: shouldReduceMotion ? 0.7 : opacity,
+                x: shouldReduceMotion ? 0 : mousePosition.x * 0.2,
+                rotateY: shouldReduceMotion ? 0 : mousePosition.x * 0.005
               }}
-              className="absolute top-40 right-20 w-full max-w-md -z-20 blur-md opacity-50"
+              className="absolute top-32 right-16 w-full max-w-xs -z-20 opacity-70"
             >
-              <RealScreenFrame title="Calendar">
-                <CalendarScreen />
-              </RealScreenFrame>
+              <BrowserFrame title="Calendar">
+                <ScreenImage name="calendar" alt="Calendar view" className="w-full h-auto" />
+              </BrowserFrame>
             </motion.div>
           </div>
         </div>
@@ -499,8 +250,8 @@ function Hero() {
   );
 }
 
-// System Overview Band
-function SystemOverviewBand() {
+// Proof Band - Animated Counters + Marquee
+function ProofBand() {
   const shouldReduceMotion = useReducedMotion();
   const [counters, setCounters] = useState({ teams: 0, tasks: 0, hours: 0 });
   
@@ -539,23 +290,8 @@ function SystemOverviewBand() {
   const keywords = ['Projects', 'Calendar', 'Work', 'Docs', 'Resources', 'Lists', 'Execution', 'Knowledge'];
 
   return (
-    <section className="py-20 px-6 lg:px-12 bg-gray-50 dark:bg-gray-950 border-y border-gray-200 dark:border-gray-800">
+    <section className="py-20 px-6 lg:px-12 bg-gray-50 dark:bg-gray-950 border-y border-gray-200 dark:border-gray-800" id="system">
       <div className="max-w-7xl mx-auto">
-        <motion.div
-          className="text-center mb-12"
-          initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
-          whileInView={shouldReduceMotion ? {} : { opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <h2 className="text-3xl md:text-4xl font-display font-semibold text-black dark:text-white mb-4">
-            One system, every workflow.
-        </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            Execution, planning, and knowledge live on one shared spine. Nothing is lost.
-          </p>
-        </motion.div>
-
         {/* Animated Counters */}
         <div className="grid grid-cols-3 gap-8 mb-12">
           <div className="text-center">
@@ -569,7 +305,7 @@ function SystemOverviewBand() {
               {counters.teams.toLocaleString()}+
             </motion.div>
             <div className="text-sm text-gray-500 dark:text-gray-400">Teams</div>
-            </div>
+          </div>
           <div className="text-center">
             <motion.div 
               className="text-4xl md:text-5xl font-display font-semibold mb-2 text-black dark:text-white"
@@ -581,7 +317,7 @@ function SystemOverviewBand() {
               {counters.tasks.toLocaleString()}
             </motion.div>
             <div className="text-sm text-gray-500 dark:text-gray-400">Tasks completed</div>
-        </div>
+          </div>
           <div className="text-center">
             <motion.div 
               className="text-4xl md:text-5xl font-display font-semibold mb-2 text-black dark:text-white"
@@ -593,7 +329,7 @@ function SystemOverviewBand() {
               {counters.hours.toLocaleString()}
             </motion.div>
             <div className="text-sm text-gray-500 dark:text-gray-400">Hours tracked</div>
-      </div>
+          </div>
         </div>
         
         {/* Marquee */}
@@ -615,8 +351,8 @@ function SystemOverviewBand() {
             {[...keywords, ...keywords, ...keywords].map((keyword, i) => (
               <div key={i} className="text-2xl md:text-3xl font-display font-light text-gray-400 dark:text-gray-500 whitespace-nowrap">
                 {keyword}
-        </div>
-            ))}
+            </div>
+          ))}
           </motion.div>
         </div>
       </div>
@@ -624,8 +360,8 @@ function SystemOverviewBand() {
   );
 }
 
-// Scrollytelling Product Tour
-function ScrollytellingTour() {
+// Sticky Scrollytelling Tour
+function StickyTour() {
   const shouldReduceMotion = useReducedMotion();
   const containerRef = useRef(null);
   const { scrollYProgress } = useScroll({
@@ -637,29 +373,29 @@ function ScrollytellingTour() {
   
   const steps = [
     {
-      title: "Projects",
-      description: "Break down complex work into actionable steps. See progress at a glance.",
-      screen: <ProjectsScreen />
+      title: "Capture the day",
+      description: "Intention, objectives, schedule in one view.",
+      screen: "dashboard"
     },
     {
-      title: "Workspace",
-      description: "Board, timeline, and ownership. Visualize tasks and track progress.",
-      screen: <WorkspaceScreen />
+      title: "Ship projects",
+      description: "Portfolio, status, progress, owners.",
+      screen: "projects"
     },
     {
-      title: "Calendar",
-      description: "Calendar with deep-work blocks. Tasks appear where you need them.",
-      screen: <CalendarScreen />
+      title: "Run execution",
+      description: "Board/list/timeline/notes in one workspace.",
+      screen: "workspace"
     },
     {
-      title: "Resources",
-      description: "Resources and lists. Your second brain, built into your workflow.",
-      screen: <ResourcesScreen />
+      title: "Protect time",
+      description: "Calendar blocks and work sessions.",
+      screen: "calendar"
     },
     {
-      title: "Lists",
-      description: "Everything linked together. One system, one source of truth.",
-      screen: <ListsScreen />
+      title: "Build knowledge",
+      description: "Resources + Lists linked to projects.",
+      screen: "resources"
     }
   ];
   
@@ -676,12 +412,11 @@ function ScrollytellingTour() {
     <section 
       ref={containerRef}
       className="relative py-32 px-6 lg:px-12 bg-white dark:bg-gray-900"
-      id="features"
     >
       <div className="max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-16">
           {/* Left: Text Steps */}
-          <div className="space-y-32">
+        <div className="space-y-32">
             {steps.map((step, index) => (
               <motion.div
                 key={index} 
@@ -695,56 +430,111 @@ function ScrollytellingTour() {
               >
                 <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-4 font-semibold">
                   {step.title}
-                    </div>
+        </div>
                 <h3 className="text-4xl md:text-5xl font-display font-semibold text-black dark:text-white mb-6 leading-tight">
                   {step.title}
-                  </h3>
+                </h3>
                 <p className="text-xl text-gray-600 dark:text-gray-400 leading-relaxed">
                   {step.description}
-                  </p>
+                </p>
               </motion.div>
             ))}
-                </div>
-
+            </div>
+          
           {/* Right: Sticky Preview */}
           <div className="lg:sticky lg:top-24 h-fit">
-                  <div className="relative">
+            <div className="relative aspect-[16/10]">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeStep}
-                  initial={shouldReduceMotion ? {} : { opacity: 0, scale: 0.95 }}
-                  animate={shouldReduceMotion ? {} : { opacity: 1, scale: 1 }}
-                  exit={shouldReduceMotion ? {} : { opacity: 0, scale: 0.95 }}
+                  initial={shouldReduceMotion ? {} : { opacity: 0, x: 20 }}
+                  animate={shouldReduceMotion ? {} : { opacity: 1, x: 0 }}
+                  exit={shouldReduceMotion ? {} : { opacity: 0, x: -20 }}
                   transition={{ duration: 0.4 }}
+                  className="absolute inset-0"
                 >
-                  <RealScreenFrame title={steps[activeStep].title}>
-                    {steps[activeStep].screen}
-                  </RealScreenFrame>
+                  <BrowserFrame title={steps[activeStep].title} className="h-full">
+                    <ScreenImage 
+                      name={steps[activeStep].screen} 
+                      alt={`${steps[activeStep].title} view`}
+                      className="w-full h-full object-cover"
+                    />
+                  </BrowserFrame>
                 </motion.div>
               </AnimatePresence>
                       </div>
-                  </div>
+                      </div>
         </div>
       </div>
     </section>
   );
 }
 
-// Screen Gallery
-function ScreenGallery() {
+// Guided Tour Carousel
+function GuidedCarousel() {
   const shouldReduceMotion = useReducedMotion();
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const progressRef = useRef(null);
   
-  const screens = [
-    { title: 'Dashboard', screen: <DashboardScreen />, span: 'col-span-2' },
-    { title: 'Projects', screen: <ProjectsScreen />, span: 'col-span-1' },
-    { title: 'Workspace', screen: <WorkspaceScreen />, span: 'col-span-1' },
-    { title: 'Calendar', screen: <CalendarScreen />, span: 'col-span-2' },
-    { title: 'Resources', screen: <ResourcesScreen />, span: 'col-span-1' },
-    { title: 'Lists', screen: <ListsScreen />, span: 'col-span-1' }
+  const modules = [
+    { name: 'Dashboard', screen: 'dashboard' },
+    { name: 'Projects', screen: 'projects' },
+    { name: 'Workspace', screen: 'workspace' },
+    { name: 'Calendar', screen: 'calendar' },
+    { name: 'Resources', screen: 'resources' },
+    { name: 'Lists', screen: 'lists' }
   ];
-
-  return (
-    <section className="py-32 px-6 lg:px-12 bg-gray-50 dark:bg-gray-950">
+  
+  // Auto-play
+  useEffect(() => {
+    if (shouldReduceMotion || isPaused) return;
+    
+    const interval = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % modules.length);
+    }, 7000);
+    
+    return () => clearInterval(interval);
+  }, [shouldReduceMotion, isPaused, modules.length]);
+  
+  // Progress bar animation
+  useEffect(() => {
+    if (shouldReduceMotion || isPaused) {
+      if (progressRef.current) {
+        progressRef.current.style.width = '0%';
+      }
+      return;
+    }
+    
+    const progressBar = progressRef.current;
+    if (!progressBar) return;
+    
+    progressBar.style.width = '0%';
+    progressBar.style.transition = 'width 7s linear';
+    
+    const timeout = setTimeout(() => {
+      if (progressBar) {
+        progressBar.style.width = '100%';
+      }
+    }, 10);
+    
+    return () => clearTimeout(timeout);
+  }, [activeIndex, shouldReduceMotion, isPaused]);
+  
+  const handlePrevious = () => {
+    setActiveIndex((prev) => (prev - 1 + modules.length) % modules.length);
+    setIsPaused(true);
+    setTimeout(() => setIsPaused(false), 10000);
+  };
+  
+  const handleNext = () => {
+    setActiveIndex((prev) => (prev + 1) % modules.length);
+    setIsPaused(true);
+    setTimeout(() => setIsPaused(false), 10000);
+  };
+            
+            return (
+    <section className="py-32 px-6 lg:px-12 bg-gray-50 dark:bg-gray-950" id="modules">
       <div className="max-w-7xl mx-auto">
         <motion.h2 
           className="text-4xl md:text-5xl font-display font-semibold text-black dark:text-white mb-16 text-center"
@@ -756,34 +546,99 @@ function ScreenGallery() {
           Every workflow, one system.
         </motion.h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {screens.map((item, index) => (
-            <motion.div
-              key={index}
-              className={item.span}
-              initial={shouldReduceMotion ? {} : { opacity: 0, y: 30 }}
-              whileInView={shouldReduceMotion ? {} : { opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
+        <div 
+          className="max-w-5xl mx-auto"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+          onFocus={() => setIsPaused(true)}
+          onBlur={() => setIsPaused(false)}
+        >
+          {/* Module Pills */}
+          <div className="flex flex-wrap justify-center gap-2 mb-8">
+            {modules.map((module, index) => (
+              <button
+                key={index} 
+                onClick={() => {
+                  setActiveIndex(index);
+                  setIsPaused(true);
+                  setTimeout(() => setIsPaused(false), 10000);
+                }}
+                className={`px-4 py-2 text-sm font-medium rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white focus:ring-offset-2 ${
+                  activeIndex === index
+                    ? 'bg-black dark:bg-white text-white dark:text-black'
+                    : 'bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700'
+                }`}
+                aria-label={`View ${module.name}`}
+              >
+                {module.name}
+              </button>
+            ))}
+                </div>
+
+          {/* Screen Display */}
+          <div className="relative aspect-[16/10] mb-6">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeIndex}
+                initial={shouldReduceMotion ? {} : { opacity: 0, x: 50 }}
+                animate={shouldReduceMotion ? {} : { opacity: 1, x: 0 }}
+                exit={shouldReduceMotion ? {} : { opacity: 0, x: -50 }}
+                transition={{ duration: 0.5 }}
+                className="absolute inset-0"
+              >
+                <BrowserFrame title={modules[activeIndex].name} className="h-full">
+                  <ScreenImage 
+                    name={modules[activeIndex].screen} 
+                    alt={`${modules[activeIndex].name} view`}
+                    className="w-full h-full object-cover"
+                  />
+                </BrowserFrame>
+              </motion.div>
+            </AnimatePresence>
+            
+            {/* Navigation Arrows */}
+            <button
+              onClick={handlePrevious}
+              className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-white/90 dark:bg-gray-800/90 rounded-full shadow-lg hover:bg-white dark:hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
+              aria-label="Previous module"
             >
-              <RealScreenFrame title={item.title}>
-                {item.screen}
-              </RealScreenFrame>
-            </motion.div>
-          ))}
+              <svg className="w-6 h-6 text-black dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                          </svg>
+            </button>
+            <button
+              onClick={handleNext}
+              className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white/90 dark:bg-gray-800/90 rounded-full shadow-lg hover:bg-white dark:hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
+              aria-label="Next module"
+            >
+              <svg className="w-6 h-6 text-black dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+                  </div>
+          
+          {/* Progress Bar */}
+          <div className="h-1 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
+            <div
+              ref={progressRef}
+              className="h-full bg-black dark:bg-white transition-none"
+              style={{ width: '0%' }}
+            />
+                </div>
         </div>
       </div>
     </section>
   );
 }
 
-// Enterprise Proof Section
-function EnterpriseProof() {
+// Enterprise Trust Section
+function TrustSection() {
   const shouldReduceMotion = useReducedMotion();
   const features = [
     'Role-based access',
     'Audit-ready workflows',
-    'Privacy by design'
+    'Privacy by design',
+    'Fast performance at scale'
   ];
 
   return (
@@ -799,7 +654,7 @@ function EnterpriseProof() {
           Enterprise-ready by default.
         </motion.h2>
         
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feature, index) => (
             <motion.div
               key={index}
@@ -822,7 +677,7 @@ function EnterpriseProof() {
 // Pricing CTA Section
 function PricingCTA() {
   const shouldReduceMotion = useReducedMotion();
-  
+
   return (
     <section className="py-32 px-6 lg:px-12 bg-white dark:bg-gray-900" id="pricing">
       <div className="max-w-4xl mx-auto text-center">
@@ -836,6 +691,7 @@ function PricingCTA() {
           Simple plans that scale with your team.
         </motion.h2>
         <motion.div
+          className="flex flex-col sm:flex-row gap-4 justify-center"
           initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
           whileInView={shouldReduceMotion ? {} : { opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -843,9 +699,15 @@ function PricingCTA() {
         >
           <Link 
             to="/pricing" 
-            className="inline-block px-8 py-4 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-gray-900 dark:hover:bg-gray-100 transition-colors text-sm font-medium"
+            className="px-8 py-4 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-gray-900 dark:hover:bg-gray-100 transition-colors text-sm font-medium focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white focus:ring-offset-2"
           >
             View pricing
+          </Link>
+          <Link 
+            to="/signup" 
+            className="px-8 py-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-black dark:text-white rounded-lg hover:border-black dark:hover:border-white transition-colors text-sm font-medium focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white focus:ring-offset-2"
+          >
+            Start free
           </Link>
         </motion.div>
       </div>
@@ -867,7 +729,7 @@ function FinalCTA() {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          Start building your startup OS today.
+          Ready to unify your workflow?
         </motion.h2>
         <motion.p 
           className="text-xl text-gray-600 dark:text-gray-400 mb-10 max-w-2xl mx-auto"
@@ -888,13 +750,13 @@ function FinalCTA() {
         >
           <Link 
             to="/signup" 
-              className="px-8 py-4 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-gray-900 dark:hover:bg-gray-100 transition-colors text-sm font-medium"
+            className="px-8 py-4 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-gray-900 dark:hover:bg-gray-100 transition-colors text-sm font-medium focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white focus:ring-offset-2"
           >
             Start free
             </Link>
           <a 
-            href="#features" 
-              className="px-8 py-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-black dark:text-white rounded-lg hover:border-black dark:hover:border-white transition-colors text-sm font-medium"
+            href="#modules" 
+            className="px-8 py-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-black dark:text-white rounded-lg hover:border-black dark:hover:border-white transition-colors text-sm font-medium focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white focus:ring-offset-2"
           >
             Book a demo
           </a>
@@ -968,10 +830,10 @@ export default function Landing() {
     <div className="overflow-x-hidden bg-white dark:bg-gray-900 transition-colors">
       <Navbar />
       <Hero />
-      <SystemOverviewBand />
-      <ScrollytellingTour />
-      <ScreenGallery />
-      <EnterpriseProof />
+      <ProofBand />
+      <StickyTour />
+      <GuidedCarousel />
+      <TrustSection />
       <PricingCTA />
       <FinalCTA />
       <Footer />
