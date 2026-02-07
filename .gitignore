@@ -52,7 +52,8 @@ coverage/
 
 # Uploads and user-generated content
 uploads/
-public/uploads/
+# public/ - Commented out to allow tracking of static assets (images, etc.)
+# Only public/uploads/ is ignored (user-generated content)uploads/
 *.pdf
 *.mp3
 *.mp4
@@ -107,7 +108,10 @@ dist/
 
 # Gatsby
 .cache/
-public/
+# # public/ - Commented out to allow tracking of static assets (images, etc.)
+# Only public/uploads/ is ignored (user-generated content) - Commented out to allow tracking of static assets (images, etc.)
+# Only # public/ - Commented out to allow tracking of static assets (images, etc.)
+# Only public/uploads/ is ignored (user-generated content)uploads/ is ignored (user-generated content)
 
 # Serverless
 .serverless/
@@ -211,7 +215,8 @@ coverage/
 
 # Uploads and user-generated content
 uploads/
-public/uploads/
+# public/ - Commented out to allow tracking of static assets (images, etc.)
+# Only public/uploads/ is ignored (user-generated content)uploads/
 *.pdf
 *.mp3
 *.mp4
@@ -266,7 +271,10 @@ dist/
 
 # Gatsby
 .cache/
-public/
+# # public/ - Commented out to allow tracking of static assets (images, etc.)
+# Only public/uploads/ is ignored (user-generated content) - Commented out to allow tracking of static assets (images, etc.)
+# Only # public/ - Commented out to allow tracking of static assets (images, etc.)
+# Only public/uploads/ is ignored (user-generated content)uploads/ is ignored (user-generated content)
 
 # Serverless
 .serverless/
@@ -370,7 +378,8 @@ coverage/
 
 # Uploads and user-generated content
 uploads/
-public/uploads/
+# public/ - Commented out to allow tracking of static assets (images, etc.)
+# Only public/uploads/ is ignored (user-generated content)uploads/
 *.pdf
 *.mp3
 *.mp4
@@ -425,7 +434,10 @@ dist/
 
 # Gatsby
 .cache/
-public/
+# # public/ - Commented out to allow tracking of static assets (images, etc.)
+# Only public/uploads/ is ignored (user-generated content) - Commented out to allow tracking of static assets (images, etc.)
+# Only # public/ - Commented out to allow tracking of static assets (images, etc.)
+# Only public/uploads/ is ignored (user-generated content)uploads/ is ignored (user-generated content)
 
 # Serverless
 .serverless/

@@ -1,7 +1,7 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { landingCopy } from './landingCopy';
-import HeroTabExplosion from './HeroTabExplosion';
+import HeroWindowMerge from './HeroWindowMerge';
 import MagneticButton from './MagneticButton';
 
 export default function Hero() {
@@ -56,9 +56,9 @@ export default function Hero() {
             </p>
           </motion.div>
 
-          {/* Right: Tab Explosion Visualization */}
+          {/* Right: Window Merge → Dashboard */}
           <div className="w-full">
-            <HeroTabExplosion />
+            <HeroWindowMerge />
           </div>
         </div>
       </div>

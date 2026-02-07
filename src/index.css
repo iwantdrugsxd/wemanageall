@@ -73,6 +73,10 @@
     border-width: 1px;
   }
   
+  .bg-gradient-radial {
+    background: radial-gradient(circle, var(--tw-gradient-stops));
+  }
+  
   /* Motion defaults - premium easing */
   .landing [data-motion] {
     transition-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);

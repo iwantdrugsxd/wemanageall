@@ -3,7 +3,9 @@ import LandingNavbar from '../components/landing/LandingNavbar';
 import Hero from '../components/landing/Hero';
 import StoryScroller from '../components/landing/StoryScroller';
 import TrustGeometry from '../components/landing/TrustGeometry';
-import PricingTeaser from '../components/landing/PricingTeaser';
+import PricingSection from '../components/landing/PricingSection';
+import PricingCompare from '../components/landing/PricingCompare';
+import PricingFaq from '../components/landing/PricingFaq';
 import FinalCTA from '../components/landing/FinalCTA';
 import LandingFooter from '../components/landing/LandingFooter';
 import SmartCTA from '../components/landing/SmartCTA';
@@ -22,7 +24,9 @@ export default function Landing() {
       <StoryScroller />
       <TrustGeometry />
       <div id="sentinel-pricing" className="absolute top-0 left-0 w-full h-1" aria-hidden="true" />
-      <PricingTeaser />
+      <PricingSection />
+      <PricingCompare />
+      <PricingFaq />
       <FinalCTA />
       <LandingFooter />
       <SmartCTA />

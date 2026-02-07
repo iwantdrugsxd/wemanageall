@@ -709,8 +709,9 @@ export default function Projects() {
         </div>
       ) : (
         <div>
-          {/* Create New Project Card (only in grid view) */}
+          {/* Create New Project Card + First Project Card (only in grid view) */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            {/* Create New Project Card */}
             <div
               onClick={() => setShowCreateModal(true)}
               className="rounded-lg p-8 border-2 border-dashed cursor-pointer transition-all duration-200 group"
@@ -736,9 +737,152 @@ export default function Projects() {
                 <p className="text-xs text-center" style={{ color: 'var(--text-muted)' }}>Start from scratch</p>
               </div>
             </div>
+            
+            {/* First Project Card (Partizo) - rendered alongside Create New Project */}
+            {filteredProjects.length > 0 && (
+              <div
+                key={filteredProjects[0].id}
+                onClick={() => navigate(`/projects/${filteredProjects[0].id}`)}
+                className="rounded-lg overflow-hidden border cursor-pointer transition-all duration-200 group relative"
+                style={{
+                  backgroundColor: 'var(--bg-card)',
+                  borderColor: 'var(--border-subtle)',
+                  borderLeftWidth: '4px',
+                  borderLeftColor: 'var(--accent)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--accent)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                }}
+              >
+                {/* Favorite Button */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleToggleFavorite(filteredProjects[0].id, filteredProjects[0].is_favorite);
+                  }}
+                  className="absolute top-3 left-3 z-10 p-1.5 rounded transition-colors"
+                  style={{ backgroundColor: 'var(--bg-card)' }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = 'var(--bg-surface)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = 'var(--bg-card)';
+                  }}
+                >
+                  <svg 
+                    className={`w-4 h-4 ${filteredProjects[0].is_favorite ? 'fill-current' : ''}`}
+                    style={{ color: filteredProjects[0].is_favorite ? 'var(--accent)' : 'var(--text-muted)' }}
+                    fill={filteredProjects[0].is_favorite ? "currentColor" : "none"} 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                  </svg>
+                </button>
+                
+                {/* Cover Section */}
+                <div 
+                  className="h-32 relative overflow-hidden"
+                  style={{ backgroundColor: 'var(--accent)' }}
+                >
+                  {filteredProjects[0].cover_image_url ? (
+                    <img
+                      src={filteredProjects[0].cover_image_url}
+                      alt={filteredProjects[0].name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: 'var(--accent)' }}>
+                      <div className="w-12 h-12 rounded-lg flex items-center justify-center">
+                        <span className="text-2xl">{filteredProjects[0].icon || '📋'}</span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Progress Circle */}
+                  <div className="absolute top-4 right-4">
+                    <div className="relative w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
+                      <svg className="transform -rotate-90 w-10 h-10">
+                        <circle
+                          cx="20"
+                          cy="20"
+                          r="18"
+                          stroke="rgba(255,255,255,0.2)"
+                          strokeWidth="2"
+                          fill="none"
+                        />
+                        <circle
+                          cx="20"
+                          cy="20"
+                          r="18"
+                          stroke="white"
+                          strokeWidth="2"
+                          fill="none"
+                          strokeDasharray={2 * Math.PI * 18}
+                          strokeDashoffset={2 * Math.PI * 18 * (1 - (filteredProjects[0].progress || 0) / 100)}
+                          className="transition-all duration-300"
+                        />
+                      </svg>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-xs text-white">{filteredProjects[0].progress || 0}%</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Project Name Overlay */}
+                  <div className="absolute bottom-0 left-0 right-0 p-4" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.7), transparent)' }}>
+                    <h3 className="text-base text-white">{filteredProjects[0].name}</h3>
+                  </div>
+                </div>
+
+                {/* Content Section */}
+                <div className="p-5">
+                  {/* Tags */}
+                  {filteredProjects[0].tags && filteredProjects[0].tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mb-3">
+                      {filteredProjects[0].tags.map((tag, idx) => (
+                        <span
+                          key={idx}
+                          className="px-2 py-0.5 text-xs rounded"
+                          style={{
+                            backgroundColor: 'var(--bg-surface)',
+                            color: 'var(--text-muted)'
+                          }}
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  
+                  <div className="mb-3">
+                    <p className="text-xs uppercase tracking-wide mb-2" style={{ color: 'var(--text-muted)' }}>Next Task</p>
+                    {filteredProjects[0].nextTask ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: 'var(--accent)' }}></div>
+                        <p className="text-sm line-clamp-1" style={{ color: 'var(--text-primary)' }}>{filteredProjects[0].nextTask.title}</p>
+                      </div>
+                    ) : (
+                      <p className="text-sm" style={{ color: 'var(--text-muted)' }}>No tasks yet</p>
+                    )}
+                  </div>
+                  
+                  <div className="pt-3 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{filteredProjects[0].tasksRemaining || 0} tasks remaining</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
+          
+          {/* Rest of the projects (excluding the first one) */}
           <ProjectsGrid
-            projects={filteredProjects}
+            projects={filteredProjects.slice(1)}
             showArchived={showArchived}
             searchQuery={searchQuery}
             onToggleFavorite={handleToggleFavorite}
