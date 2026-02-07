@@ -1,58 +1,63 @@
 import { useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import PricingToggle from './PricingToggle';
 
 const PLANS = {
   free: {
     name: 'Free',
     monthlyPrice: 0,
     annualPrice: 0,
-    for: 'Solo founders validating an idea',
-    cta: 'Start free',
+    for: '',
+    cta: 'Current Plan',
+    ctaLink: '/signup',
+    isCurrent: true,
+    highlights: [
+      '3 Projects',
+      '50 Calendar Events',
+      'Community Support'
+    ]
+  },
+  starter: {
+    name: 'Starter',
+    monthlyPrice: 199,
+    annualPrice: 199,
+    for: '',
+    cta: 'Start 7-Day Trial',
     ctaLink: '/signup',
     highlights: [
-      'Core modules: Projects, Work, Docs, Calendar',
-      'Basic storage',
-      'Personal workspace'
+      'Unlimited Projects',
+      'Unlimited Calendar Events',
+      'Advanced Analytics',
+      'Email Support'
     ]
   },
   team: {
     name: 'Team',
-    monthlyPrice: 12,
-    annualPrice: 10,
-    for: 'Small teams shipping weekly',
-    cta: 'Start Team trial',
+    monthlyPrice: 499,
+    annualPrice: 499,
+    for: '',
+    cta: 'Start 7-Day Trial',
     ctaLink: '/signup',
     isPopular: true,
+    hasSeatsInput: true,
     highlights: [
-      'Unlimited projects',
-      'Shared workspace + collaboration',
-      'Advanced views and templates'
-    ]
-  },
-  business: {
-    name: 'Business',
-    monthlyPrice: 24,
-    annualPrice: 20,
-    for: 'Teams needing controls',
-    cta: 'Contact sales',
-    ctaLink: 'mailto:hello@wemanageall.in?subject=Business%20plan',
-    highlights: [
-      'Role-based access',
-      'Audit-ready activity',
-      'Priority support + invoices'
+      'Unlimited Projects',
+      'Unlimited Calendar Events',
+      'Up to 25 Team Members',
+      'Advanced Analytics',
+      'Integrations',
+      'Priority Support'
     ]
   }
 };
 
 export default function PricingSection() {
   const shouldReduceMotion = useReducedMotion();
-  const [billingCycle, setBillingCycle] = useState('monthly');
+  const [teamSeats, setTeamSeats] = useState(2);
   
   const formatPrice = (price) => {
-    if (price === 0) return '$0';
-    return `$${price}`;
+    if (price === 0) return 'Free';
+    return `₹${price}`;
   };
   
   return (
@@ -67,21 +72,17 @@ export default function PricingSection() {
           transition={{ duration: 0.6 }}
         >
           <h2 className="mk-h1 mb-4 text-[var(--mk-ink)]">
-            Simple plans that scale with your team.
+            Choose your plan
           </h2>
           <p className="mk-lead text-[var(--mk-ink-2)] max-w-2xl mx-auto">
-            Choose the plan that fits your workflow. Upgrade or downgrade anytime.
+            Select the plan that works best for you. Upgrade or downgrade anytime.
           </p>
         </motion.div>
-
-        {/* Billing Toggle */}
-        <PricingToggle value={billingCycle} onChange={setBillingCycle} />
 
         {/* Plan Cards */}
         <div className="grid md:grid-cols-3 gap-6 lg:gap-8 mb-16">
           {Object.entries(PLANS).map(([key, plan], index) => {
-            const price = billingCycle === 'annual' ? plan.annualPrice : plan.monthlyPrice;
-            const isExternal = plan.ctaLink.startsWith('mailto:');
+            const price = plan.monthlyPrice;
             
             return (
               <motion.div
@@ -118,56 +119,64 @@ export default function PricingSection() {
                   </span>
                   {price > 0 && (
                     <span className="text-sm text-[var(--mk-ink-2)] ml-2">
-                      / seat / {billingCycle === 'annual' ? 'month' : 'month'}
+                      {key === 'team' ? '/user/month' : '/month'}
                     </span>
-                  )}
-                  {price > 0 && billingCycle === 'annual' && (
-                    <div className="text-xs text-[var(--mk-ink-2)] mt-1">
-                      Billed annually
-                    </div>
                   )}
                 </div>
 
-                {/* For */}
-                <p className="text-sm text-[var(--mk-ink-2)] mb-6">
-                  {plan.for}
-                </p>
-
                 {/* Highlights */}
-                <ul className="space-y-3 mb-8">
+                <ul className="space-y-3 mb-6">
                   {plan.highlights.map((highlight, i) => (
                     <li key={i} className="text-sm text-[var(--mk-ink-2)] flex items-start">
-                      <span className="mr-3 text-[var(--mk-hairline)] font-bold">—</span>
+                      <svg className="mr-3 mt-0.5 flex-shrink-0 w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
                       {highlight}
                     </li>
                   ))}
                 </ul>
 
-                {/* CTA */}
-                {isExternal ? (
-                  <a
-                    href={plan.ctaLink}
-                    className={`block w-full text-center px-6 py-3 rounded-lg text-sm font-medium transition-opacity focus:outline-none focus:ring-2 focus:ring-[var(--mk-ink)] focus:ring-offset-2 ${
-                      plan.isPopular
-                        ? 'bg-[var(--mk-ink)] text-[var(--mk-bg)] hover:opacity-90'
-                        : 'bg-[var(--mk-surface)] border mk-hairline text-[var(--mk-ink)] hover:border-[var(--mk-ink)]'
-                    }`}
-                    style={{ borderWidth: plan.isPopular ? '0' : '1px' }}
+                {/* Number of Seats Input (Team Plan) */}
+                {plan.hasSeatsInput && (
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-[var(--mk-ink-2)] mb-2">
+                      Number of Seats
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="25"
+                      value={teamSeats}
+                      onChange={(e) => setTeamSeats(parseInt(e.target.value) || 1)}
+                      className="w-full px-4 py-2 border mk-hairline rounded-lg bg-[var(--mk-bg)] text-[var(--mk-ink)] focus:outline-none focus:ring-2 focus:ring-[var(--mk-ink)] focus:ring-offset-2"
+                      style={{ borderWidth: '1px' }}
+                    />
+                  </div>
+                )}
+
+                {/* CTA Buttons */}
+                {plan.isCurrent ? (
+                  <button
+                    disabled
+                    className="block w-full text-center px-6 py-3 rounded-lg text-sm font-medium bg-gray-200 text-gray-500 cursor-not-allowed"
                   >
                     {plan.cta}
-                  </a>
+                  </button>
                 ) : (
-                  <Link
-                    to={plan.ctaLink}
-                    className={`block w-full text-center px-6 py-3 rounded-lg text-sm font-medium transition-opacity focus:outline-none focus:ring-2 focus:ring-[var(--mk-ink)] focus:ring-offset-2 ${
-                      plan.isPopular
-                        ? 'bg-[var(--mk-ink)] text-[var(--mk-bg)] hover:opacity-90'
-                        : 'bg-[var(--mk-surface)] border mk-hairline text-[var(--mk-ink)] hover:border-[var(--mk-ink)]'
-                    }`}
-                    style={{ borderWidth: plan.isPopular ? '0' : '1px' }}
-                  >
-                    {plan.cta}
-                  </Link>
+                  <div className="space-y-3">
+                    <Link
+                      to={plan.ctaLink}
+                      className="block w-full text-center px-6 py-3 rounded-lg text-sm font-medium bg-orange-500 text-white hover:bg-orange-600 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                    >
+                      {plan.cta}
+                    </Link>
+                    <Link
+                      to={plan.ctaLink}
+                      className="block w-full text-center px-6 py-3 rounded-lg text-sm font-medium bg-blue-900 text-white hover:bg-blue-800 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-900 focus:ring-offset-2"
+                    >
+                      Subscribe
+                    </Link>
+                  </div>
                 )}
               </motion.div>
             );
