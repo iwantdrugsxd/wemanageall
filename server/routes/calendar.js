@@ -71,6 +71,22 @@ router.get('/events', requireAuth, async (req, res) => {
 
 // POST /api/calendar/events - Create new event
 router.post('/events', requireAuth, async (req, res) => {
+  // Check calendar event limit
+  try {
+    const { canCreateCalendarEvent } = await import('../services/subscription.js');
+    const canCreate = await canCreateCalendarEvent(req.user.id, null);
+    
+    if (!canCreate) {
+      return res.status(403).json({
+        error: 'You have reached the calendar event limit for your plan. Upgrade to create more events.',
+        upgradeRequired: true,
+      });
+    }
+  } catch (error) {
+    console.error('Calendar event limit check error:', error);
+    // Continue if check fails (graceful degradation)
+  }
+
   try {
     await ensureMigration();
     const {

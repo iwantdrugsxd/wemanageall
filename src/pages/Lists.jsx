@@ -50,6 +50,9 @@ export default function Lists({ embedded = false }) {
   });
   const [editListImagePreview, setEditListImagePreview] = useState(null);
   const [uploadingEditImage, setUploadingEditImage] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [shareList, setShareList] = useState(null);
+  const [shareCode, setShareCode] = useState(null);
 
   const icons = ['📋', '🎬', '📚', '🌍', '💡', '🛒', '🎯', '📝', '⭐', '🔥'];
 
@@ -184,12 +187,56 @@ export default function Lists({ embedded = false }) {
   const handleUpdateList = async () => {
     if (!editingList || !editListForm.name.trim()) return;
 
+    // Handle share toggle separately
+    const wasShared = editingList.is_shared;
+    const willBeShared = editListForm.is_shared;
+    
+    if (wasShared !== willBeShared) {
+      if (willBeShared) {
+        // Enable sharing
+        try {
+          const shareResponse = await fetch(`/api/lists/${editingList.id}/share`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+          });
+          if (!shareResponse.ok) {
+            alert('Failed to enable sharing');
+            return;
+          }
+        } catch (error) {
+          console.error('Share error:', error);
+          alert('Failed to enable sharing');
+          return;
+        }
+      } else {
+        // Disable sharing
+        try {
+          const unshareResponse = await fetch(`/api/lists/${editingList.id}/unshare`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+          });
+          if (!unshareResponse.ok) {
+            alert('Failed to disable sharing');
+            return;
+          }
+        } catch (error) {
+          console.error('Unshare error:', error);
+          alert('Failed to disable sharing');
+          return;
+        }
+      }
+    }
+
     try {
+      // Exclude is_shared from PATCH since we handle it separately
+      const { is_shared, ...updateData } = editListForm;
       const response = await fetch(`/api/lists/${editingList.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify(editListForm),
+        body: JSON.stringify(updateData),
       });
 
       if (response.ok) {
@@ -233,18 +280,61 @@ export default function Lists({ embedded = false }) {
 
   const handleToggleShare = async (listId, currentShared) => {
     try {
-      const response = await fetch(`/api/lists/${listId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ is_shared: !currentShared }),
-      });
+      if (!currentShared) {
+        // Enable sharing - generate share code
+        const response = await fetch(`/api/lists/${listId}/share`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+        });
 
-      if (response.ok) {
-        await fetchLists();
+        if (response.ok) {
+          const data = await response.json();
+          setShareCode(data.share_code);
+          await fetchLists();
+        }
+      } else {
+        // Disable sharing
+        const response = await fetch(`/api/lists/${listId}/unshare`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+        });
+
+        if (response.ok) {
+          setShareCode(null);
+          await fetchLists();
+        }
       }
     } catch (error) {
       console.error('Toggle share error:', error);
+    }
+  };
+
+  const handleOpenShareModal = async (list) => {
+    setShareList(list);
+    setShowShareModal(true);
+    
+    // If list is already shared, use existing share_code
+    if (list.share_code) {
+      setShareCode(list.share_code);
+    } else {
+      // Generate share code
+      try {
+        const response = await fetch(`/api/lists/${list.id}/share`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setShareCode(data.share_code);
+          await fetchLists(); // Refresh to get updated list with share_code
+        }
+      } catch (error) {
+        console.error('Failed to generate share code:', error);
+      }
     }
   };
 
@@ -399,6 +489,7 @@ export default function Lists({ embedded = false }) {
               onEdit={handleEditList}
               onTogglePin={handleTogglePin}
               onToggleShare={handleToggleShare}
+              onShare={handleOpenShareModal}
               progress={getProgressPercentage(list)}
               timeAgo={getTimeAgo(list.updated_at)}
             />
@@ -811,12 +902,119 @@ export default function Lists({ embedded = false }) {
           </div>
         </div>
       )}
+
+      {/* Share Modal */}
+      {showShareModal && shareList && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div
+            className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-display text-lg font-semibold text-black">Share List</h3>
+              <button
+                onClick={() => {
+                  setShowShareModal(false);
+                  setShareList(null);
+                  setShareCode(null);
+                }}
+                className="p-2 hover:bg-gray-100 rounded-lg"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {shareCode ? (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-black mb-2">Share Code</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={shareCode}
+                      readOnly
+                      className="flex-1 px-4 py-3 border border-gray-300 rounded-xl bg-gray-100 text-center text-lg font-mono tracking-widest"
+                    />
+                    <button
+                      onClick={async () => {
+                        try {
+                          await navigator.clipboard.writeText(shareCode);
+                          alert('Share code copied to clipboard!');
+                        } catch (error) {
+                          console.error('Failed to copy:', error);
+                        }
+                      }}
+                      className="px-4 py-3 bg-black text-white rounded-xl hover:bg-gray-900 transition-colors"
+                    >
+                      Copy
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-black mb-2">Share Link</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={`${window.location.origin}/lists/share/${shareCode}`}
+                      readOnly
+                      className="flex-1 px-4 py-3 border border-gray-300 rounded-xl bg-gray-100 text-sm"
+                    />
+                    <button
+                      onClick={async () => {
+                        try {
+                          await navigator.clipboard.writeText(`${window.location.origin}/lists/share/${shareCode}`);
+                          alert('Share link copied to clipboard!');
+                        } catch (error) {
+                          console.error('Failed to copy:', error);
+                        }
+                      }}
+                      className="px-4 py-3 bg-black text-white rounded-xl hover:bg-gray-900 transition-colors"
+                    >
+                      Copy
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <a
+                    href={`mailto:?subject=Check out this list: ${shareList.name}&body=Check out this shared list: ${window.location.origin}/lists/share/${shareCode}`}
+                    className="block w-full px-4 py-3 bg-gray-100 text-black rounded-xl hover:bg-gray-200 transition-colors text-center text-sm"
+                  >
+                    Email Link
+                  </a>
+                </div>
+
+                <div className="pt-4 border-t border-gray-300">
+                  <button
+                    onClick={async () => {
+                      await handleToggleShare(shareList.id, true);
+                      setShowShareModal(false);
+                      setShareList(null);
+                      setShareCode(null);
+                    }}
+                    className="w-full px-4 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors text-sm"
+                  >
+                    Disable Sharing
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-gray-600 mb-4">Generating share code...</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 // List Card Component
-function ListCard({ list, onOpen, onDelete, onEdit, onTogglePin, onToggleShare, progress, timeAgo }) {
+function ListCard({ list, onOpen, onDelete, onEdit, onTogglePin, onToggleShare, onShare, progress, timeAgo }) {
   return (
     <div
       className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:border-black cursor-pointer transition-all duration-200 group relative"
@@ -896,12 +1094,12 @@ function ListCard({ list, onOpen, onDelete, onEdit, onTogglePin, onToggleShare, 
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                onToggleShare(list.id, list.is_shared);
+                onShare(list);
               }}
               className={`p-1.5 rounded hover:bg-gray-100 transition-all opacity-0 group-hover:opacity-100 ${
                 list.is_shared ? 'opacity-100' : ''
               }`}
-              title={list.is_shared ? 'Unshare list' : 'Share list'}
+              title="Share list"
             >
               <svg className={`w-4 h-4 ${list.is_shared ? 'text-black' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />

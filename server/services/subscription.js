@@ -305,6 +305,64 @@ export async function canCreateProject(userId, organizationId = null) {
 }
 
 /**
+ * Check if user can create more calendar events
+ * Counts events in the current month
+ */
+export async function canCreateCalendarEvent(userId, organizationId = null) {
+  let subscription;
+
+  if (organizationId) {
+    subscription = await getOrganizationSubscription(organizationId);
+  } else {
+    subscription = await getUserSubscription(userId);
+  }
+
+  // Check if subscription is active (including valid trials)
+  if (!isActiveStatus(subscription.status, subscription.trial_end)) {
+    return false;
+  }
+
+  const plan = SUBSCRIPTION_PLANS[subscription.plan_type] || SUBSCRIPTION_PLANS.free;
+  const maxEvents = plan.features.calendarEvents;
+
+  if (maxEvents === -1) {
+    return true; // Unlimited
+  }
+
+  // Count events in current month (check both calendar_events and events tables)
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+
+  // Count from calendar_events table
+  const calendarCountResult = await query(
+    `SELECT COUNT(*) as count FROM calendar_events 
+     WHERE user_id = $1 
+     AND start_time >= $2 
+     AND start_time <= $3
+     ${organizationId ? 'AND organization_id = $4' : ''}`,
+    organizationId 
+      ? [userId, startOfMonth, endOfMonth, organizationId]
+      : [userId, startOfMonth, endOfMonth]
+  );
+
+  // Count from events table (alternative event system)
+  const eventsCountResult = await query(
+    `SELECT COUNT(*) as count FROM events 
+     WHERE user_id = $1 
+     AND start_at >= $2 
+     AND start_at <= $3`,
+    [userId, startOfMonth, endOfMonth]
+  );
+
+  const calendarCount = parseInt(calendarCountResult.rows[0]?.count) || 0;
+  const eventsCount = parseInt(eventsCountResult.rows[0]?.count) || 0;
+  const currentCount = calendarCount + eventsCount;
+  
+  return currentCount < maxEvents;
+}
+
+/**
  * Check if user can add team members
  * For Team plans, also enforces purchased seats limit
  */

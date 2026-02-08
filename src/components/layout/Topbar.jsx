@@ -299,6 +299,14 @@ export default function Topbar({ onQuickAction }) {
                     >
                       Pricing & Plans
                     </Link>
+                    <Link
+                      to="/organizations"
+                      onClick={() => setShowUserMenu(false)}
+                      className="block w-full text-left px-4 py-2 text-sm transition-colors"
+                      style={{ color: 'var(--text-primary)' }}
+                    >
+                      Workspaces
+                    </Link>
                   </div>
 
                   <hr className="my-2" style={{ borderColor: 'var(--border-subtle)' }} />

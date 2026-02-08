@@ -18,10 +18,15 @@ import Settings from './pages/Settings';
 import Notifications from './pages/Notifications';
 import Library from './pages/Library';
 import Lists from './pages/Lists';
+import ListShare from './pages/ListShare';
 import Pricing from './pages/Pricing';
 import Work from './pages/Work';
 import DocsHub from './pages/DocsHub';
 import Admin from './pages/Admin';
+import Organizations from './pages/Organizations';
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
+import ResetPassword from './pages/ResetPassword';
 import Layout from './components/Layout';
 
 // Loading spinner component
@@ -284,6 +289,16 @@ function App() {
           </ProtectedRoute>
         } 
       />
+      <Route 
+        path="/organizations" 
+        element={
+          <ProtectedRoute requireOnboarding>
+            <Layout>
+              <Organizations />
+            </Layout>
+          </ProtectedRoute>
+        } 
+      />
       {/* Library routes - redirect to Resources */}
       <Route 
         path="/library" 
@@ -322,6 +337,11 @@ function App() {
           </ProtectedRoute>
         } 
       />
+      {/* Public shared list route (no auth required) */}
+      <Route 
+        path="/lists/share/:code" 
+        element={<ListShare />} 
+      />
       {/* Resources route (alias to Library) */}
       <Route 
         path="/resources" 
@@ -342,6 +362,22 @@ function App() {
             </Layout>
           </ProtectedRoute>
         } 
+      />
+      
+      {/* Legal Pages (no auth required) */}
+      <Route 
+        path="/terms" 
+        element={<Terms />} 
+      />
+      <Route 
+        path="/privacy" 
+        element={<Privacy />} 
+      />
+      
+      {/* Password Reset (no auth required) */}
+      <Route 
+        path="/reset-password" 
+        element={<ResetPassword />} 
       />
       
       {/* Catch all - redirect to home */}

@@ -20,7 +20,10 @@ export default function IntentionsPanel({
   onAddIntention,
   onUpdateIntention,
   onDeleteIntention,
-  onEditIntention
+  onEditIntention,
+  recentIntentions = [],
+  showRecentIntentions = false,
+  setShowRecentIntentions
 }) {
   return (
     <div 
@@ -34,12 +37,57 @@ export default function IntentionsPanel({
         <h3 className="text-sm font-medium uppercase tracking-wide transition-colors" style={{ color: 'var(--text-primary)' }}>
           Today's Intention
         </h3>
-        {intentionSaved && (
-          <svg className="w-4 h-4 transition-colors" style={{ color: 'var(--text-muted)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-          </svg>
-        )}
+        <div className="flex items-center gap-2">
+          {recentIntentions && recentIntentions.length > 0 && (
+            <button
+              onClick={() => setShowRecentIntentions(!showRecentIntentions)}
+              className="text-xs px-2 py-1 rounded transition-colors"
+              style={{ 
+                color: showRecentIntentions ? 'var(--text-primary)' : 'var(--text-muted)',
+                backgroundColor: showRecentIntentions ? 'var(--bg-surface)' : 'transparent'
+              }}
+            >
+              Recent
+            </button>
+          )}
+          {intentionSaved && (
+            <svg className="w-4 h-4 transition-colors" style={{ color: 'var(--text-muted)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          )}
+        </div>
       </div>
+
+      {/* Recent Intentions List */}
+      {showRecentIntentions && recentIntentions && recentIntentions.length > 0 && (
+        <div className="mb-4 p-3 rounded border transition-colors" style={{ 
+          backgroundColor: 'var(--bg-surface)',
+          borderColor: 'var(--border-subtle)'
+        }}>
+          <p className="text-xs mb-2 transition-colors" style={{ color: 'var(--text-muted)' }}>Recent intentions:</p>
+          <div className="space-y-1">
+            {recentIntentions.slice(0, 7).map((intention) => (
+              <button
+                key={intention.id}
+                onClick={() => {
+                  if (!showAddIntention) {
+                    setShowAddIntention(true);
+                  }
+                  setNewIntention(intention.intention);
+                  setShowRecentIntentions(false);
+                }}
+                className="w-full text-left px-2 py-1 text-xs rounded hover:bg-opacity-50 transition-colors"
+                style={{ 
+                  color: 'var(--text-primary)',
+                  backgroundColor: 'transparent'
+                }}
+              >
+                {intention.intention}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     
       {intentions && intentions.length > 0 ? (
         <div className="space-y-2 mb-4">

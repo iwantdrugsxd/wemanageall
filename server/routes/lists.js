@@ -54,6 +54,16 @@ const initTables = async () => {
       END $$;
     `);
 
+    // Add share_code column if it doesn't exist
+    await query(`
+      DO $$ 
+      BEGIN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'lists' AND column_name = 'share_code') THEN
+          ALTER TABLE lists ADD COLUMN share_code VARCHAR(12) UNIQUE;
+        END IF;
+      END $$;
+    `);
+
     // Create indexes
     await query(`CREATE INDEX IF NOT EXISTS idx_lists_user_id ON lists(user_id)`);
     await query(`CREATE INDEX IF NOT EXISTS idx_lists_updated_at ON lists(updated_at DESC)`);
@@ -96,6 +106,7 @@ router.get('/', requireAuth, async (req, res) => {
         l.cover_image_url,
         l.is_pinned,
         l.is_shared,
+        l.share_code,
         l.created_at,
         l.updated_at,
         COUNT(li.id) as total_items,
@@ -122,7 +133,7 @@ router.get('/', requireAuth, async (req, res) => {
     }
 
     queryText += `
-      GROUP BY l.id, l.name, l.icon, l.description, l.cover_image_url, l.is_pinned, l.is_shared, l.created_at, l.updated_at
+      GROUP BY l.id, l.name, l.icon, l.description, l.cover_image_url, l.is_pinned, l.is_shared, l.share_code, l.created_at, l.updated_at
       ORDER BY l.is_pinned DESC, l.updated_at DESC
     `;
 
@@ -146,7 +157,7 @@ router.get('/:id', requireAuth, async (req, res) => {
     await ensureTables();
 
     const listResult = await query(`
-      SELECT id, name, icon, description, cover_image_url, is_pinned, is_shared, created_at, updated_at
+      SELECT id, name, icon, description, cover_image_url, is_pinned, is_shared, share_code, created_at, updated_at
       FROM lists
       WHERE id = $1 AND user_id = $2
     `, [req.params.id, req.user.id]);
@@ -189,7 +200,7 @@ router.post('/', requireAuth, async (req, res) => {
     const result = await query(`
       INSERT INTO lists (user_id, name, icon, description, cover_image_url)
       VALUES ($1, $2, $3, $4, $5)
-      RETURNING id, name, icon, description, cover_image_url, is_pinned, is_shared, created_at, updated_at
+      RETURNING id, name, icon, description, cover_image_url, is_pinned, is_shared, share_code, created_at, updated_at
     `, [req.user.id, name.trim(), icon || null, description || null, cover_image_url || null]);
 
     res.json({
@@ -257,7 +268,7 @@ router.patch('/:id', requireAuth, async (req, res) => {
       UPDATE lists
       SET ${updates.join(', ')}
       WHERE id = $${paramIndex} AND user_id = $${paramIndex + 1}
-      RETURNING id, name, icon, description, cover_image_url, is_pinned, is_shared, created_at, updated_at
+      RETURNING id, name, icon, description, cover_image_url, is_pinned, is_shared, share_code, created_at, updated_at
     `, params);
 
     if (result.rows.length === 0) {
@@ -572,6 +583,158 @@ router.patch('/:id/reorder', requireAuth, async (req, res) => {
     console.error('Reorder items error:', error);
     res.status(500).json({
       error: error.message || 'Failed to reorder items.'
+    });
+  }
+});
+
+// Helper function to generate share code
+const generateShareCode = () => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let code = '';
+  for (let i = 0; i < 8; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
+};
+
+// POST /api/lists/:id/share - Generate share code
+router.post('/:id/share', requireAuth, async (req, res) => {
+  try {
+    await ensureTables();
+
+    const listId = req.params.id;
+
+    // Verify list belongs to user
+    const listCheck = await query(
+      `SELECT id, share_code FROM lists WHERE id = $1 AND user_id = $2`,
+      [listId, req.user.id]
+    );
+
+    if (listCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'List not found.' });
+    }
+
+    let shareCode = listCheck.rows[0].share_code;
+
+    // Generate new share code if doesn't exist
+    if (!shareCode) {
+      let attempts = 0;
+      let unique = false;
+      
+      while (!unique && attempts < 10) {
+        shareCode = generateShareCode();
+        const existing = await query(
+          `SELECT id FROM lists WHERE share_code = $1`,
+          [shareCode]
+        );
+        if (existing.rows.length === 0) {
+          unique = true;
+        }
+        attempts++;
+      }
+
+      if (!unique) {
+        return res.status(500).json({ error: 'Failed to generate unique share code.' });
+      }
+    }
+
+    // Update list with share code and set is_shared = true
+    const result = await query(`
+      UPDATE lists
+      SET share_code = $1, is_shared = TRUE, updated_at = CURRENT_TIMESTAMP
+      WHERE id = $2 AND user_id = $3
+      RETURNING id, name, icon, description, cover_image_url, is_pinned, is_shared, share_code, created_at, updated_at
+    `, [shareCode, listId, req.user.id]);
+
+    res.json({
+      success: true,
+      share_code: shareCode,
+      list: result.rows[0]
+    });
+  } catch (error) {
+    console.error('Share list error:', error);
+    res.status(500).json({
+      error: error.message || 'Failed to share list.'
+    });
+  }
+});
+
+// POST /api/lists/:id/unshare - Disable sharing
+router.post('/:id/unshare', requireAuth, async (req, res) => {
+  try {
+    await ensureTables();
+
+    const listId = req.params.id;
+
+    // Verify list belongs to user
+    const listCheck = await query(
+      `SELECT id FROM lists WHERE id = $1 AND user_id = $2`,
+      [listId, req.user.id]
+    );
+
+    if (listCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'List not found.' });
+    }
+
+    // Update list to disable sharing
+    const result = await query(`
+      UPDATE lists
+      SET is_shared = FALSE, updated_at = CURRENT_TIMESTAMP
+      WHERE id = $1 AND user_id = $2
+      RETURNING id, name, icon, description, cover_image_url, is_pinned, is_shared, share_code, created_at, updated_at
+    `, [listId, req.user.id]);
+
+    res.json({
+      success: true,
+      list: result.rows[0]
+    });
+  } catch (error) {
+    console.error('Unshare list error:', error);
+    res.status(500).json({
+      error: error.message || 'Failed to unshare list.'
+    });
+  }
+});
+
+// GET /api/lists/share/:code - Public read-only view
+router.get('/share/:code', async (req, res) => {
+  try {
+    await ensureTables();
+
+    const shareCode = req.params.code;
+
+    // Find list by share code where is_shared = true
+    const listResult = await query(`
+      SELECT id, name, icon, description, cover_image_url, created_at, updated_at
+      FROM lists
+      WHERE share_code = $1 AND is_shared = TRUE
+    `, [shareCode]);
+
+    if (listResult.rows.length === 0) {
+      return res.status(404).json({ error: 'List not found or not shared.' });
+    }
+
+    const list = listResult.rows[0];
+
+    // Get items for the list
+    const itemsResult = await query(`
+      SELECT id, title, note, tag, is_done, position, created_at, updated_at
+      FROM list_items
+      WHERE list_id = $1
+      ORDER BY is_done ASC, position ASC, created_at ASC
+    `, [list.id]);
+
+    res.json({
+      success: true,
+      list: {
+        ...list,
+        items: itemsResult.rows
+      }
+    });
+  } catch (error) {
+    console.error('Get shared list error:', error);
+    res.status(500).json({
+      error: error.message || 'Failed to fetch shared list.'
     });
   }
 });

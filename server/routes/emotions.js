@@ -162,7 +162,7 @@ router.get('/', requireAuth, async (req, res) => {
 // POST /api/emotions - Create a text unload entry
 router.post('/', requireAuth, async (req, res) => {
   try {
-    const { content, type = 'text', locked = false } = req.body;
+    const { content, type = 'text', locked } = req.body;
     
     if (type !== 'text') {
       return res.status(400).json({ error: 'Use /api/emotions/voice for voice entries' });
@@ -170,11 +170,21 @@ router.post('/', requireAuth, async (req, res) => {
     
     await ensureUnloadTable();
     
+    // Get user's lock_entries_default setting
+    const userResult = await query(
+      `SELECT lock_entries_default FROM users WHERE id = $1`,
+      [req.user.id]
+    );
+    const lockDefault = userResult.rows[0]?.lock_entries_default === true;
+    
+    // Use provided locked value, or default to user's setting
+    const entryLocked = locked !== undefined ? locked : lockDefault;
+    
     const result = await query(
       `INSERT INTO unload_entries (user_id, type, content, locked)
        VALUES ($1, $2, $3, $4)
        RETURNING id, type, content, locked, created_at`,
-      [req.user.id, type, content, locked]
+      [req.user.id, type, content, entryLocked]
     );
 
     res.json({
@@ -196,7 +206,7 @@ router.post('/voice', requireAuth, async (req, res) => {
       duration: req.body.duration,
     });
     
-    const { audio_url, duration, locked = false } = req.body;
+    const { audio_url, duration, locked } = req.body;
     
     if (!audio_url) {
       return res.status(400).json({ error: 'Audio URL is required.' });
@@ -209,11 +219,21 @@ router.post('/voice', requireAuth, async (req, res) => {
     // Ensure table exists
     await ensureUnloadTable();
     
+    // Get user's lock_entries_default setting
+    const userResult = await query(
+      `SELECT lock_entries_default FROM users WHERE id = $1`,
+      [req.user.id]
+    );
+    const lockDefault = userResult.rows[0]?.lock_entries_default === true;
+    
+    // Use provided locked value, or default to user's setting
+    const entryLocked = locked !== undefined ? locked : lockDefault;
+    
     const result = await query(
       `INSERT INTO unload_entries (user_id, type, audio_url, duration, transcript, locked)
        VALUES ($1, 'voice', $2, $3, NULL, $4)
        RETURNING id, type, audio_url, duration, transcript, locked, created_at`,
-      [req.user.id, audio_url, parseInt(duration) || 0, locked]
+      [req.user.id, audio_url, parseInt(duration) || 0, entryLocked]
     );
 
     console.log('✅ Voice entry saved successfully:', result.rows[0].id);

@@ -28,7 +28,9 @@
     "db:migrate-workspace-code": "node server/db/migrate_workspace_code.js",
     "db:migrate-calendar": "node server/db/migrate_calendar.js",
     "db:migrate-tasks-time": "node -e \"import('./server/db/config.js').then(async ({query}) => { const fs = await import('fs'); const sql = fs.readFileSync('server/db/migrate_tasks_time_tracking.sql', 'utf8'); await query(sql); console.log('✅ Time tracking columns added'); process.exit(0); }).catch(e => { console.error('❌ Error:', e.message); process.exit(1); })\"",
-    "db:migrate-subscriptions": "node server/db/migrate_subscriptions.js"
+    "db:migrate-subscriptions": "node server/db/migrate_subscriptions.js",
+    "test": "vitest",
+    "test:ui": "vitest --ui"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -60,12 +62,17 @@
     "react-router-dom": "^6.20.0"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.1.5",
+    "@testing-library/react": "^14.1.2",
+    "@testing-library/user-event": "^14.5.1",
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.16",
     "concurrently": "^8.2.2",
+    "jsdom": "^22.1.0",
     "playwright": "^1.58.1",
     "postcss": "^8.4.32",
     "tailwindcss": "^3.4.0",
-    "vite": "^5.0.0"
+    "vite": "^5.0.0",
+    "vitest": "^1.0.4"
   }
 }

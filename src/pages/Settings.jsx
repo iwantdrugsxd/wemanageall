@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -24,7 +24,49 @@ export default function Settings() {
   const [weeklySummary, setWeeklySummary] = useState(false);
   const [twoFactorAuth, setTwoFactorAuth] = useState(false);
   const [defaultWorkspace, setDefaultWorkspace] = useState('personal');
-  const [lockEntriesByDefault, setLockEntriesByDefault] = useState(false);
+  const [lockEntriesByDefault, setLockEntriesByDefault] = useState(user?.lockEntriesDefault || false);
+
+  // Sync lockEntriesByDefault with user profile
+  useEffect(() => {
+    if (user?.lockEntriesDefault !== undefined) {
+      setLockEntriesByDefault(user.lockEntriesDefault);
+    }
+  }, [user]);
+
+  const handleLockEntriesDefaultChange = async (value) => {
+    setLockEntriesByDefault(value);
+    try {
+      const response = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ lock_entries_default: value }),
+      });
+
+      if (response.ok) {
+        // Refresh user profile to get updated value
+        const profileResponse = await fetch('/api/profile', {
+          credentials: 'include',
+        });
+        if (profileResponse.ok) {
+          const data = await profileResponse.json();
+          // Update user in context if available
+          if (window.updateUserProfile) {
+            window.updateUserProfile(data.profile);
+          }
+        }
+      } else {
+        // Revert on error
+        setLockEntriesByDefault(!value);
+        alert('Failed to update setting');
+      }
+    } catch (error) {
+      console.error('Failed to update lock entries default:', error);
+      // Revert on error
+      setLockEntriesByDefault(!value);
+      alert('Failed to update setting');
+    }
+  };
 
   const handleExport = async () => {
     try {
@@ -470,7 +512,7 @@ export default function Settings() {
               <input
                 type="checkbox"
                 checked={lockEntriesByDefault}
-                onChange={(e) => setLockEntriesByDefault(e.target.checked)}
+                onChange={(e) => handleLockEntriesDefaultChange(e.target.checked)}
                 className="w-5 h-5 rounded transition-colors border-[var(--border-subtle)] bg-[var(--bg-card)]"
               />
               <span className="text-sm text-[var(--text-primary)]">
@@ -480,6 +522,22 @@ export default function Settings() {
             <p className="text-sm text-[var(--text-muted)]">
               Make all new entries private by default.
             </p>
+            <div className="mt-4 pt-4 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
+              <div className="space-y-2">
+                <Link
+                  to="/terms"
+                  className="block text-sm text-[var(--text-primary)] hover:underline transition-colors"
+                >
+                  Terms of Service
+                </Link>
+                <Link
+                  to="/privacy"
+                  className="block text-sm text-[var(--text-primary)] hover:underline transition-colors"
+                >
+                  Privacy Policy
+                </Link>
+              </div>
+            </div>
           </div>
         </Panel>
 

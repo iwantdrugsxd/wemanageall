@@ -130,7 +130,7 @@ export async function getUserProfile(id) {
   // Get user
   const userResult = await query(
     `SELECT id, name, email, created_at, onboarding_completed, onboarding_step,
-            vision, reminder_time, review_day, tone, current_goal, life_phase
+            vision, reminder_time, review_day, tone, current_goal, life_phase, lock_entries_default
      FROM users WHERE id = $1`,
     [id]
   );
@@ -174,7 +174,7 @@ export async function getUserProfile(id) {
  * Update user profile
  */
 export async function updateUser(id, updates) {
-  const allowedFields = ['name', 'vision', 'reminder_time', 'review_day', 'tone', 'current_goal'];
+  const allowedFields = ['name', 'vision', 'reminder_time', 'review_day', 'tone', 'current_goal', 'lock_entries_default'];
   const setClause = [];
   const values = [];
   let paramIndex = 1;
@@ -384,7 +384,7 @@ export async function updateOnboardingStep(id, step, data = {}) {
     // Query profile using the transaction client to see uncommitted changes
     const profileResult = await client.query(
       `SELECT id, name, email, created_at, onboarding_completed, onboarding_step,
-              vision, reminder_time, review_day, tone, current_goal, life_phase
+              vision, reminder_time, review_day, tone, current_goal, life_phase, lock_entries_default
        FROM users WHERE id = $1`,
       [id]
     );
@@ -455,6 +455,7 @@ function formatUserResponse(user, extras = {}) {
       reviewDay: user.review_day || 'sunday',
       tone: user.tone || 'coach',
     },
+    lockEntriesDefault: user.lock_entries_default || false,
   };
 }
 

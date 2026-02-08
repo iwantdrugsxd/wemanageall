@@ -969,6 +969,9 @@ export default function Home() {
             onUpdateIntention={handleUpdateIntention}
             onDeleteIntention={handleDeleteIntention}
             onEditIntention={handleEditIntention}
+            recentIntentions={recentIntentions}
+            showRecentIntentions={showRecentIntentions}
+            setShowRecentIntentions={setShowRecentIntentions}
           />
 
           {/* Objectives (Tasks) */}

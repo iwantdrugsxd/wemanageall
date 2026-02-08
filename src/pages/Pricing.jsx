@@ -34,12 +34,8 @@ export default function Pricing() {
       });
       if (response.ok) {
         const data = await response.json();
-        // Filter to only show: free, premium (Starter), team_starter (Team)
-        // Hide team_pro and enterprise or show as "Contact Sales"
-        const visiblePlans = data.plans.filter(p => 
-          p.id === 'free' || p.id === 'premium' || p.id === 'team_starter'
-        );
-        setPlans(visiblePlans);
+        // Show all plans - team_pro and enterprise will show as "Contact Sales"
+        setPlans(data.plans);
       }
     } catch (error) {
       console.error('Failed to fetch plans:', error);
@@ -252,6 +248,7 @@ export default function Pricing() {
           {plans.map((plan) => {
             const isCurrentPlan = currentPlan && currentPlan.id === plan.id;
             const isTeamPlan = plan.features.teamMembers > 0;
+            const isContactSales = plan.id === 'team_pro' || plan.id === 'enterprise';
             const price = billingCycle === 'annual' && plan.priceAnnual ? plan.priceAnnual : plan.price;
             const monthlyPrice = billingCycle === 'annual' && plan.priceAnnual 
               ? (plan.priceAnnual / 12).toFixed(0) 
@@ -260,12 +257,21 @@ export default function Pricing() {
             return (
               <div
                 key={plan.id}
-                className={`bg-white border rounded-lg p-6 ${
+                className={`bg-white border rounded-lg p-6 relative ${
                   plan.id === 'premium' || plan.id === 'team_starter'
                     ? 'border-gray-900 border-2 shadow-lg'
                     : 'border-gray-200'
                 }`}
               >
+                {/* Custom Badge for Contact Sales plans */}
+                {isContactSales && (
+                  <div className="absolute top-4 right-4">
+                    <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded">
+                      Custom
+                    </span>
+                  </div>
+                )}
+                
                 {/* Plan Header */}
                 <div className="mb-6">
                   <h3 className="text-xl font-medium text-gray-900 mb-2">{plan.name}</h3>
@@ -348,7 +354,14 @@ export default function Pricing() {
                 </ul>
 
                 {/* CTA Buttons */}
-                {isCurrentPlan && (currentSubscription.status === 'active' || currentSubscription.status === 'trial') ? (
+                {isContactSales ? (
+                  <a
+                    href={`mailto:sales@wemanageall.in?subject=${encodeURIComponent(plan.name + ' Inquiry')}&body=${encodeURIComponent('I am interested in learning more about the ' + plan.name + ' plan.')}`}
+                    className="block w-full px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-center"
+                  >
+                    Contact Sales
+                  </a>
+                ) : isCurrentPlan && (currentSubscription.status === 'active' || currentSubscription.status === 'trial') ? (
                   <button
                     disabled
                     className="w-full px-4 py-2 bg-gray-100 text-gray-500 rounded-lg cursor-not-allowed"

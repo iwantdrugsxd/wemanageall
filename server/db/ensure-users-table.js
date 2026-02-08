@@ -52,8 +52,27 @@ export async function ensureUsersTable() {
         subscription_plan VARCHAR(50) DEFAULT 'free' CHECK (subscription_plan IN ('free', 'premium', 'team_starter', 'team_pro', 'enterprise')),
         subscription_status VARCHAR(50) DEFAULT 'active' CHECK (subscription_status IN ('active', 'cancelled', 'expired', 'trial')),
         default_mode VARCHAR(50) DEFAULT 'individual' CHECK (default_mode IN ('individual', 'team')),
-        current_organization_id UUID
+        current_organization_id UUID,
+        lock_entries_default BOOLEAN DEFAULT FALSE,
+        password_reset_token TEXT,
+        password_reset_expires TIMESTAMP WITH TIME ZONE
       );
+    `);
+
+    // Add new columns if they don't exist (for existing tables)
+    await query(`
+      DO $$ 
+      BEGIN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'lock_entries_default') THEN
+          ALTER TABLE users ADD COLUMN lock_entries_default BOOLEAN DEFAULT FALSE;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'password_reset_token') THEN
+          ALTER TABLE users ADD COLUMN password_reset_token TEXT;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'password_reset_expires') THEN
+          ALTER TABLE users ADD COLUMN password_reset_expires TIMESTAMP WITH TIME ZONE;
+        END IF;
+      END $$;
     `);
 
     // Create indexes

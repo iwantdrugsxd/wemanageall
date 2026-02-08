@@ -16,6 +16,7 @@ export default function WorkspaceLayout({
   onToggleCollaborators,
   onAddTask,
   onFilter,
+  onManagePhases,
   children
 }) {
   const views = [
@@ -44,6 +45,7 @@ export default function WorkspaceLayout({
             onToggleCollaborators={onToggleCollaborators}
             onAddTask={onAddTask}
             onFilter={onFilter}
+            onManagePhases={onManagePhases}
           />
 
           {/* Tabs */}

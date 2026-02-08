@@ -367,7 +367,6 @@ export default function Emotions() {
       setMediaRecorder(recorder);
       setIsRecording(true);
       setRecordingTime(0);
-      setSpeechRecognition(recognition);
     } catch (error) {
       console.error('Failed to start recording:', error);
       alert('Could not access microphone. Please check permissions.');
@@ -526,7 +525,7 @@ export default function Emotions() {
                             </button>
                           )}
                           <button
-                            onClick={handleStartRecording}
+                            onClick={() => setView('record')}
                             className="w-10 h-10 bg-[#1F2933] text-white rounded-full flex items-center justify-center hover:bg-[#2d3d4d] transition-all shadow-lg group"
                             title="Record voice message"
                           >
@@ -1003,12 +1002,27 @@ export default function Emotions() {
             Sometimes talking is easier than typing.<br />
             This space is private.
           </p>
-          <button
-            onClick={handleStartRecording}
-            className="px-12 py-4 bg-black text-ofa-cream rounded-xl hover:bg-black transition-colors text-lg"
-          >
-            Start recording
-          </button>
+          <div className="flex items-center justify-center gap-4">
+            <button
+              onClick={handleStartRecording}
+              className="px-12 py-4 bg-black text-ofa-cream rounded-xl hover:bg-black transition-colors text-lg"
+            >
+              Start recording
+            </button>
+            <button
+              onClick={() => {
+                setView('home');
+                setAudioUrl(null);
+                setAudioBlob(null);
+                setRecordingTime(0);
+                setIsRecording(false);
+                setMediaRecorder(null);
+              }}
+              className="px-8 py-4 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors text-lg"
+            >
+              Back to Unload
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -1058,15 +1072,33 @@ export default function Emotions() {
           </div>
 
           {/* Stop Button */}
-          <button
-            onClick={handleStopRecording}
-            className="px-12 py-4 bg-gray-1000 text-white rounded-xl hover:text-black transition-colors text-lg flex items-center gap-3 mx-auto"
-          >
-            <div className="w-6 h-6 bg-white rounded flex items-center justify-center">
-              <div className="w-3 h-3 bg-gray-1000 rounded-sm"></div>
-            </div>
-            <span>Stop Recording</span>
-          </button>
+          <div className="flex items-center justify-center gap-4">
+            <button
+              onClick={handleStopRecording}
+              className="px-12 py-4 bg-gray-1000 text-white rounded-xl hover:text-black transition-colors text-lg flex items-center gap-3"
+            >
+              <div className="w-6 h-6 bg-white rounded flex items-center justify-center">
+                <div className="w-3 h-3 bg-gray-1000 rounded-sm"></div>
+              </div>
+              <span>Stop Recording</span>
+            </button>
+            <button
+              onClick={() => {
+                if (mediaRecorder && isRecording) {
+                  mediaRecorder.stop();
+                }
+                setIsRecording(false);
+                setMediaRecorder(null);
+                setView('home');
+                setAudioUrl(null);
+                setAudioBlob(null);
+                setRecordingTime(0);
+              }}
+              className="px-8 py-4 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors text-lg"
+            >
+              Cancel
+            </button>
+          </div>
 
           {/* Footer */}
           <div className="mt-16 text-left text-white/60 text-sm">

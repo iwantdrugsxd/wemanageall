@@ -1,8 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export default function Money() {
   const { user } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [income, setIncome] = useState([]);
   const [expenses, setExpenses] = useState([]);
@@ -56,6 +59,21 @@ export default function Money() {
   useEffect(() => {
     fetchMoneyData();
   }, []);
+
+  // Deep-link support for ?action=add-expense
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('action') === 'add-expense') {
+      setEntryType('expense');
+      setEditingExpense(null);
+      setEditingIncome(null);
+      setEditingSubscription(null);
+      setExpenseForm({ amount: '', category: '', description: '', note: '', date: new Date().toISOString().split('T')[0] });
+      setShowAddModal(true);
+      // Clean URL after opening modal
+      navigate('/money', { replace: true });
+    }
+  }, [location.search, navigate]);
 
   useEffect(() => {
     setSelectedIncomeIds((prev) => prev.filter((id) => income.some((item) => item.id === id)));

@@ -1,6 +1,10 @@
 import { Router } from 'express';
 import passport from 'passport';
-import { createUser, getUserProfile } from '../models/user.js';
+import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
+import { createUser, getUserProfile, findUserByEmail, updateUser } from '../models/user.js';
+import { query } from '../db/config.js';
+import { sendPasswordResetEmail } from '../services/email.js';
 
 const router = Router();
 
@@ -281,5 +285,133 @@ router.get('/google/callback',
     }
   }
 );
+
+/**
+ * POST /api/auth/forgot-password
+ * Request password reset
+ */
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email || !email.includes('@')) {
+      return res.status(400).json({ 
+        error: 'Valid email is required.' 
+      });
+    }
+
+    // Find user by email
+    const user = await findUserByEmail(email);
+
+    // Always return success (don't leak if email exists)
+    if (!user) {
+      return res.json({
+        success: true,
+        message: 'If an account exists, a reset link was sent.'
+      });
+    }
+
+    // Generate secure reset token (32 bytes = 64 hex chars)
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetExpires = new Date();
+    resetExpires.setHours(resetExpires.getHours() + 1); // 1 hour expiry
+
+    // Save token and expiry to user
+    await query(
+      `UPDATE users 
+       SET password_reset_token = $1, password_reset_expires = $2 
+       WHERE id = $3`,
+      [resetToken, resetExpires, user.id]
+    );
+
+    // Generate reset link
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const resetLink = `${frontendUrl}/reset-password?token=${resetToken}`;
+
+    // Send email
+    await sendPasswordResetEmail(user.email, resetLink);
+
+    res.json({
+      success: true,
+      message: 'If an account exists, a reset link was sent.'
+    });
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    // Still return success to prevent email enumeration
+    res.json({
+      success: true,
+      message: 'If an account exists, a reset link was sent.'
+    });
+  }
+});
+
+/**
+ * POST /api/auth/reset-password
+ * Reset password with token
+ */
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { token, password } = req.body;
+
+    if (!token || !password) {
+      return res.status(400).json({ 
+        error: 'Token and password are required.' 
+      });
+    }
+
+    if (password.length < 8) {
+      return res.status(400).json({ 
+        error: 'Password must be at least 8 characters.' 
+      });
+    }
+
+    // Find user by reset token
+    const result = await query(
+      `SELECT id, password_reset_expires 
+       FROM users 
+       WHERE password_reset_token = $1`,
+      [token]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(400).json({ 
+        error: 'Invalid or expired reset token.' 
+      });
+    }
+
+    const user = result.rows[0];
+
+    // Check if token is expired
+    const now = new Date();
+    const expires = new Date(user.password_reset_expires);
+    if (now > expires) {
+      return res.status(400).json({ 
+        error: 'Reset token has expired. Please request a new one.' 
+      });
+    }
+
+    // Hash new password (same as signup)
+    const salt = await bcrypt.genSalt(12);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Update password and clear reset token
+    await query(
+      `UPDATE users 
+       SET password = $1, password_reset_token = NULL, password_reset_expires = NULL 
+       WHERE id = $2`,
+      [hashedPassword, user.id]
+    );
+
+    res.json({
+      success: true,
+      message: 'Password reset successfully.'
+    });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({ 
+      error: 'Failed to reset password.' 
+    });
+  }
+});
 
 export default router;

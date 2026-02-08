@@ -312,8 +312,18 @@ export default function Calendar({ embedded = false } = {}) {
         }),
       });
       
+      const data = await response.json();
+      
+      if (data.upgradeRequired) {
+        alert('You have reached the calendar event limit for your plan. Upgrade to create more events.');
+        // Optionally navigate to pricing
+        setTimeout(() => {
+          window.location.href = '/pricing';
+        }, 2000);
+        return;
+      }
+      
       if (response.ok) {
-        const data = await response.json();
         // Map response format to existing format
         const mappedEvent = {
           ...data.event,

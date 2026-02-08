@@ -50,6 +50,8 @@ export default function Projects() {
   const [templateName, setTemplateName] = useState('');
   const [templateDescription, setTemplateDescription] = useState('');
   const [templateIsPublic, setTemplateIsPublic] = useState(false);
+  const [templateSourceProject, setTemplateSourceProject] = useState(null);
+  const [showTemplateModal, setShowTemplateModal] = useState(false);
   const [showHealthModal, setShowHealthModal] = useState(false);
   const [showActivityModal, setShowActivityModal] = useState(false);
   const [healthData, setHealthData] = useState(null);
@@ -60,6 +62,7 @@ export default function Projects() {
   const [showPropertiesDrawer, setShowPropertiesDrawer] = useState(false);
   const [sortField, setSortField] = useState({ field: '', direction: 'asc' });
   const [groupBy, setGroupBy] = useState(null);
+  const [projectsLimitReached, setProjectsLimitReached] = useState(false);
   
   // Saved views integration
   const savedViews = useSavedViews('projects');
@@ -218,8 +221,8 @@ export default function Projects() {
     }
   };
 
-  const handleSaveAsTemplate = async (project) => {
-    if (!templateName.trim()) {
+  const handleSaveAsTemplate = async () => {
+    if (!templateSourceProject || !templateName.trim()) {
       alert('Template name is required');
       return;
     }
@@ -233,9 +236,9 @@ export default function Projects() {
         body: JSON.stringify({
           name: templateName.trim(),
           description: templateDescription.trim() || null,
-          project_id: project.id,
-          icon: project.icon || '📋',
-          color: project.color || '#000000',
+          project_id: templateSourceProject.id,
+          icon: templateSourceProject.icon || '📋',
+          color: templateSourceProject.color || '#000000',
           is_public: templateIsPublic
         }),
       });
@@ -244,7 +247,8 @@ export default function Projects() {
         setTemplateName('');
         setTemplateDescription('');
         setTemplateIsPublic(false);
-        setShowTemplates(false);
+        setTemplateSourceProject(null);
+        setShowTemplateModal(false);
         await fetchTemplates();
         alert('Template saved successfully!');
       } else {
@@ -257,6 +261,15 @@ export default function Projects() {
     } finally {
       setSavingTemplate(false);
     }
+  };
+
+  const handleOpenTemplateModal = (project, e) => {
+    if (e) e.stopPropagation();
+    setTemplateSourceProject(project);
+    setTemplateName(`${project.name} Template`);
+    setTemplateDescription(project.description || '');
+    setTemplateIsPublic(false);
+    setShowTemplateModal(true);
   };
 
   const handleApplyTemplate = async (templateId) => {
@@ -459,6 +472,16 @@ export default function Projects() {
       
       const data = await response.json();
       
+      if (data.upgradeRequired) {
+        setError('You have reached the project limit for your plan. Upgrade to create more projects.');
+        setCreating(false);
+        // Optionally navigate to pricing
+        setTimeout(() => {
+          navigate('/pricing');
+        }, 2000);
+        return;
+      }
+      
       if (response.ok && data.success) {
         // Store project info before resetting form
         const createdProjectName = newProject.name;
@@ -504,12 +527,12 @@ export default function Projects() {
       } else {
         // Handle error response
         if (data.upgradeRequired) {
-          // Redirect to pricing page
-          navigate('/pricing', { 
-            state: { message: data.error || 'Upgrade required to create more projects.' } 
-          });
+          setError(data.error || 'You have reached the project limit for your plan. Upgrade to create more projects.');
+          setTimeout(() => {
+            navigate('/pricing');
+          }, 2000);
         } else {
-        setError(data.error || 'Failed to create project. Please try again.');
+          setError(data.error || 'Failed to create project. Please try again.');
         }
       }
     } catch (error) {
@@ -705,6 +728,7 @@ export default function Projects() {
             onActivity={handleFetchActivity}
             formatDate={formatDate}
             onRowClick={handleProjectClick}
+            onSaveAsTemplate={handleOpenTemplateModal}
           />
         </div>
       ) : (
@@ -713,14 +737,26 @@ export default function Projects() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
             {/* Create New Project Card */}
             <div
-              onClick={() => setShowCreateModal(true)}
-              className="rounded-lg p-8 border-2 border-dashed cursor-pointer transition-all duration-200 group"
+              onClick={() => {
+                if (projectsLimitReached) {
+                  navigate('/pricing');
+                } else {
+                  setShowCreateModal(true);
+                }
+              }}
+              className={`rounded-lg p-8 border-2 border-dashed transition-all duration-200 group ${
+                projectsLimitReached 
+                  ? 'opacity-50 cursor-not-allowed' 
+                  : 'cursor-pointer'
+              }`}
               style={{
                 backgroundColor: 'var(--bg-card)',
-                borderColor: 'var(--border-subtle)'
+                borderColor: projectsLimitReached ? 'var(--border-subtle)' : 'var(--border-subtle)'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = 'var(--accent)';
+                if (!projectsLimitReached) {
+                  e.currentTarget.style.borderColor = 'var(--accent)';
+                }
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.borderColor = 'var(--border-subtle)';
@@ -733,8 +769,12 @@ export default function Projects() {
                 >
                   <span className="text-2xl" style={{ color: 'var(--text-primary)' }}>+</span>
                 </div>
-                <h3 className="text-base mb-1" style={{ color: 'var(--text-primary)' }}>Create New Project</h3>
-                <p className="text-xs text-center" style={{ color: 'var(--text-muted)' }}>Start from scratch</p>
+                <h3 className="text-base mb-1" style={{ color: 'var(--text-primary)' }}>
+                  {projectsLimitReached ? 'Upgrade to Create More' : 'Create New Project'}
+                </h3>
+                <p className="text-xs text-center" style={{ color: 'var(--text-muted)' }}>
+                  {projectsLimitReached ? 'You\'ve reached your plan limit' : 'Start from scratch'}
+                </p>
               </div>
             </div>
             
@@ -892,6 +932,7 @@ export default function Projects() {
             onDelete={handleDeleteProject}
             onHealth={handleFetchHealth}
             onActivity={handleFetchActivity}
+            onSaveAsTemplate={handleOpenTemplateModal}
           />
         </div>
       )}
@@ -1429,6 +1470,111 @@ export default function Projects() {
             >
               Close
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Save Template Modal */}
+      {showTemplateModal && templateSourceProject && (
+        <div 
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => {
+            setShowTemplateModal(false);
+            setTemplateSourceProject(null);
+            setTemplateName('');
+            setTemplateDescription('');
+            setTemplateIsPublic(false);
+          }}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="font-display text-2xl font-semibold text-black mb-2">Save as Template</h3>
+                <p className="text-sm text-gray-600">Create a reusable template from this project</p>
+              </div>
+              <button
+                onClick={() => {
+                  setShowTemplateModal(false);
+                  setTemplateSourceProject(null);
+                  setTemplateName('');
+                  setTemplateDescription('');
+                  setTemplateIsPublic(false);
+                }}
+                className="text-gray-500 hover:text-black transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              handleSaveAsTemplate();
+            }} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-black mb-2">Template Name</label>
+                <input
+                  type="text"
+                  value={templateName}
+                  onChange={(e) => setTemplateName(e.target.value)}
+                  placeholder="Template name"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-black"
+                  required
+                  autoFocus
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-black mb-2">Description (optional)</label>
+                <textarea
+                  value={templateDescription}
+                  onChange={(e) => setTemplateDescription(e.target.value)}
+                  placeholder="Template description"
+                  rows={3}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-black resize-none"
+                />
+              </div>
+              
+              <div>
+                <label className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    checked={templateIsPublic}
+                    onChange={(e) => setTemplateIsPublic(e.target.checked)}
+                    className="w-5 h-5 rounded border-gray-300 text-black focus:ring-black"
+                  />
+                  <span className="text-sm text-black">Make this template public</span>
+                </label>
+                <p className="text-xs text-gray-500 mt-1">Public templates can be used by other users</p>
+              </div>
+              
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowTemplateModal(false);
+                    setTemplateSourceProject(null);
+                    setTemplateName('');
+                    setTemplateDescription('');
+                    setTemplateIsPublic(false);
+                  }}
+                  className="flex-1 px-6 py-3 bg-white border border-gray-300 text-gray-600 rounded-xl hover:bg-gray-100 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingTemplate || !templateName.trim()}
+                  className="flex-1 px-6 py-3 bg-black text-white rounded-xl hover:bg-gray-900 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {savingTemplate ? 'Saving...' : 'Save Template'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

@@ -10,6 +10,10 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotSuccess, setForgotSuccess] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -136,7 +140,11 @@ export default function Login() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label htmlFor="password" className="block text-sm font-medium text-black">Password</label>
-                <button type="button" className="text-sm text-black hover:text-black-deep transition-colors">
+                <button 
+                  type="button" 
+                  onClick={() => setShowForgotPassword(true)}
+                  className="text-sm text-black hover:text-black-deep transition-colors"
+                >
                   Forgot password?
                 </button>
               </div>
@@ -202,6 +210,103 @@ export default function Login() {
           </p>
         </div>
       </div>
+
+      {/* Forgot Password Modal */}
+      {showForgotPassword && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div
+            className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-display text-lg font-semibold text-black">Reset Password</h3>
+              <button
+                onClick={() => {
+                  setShowForgotPassword(false);
+                  setForgotEmail('');
+                  setForgotSuccess(false);
+                }}
+                className="p-2 hover:bg-gray-100 rounded-lg"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {forgotSuccess ? (
+              <div className="text-center py-4">
+                <p className="text-gray-600 mb-4">
+                  If an account exists, a reset link was sent to <strong>{forgotEmail}</strong>.
+                </p>
+                <button
+                  onClick={() => {
+                    setShowForgotPassword(false);
+                    setForgotEmail('');
+                    setForgotSuccess(false);
+                  }}
+                  className="px-6 py-2 bg-black text-white rounded-xl hover:bg-gray-900 transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            ) : (
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  setForgotLoading(true);
+                  try {
+                    const response = await fetch('/api/auth/forgot-password', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      credentials: 'include',
+                      body: JSON.stringify({ email: forgotEmail }),
+                    });
+
+                    if (response.ok) {
+                      setForgotSuccess(true);
+                    } else {
+                      const data = await response.json();
+                      setError(data.error || 'Failed to send reset email');
+                    }
+                  } catch (err) {
+                    setError('Network error. Please try again.');
+                  } finally {
+                    setForgotLoading(false);
+                  }
+                }}
+                className="space-y-4"
+              >
+                <div>
+                  <label className="block text-sm font-medium text-black mb-2">Email</label>
+                  <input
+                    type="email"
+                    value={forgotEmail}
+                    onChange={(e) => setForgotEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-black"
+                    required
+                  />
+                </div>
+
+                {error && (
+                  <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
+                    {error}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={forgotLoading}
+                  className="w-full px-6 py-3 bg-black text-white rounded-xl hover:bg-gray-900 transition-colors disabled:opacity-50"
+                >
+                  {forgotLoading ? 'Sending...' : 'Send Reset Link'}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
