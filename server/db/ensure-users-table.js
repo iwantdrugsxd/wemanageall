@@ -21,56 +21,58 @@ export async function ensureUsersTable() {
       );
     `);
 
-    if (checkTable.rows[0].exists) {
+    if (!checkTable.rows[0].exists) {
+      console.log('⚠️  Users table not found. Initializing essential tables...');
+
+      // Enable UUID extension
+      await query('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"');
+
+      // Create users table
+      await query(`
+        CREATE TABLE IF NOT EXISTS users (
+          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+          name VARCHAR(255) NOT NULL,
+          email VARCHAR(255) UNIQUE NOT NULL,
+          password VARCHAR(255),
+          google_id VARCHAR(255) UNIQUE,
+          photo TEXT,
+          created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+          onboarding_completed BOOLEAN DEFAULT FALSE,
+          onboarding_step INTEGER DEFAULT 0,
+          vision TEXT,
+          reminder_time TIME,
+          review_day VARCHAR(50),
+          tone VARCHAR(50) DEFAULT 'coach',
+          current_goal TEXT,
+          life_phase VARCHAR(50),
+          subscription_plan VARCHAR(50) DEFAULT 'free' CHECK (subscription_plan IN ('free', 'premium', 'team_starter', 'team_pro', 'enterprise')),
+          subscription_status VARCHAR(50) DEFAULT 'active' CHECK (subscription_status IN ('active', 'cancelled', 'expired', 'trial')),
+          default_mode VARCHAR(50) DEFAULT 'individual' CHECK (default_mode IN ('individual', 'team')),
+          current_organization_id UUID,
+          lock_entries_default BOOLEAN DEFAULT FALSE,
+          password_reset_token TEXT,
+          password_reset_expires TIMESTAMP WITH TIME ZONE
+        );
+      `);
+    } else {
       console.log('✅ Users table exists');
-      return true;
     }
 
-    console.log('⚠️  Users table not found. Initializing essential tables...');
-
-    // Enable UUID extension
-    await query('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"');
-
-    // Create users table
-    await query(`
-      CREATE TABLE IF NOT EXISTS users (
-        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-        name VARCHAR(255) NOT NULL,
-        email VARCHAR(255) UNIQUE NOT NULL,
-        password VARCHAR(255),
-        google_id VARCHAR(255) UNIQUE,
-        photo TEXT,
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-        onboarding_completed BOOLEAN DEFAULT FALSE,
-        onboarding_step INTEGER DEFAULT 0,
-        vision TEXT,
-        reminder_time TIME,
-        review_day VARCHAR(50),
-        tone VARCHAR(50) DEFAULT 'coach',
-        current_goal TEXT,
-        life_phase VARCHAR(50),
-        subscription_plan VARCHAR(50) DEFAULT 'free' CHECK (subscription_plan IN ('free', 'premium', 'team_starter', 'team_pro', 'enterprise')),
-        subscription_status VARCHAR(50) DEFAULT 'active' CHECK (subscription_status IN ('active', 'cancelled', 'expired', 'trial')),
-        default_mode VARCHAR(50) DEFAULT 'individual' CHECK (default_mode IN ('individual', 'team')),
-        current_organization_id UUID,
-        lock_entries_default BOOLEAN DEFAULT FALSE,
-        password_reset_token TEXT,
-        password_reset_expires TIMESTAMP WITH TIME ZONE
-      );
-    `);
-
-    // Add new columns if they don't exist (for existing tables)
+    // Always check for and add missing columns (for both new and existing tables)
     await query(`
       DO $$ 
       BEGIN
         IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'lock_entries_default') THEN
           ALTER TABLE users ADD COLUMN lock_entries_default BOOLEAN DEFAULT FALSE;
+          RAISE NOTICE 'Added column lock_entries_default';
         END IF;
         IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'password_reset_token') THEN
           ALTER TABLE users ADD COLUMN password_reset_token TEXT;
+          RAISE NOTICE 'Added column password_reset_token';
         END IF;
         IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'password_reset_expires') THEN
           ALTER TABLE users ADD COLUMN password_reset_expires TIMESTAMP WITH TIME ZONE;
+          RAISE NOTICE 'Added column password_reset_expires';
         END IF;
       END $$;
     `);
