@@ -103,8 +103,8 @@ router.post('/start-trial', requireAuth, async (req, res) => {
       return res.status(400).json({ error: 'Invalid plan type.' });
     }
 
-    // Only allow premium and team_starter trials
-    if (planType !== 'premium' && planType !== 'team_starter') {
+    // Only allow starter and premium trials
+    if (planType !== 'starter' && planType !== 'premium') {
       return res.status(400).json({ error: 'Trial not available for this plan.' });
     }
 
@@ -124,7 +124,7 @@ router.post('/start-trial', requireAuth, async (req, res) => {
 
     const plan = SUBSCRIPTION_PLANS[planType];
 
-    // Validate seats for team plans
+    // Validate seats for team plans (if any team plans are still used)
     if (planType === 'team_starter') {
       if (seats < plan.minSeats) {
         return res.status(400).json({ error: `Minimum ${plan.minSeats} seats required for Team plan.` });

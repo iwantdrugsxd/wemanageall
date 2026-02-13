@@ -10,7 +10,6 @@ export default function Pricing() {
   const [loading, setLoading] = useState(true);
   const [billingCycle, setBillingCycle] = useState('monthly');
   const [selectedPlan, setSelectedPlan] = useState(null);
-  const [teamSeats, setTeamSeats] = useState(2);
 
   useEffect(() => {
     fetchPlans();
@@ -34,8 +33,13 @@ export default function Pricing() {
       });
       if (response.ok) {
         const data = await response.json();
-        // Show all plans - team_pro and enterprise will show as "Contact Sales"
-        setPlans(data.plans);
+        // Filter to only show free, starter, premium plans
+        const visiblePlans = data.plans.filter(p => ['free', 'starter', 'premium'].includes(p.id));
+        // Ensure order: Free → Starter → Premium
+        const orderedPlans = ['free', 'starter', 'premium']
+          .map(id => visiblePlans.find(p => p.id === id))
+          .filter(Boolean);
+        setPlans(orderedPlans);
       }
     } catch (error) {
       console.error('Failed to fetch plans:', error);
@@ -65,10 +69,6 @@ export default function Pricing() {
     }
 
     setSelectedPlan(planId);
-    
-    // Check if it's a team plan
-    const plan = plans.find(p => p.id === planId);
-    const isTeamPlan = plan && plan.features.teamMembers > 0;
 
     try {
       const response = await fetch('/api/subscriptions/start-trial', {
@@ -77,7 +77,7 @@ export default function Pricing() {
         credentials: 'include',
         body: JSON.stringify({
           planType: planId,
-          seats: isTeamPlan ? teamSeats : 1,
+          seats: 1,
         }),
       });
 
@@ -106,10 +106,6 @@ export default function Pricing() {
     }
 
     setSelectedPlan(planId);
-    
-    // Check if it's a team plan
-    const plan = plans.find(p => p.id === planId);
-    const isTeamPlan = plan && plan.features.teamMembers > 0;
 
     try {
       const response = await fetch('/api/subscriptions/create', {
@@ -119,7 +115,7 @@ export default function Pricing() {
         body: JSON.stringify({
           planType: planId,
           billingCycle: billingCycle,
-          seats: isTeamPlan ? teamSeats : 1,
+          seats: 1,
           organizationId: null,
         }),
       });
@@ -140,6 +136,13 @@ export default function Pricing() {
   };
 
   const initiateRazorpayPayment = (subscriptionData) => {
+    // Safety check: Ensure Razorpay is loaded
+    if (!window.Razorpay) {
+      alert('Payment system is still loading, please try again in a moment.');
+      setSelectedPlan(null);
+      return;
+    }
+
     const options = {
       key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_1DP5mmOlF5G5ag',
       subscription_id: subscriptionData.razorpay.subscriptionId,
@@ -184,6 +187,13 @@ export default function Pricing() {
   const formatPrice = (price) => {
     if (price === 0) return 'Free';
     return `₹${price.toLocaleString()}`;
+  };
+
+  const formatStorage = (storageMB) => {
+    if (storageMB === -1) return 'Unlimited';
+    if (storageMB < 1024) return `${storageMB} MB`;
+    const gb = (storageMB / 1024).toFixed(1);
+    return gb.endsWith('.0') ? `${parseInt(gb)} GB` : `${gb} GB`;
   };
 
   const getCurrentPlan = () => {
@@ -244,11 +254,9 @@ export default function Pricing() {
         )}
 
         {/* Plans Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           {plans.map((plan) => {
             const isCurrentPlan = currentPlan && currentPlan.id === plan.id;
-            const isTeamPlan = plan.features.teamMembers > 0;
-            const isContactSales = plan.id === 'team_pro' || plan.id === 'enterprise';
             const price = billingCycle === 'annual' && plan.priceAnnual ? plan.priceAnnual : plan.price;
             const monthlyPrice = billingCycle === 'annual' && plan.priceAnnual 
               ? (plan.priceAnnual / 12).toFixed(0) 
@@ -258,39 +266,21 @@ export default function Pricing() {
               <div
                 key={plan.id}
                 className={`bg-white border rounded-lg p-6 relative ${
-                  plan.id === 'premium' || plan.id === 'team_starter'
+                  plan.id === 'premium'
                     ? 'border-gray-900 border-2 shadow-lg'
                     : 'border-gray-200'
                 }`}
               >
-                {/* Custom Badge for Contact Sales plans */}
-                {isContactSales && (
-                  <div className="absolute top-4 right-4">
-                    <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded">
-                      Custom
-                    </span>
-                  </div>
-                )}
-                
                 {/* Plan Header */}
                 <div className="mb-6">
                   <h3 className="text-xl font-medium text-gray-900 mb-2">{plan.name}</h3>
                   <div className="mb-4">
-                    {isTeamPlan ? (
-                      <div>
-                        <span className="text-3xl font-light text-gray-900">
-                          {formatPrice(monthlyPrice)}
-                        </span>
-                        <span className="text-sm text-gray-500 ml-1">/user/month</span>
-                      </div>
-                    ) : (
-                      <div>
-                        <span className="text-3xl font-light text-gray-900">
-                          {formatPrice(monthlyPrice)}
-                        </span>
-                        <span className="text-sm text-gray-500 ml-1">/month</span>
-                      </div>
-                    )}
+                    <div>
+                      <span className="text-3xl font-light text-gray-900">
+                        {formatPrice(monthlyPrice)}
+                      </span>
+                      <span className="text-sm text-gray-500 ml-1">/month</span>
+                    </div>
                     {billingCycle === 'annual' && plan.priceAnnual && (
                       <p className="text-xs text-gray-500 mt-1">
                         Billed annually: {formatPrice(plan.priceAnnual)}
@@ -317,51 +307,54 @@ export default function Pricing() {
                       {plan.features.calendarEvents === -1 ? 'Unlimited' : plan.features.calendarEvents} Calendar Events
                     </span>
                   </li>
-                  {plan.features.teamMembers > 0 && (
+                  <li className="flex items-start gap-2">
+                    <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="text-sm text-gray-700">
+                      Library storage: {formatStorage(plan.features.storage)}
+                    </span>
+                  </li>
+                  {plan.features.analytics ? (
                     <li className="flex items-start gap-2">
                       <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      <span className="text-sm text-gray-700">
-                        Up to {plan.features.teamMembers === -1 ? 'Unlimited' : plan.features.teamMembers} Team Members
-                      </span>
+                      <span className="text-sm text-gray-700">Analytics / Insights</span>
                     </li>
-                  )}
-                  {plan.features.analytics && (
+                  ) : (
                     <li className="flex items-start gap-2">
-                      <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      <svg className="w-5 h-5 text-gray-300 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                       </svg>
-                      <span className="text-sm text-gray-700">Advanced Analytics</span>
+                      <span className="text-sm text-gray-400">Analytics / Insights: Off</span>
                     </li>
                   )}
-                  {plan.features.integrations && (
+                  {plan.features.integrations ? (
                     <li className="flex items-start gap-2">
                       <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                       <span className="text-sm text-gray-700">Integrations</span>
                     </li>
-                  )}
-                  {plan.features.support && (
+                  ) : (
                     <li className="flex items-start gap-2">
-                      <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      <svg className="w-5 h-5 text-gray-300 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                       </svg>
-                      <span className="text-sm text-gray-700 capitalize">{plan.features.support} Support</span>
+                      <span className="text-sm text-gray-400">Integrations: Off</span>
                     </li>
                   )}
+                  <li className="flex items-start gap-2">
+                    <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="text-sm text-gray-700 capitalize">Support: {plan.features.support}</span>
+                  </li>
                 </ul>
 
                 {/* CTA Buttons */}
-                {isContactSales ? (
-                  <a
-                    href={`mailto:sales@wemanageall.in?subject=${encodeURIComponent(plan.name + ' Inquiry')}&body=${encodeURIComponent('I am interested in learning more about the ' + plan.name + ' plan.')}`}
-                    className="block w-full px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-center"
-                  >
-                    Contact Sales
-                  </a>
-                ) : isCurrentPlan && (currentSubscription.status === 'active' || currentSubscription.status === 'trial') ? (
+                {isCurrentPlan && (currentSubscription.status === 'active' || currentSubscription.status === 'trial') ? (
                   <button
                     disabled
                     className="w-full px-4 py-2 bg-gray-100 text-gray-500 rounded-lg cursor-not-allowed"
@@ -393,21 +386,6 @@ export default function Pricing() {
                     </button>
                   </div>
                 )}
-
-                {/* Team Plan Seats Selector */}
-                {isTeamPlan && !isCurrentPlan && (
-                  <div className="mt-4 pt-4 border-t border-gray-200">
-                    <label className="block text-xs text-gray-600 mb-2">Number of Seats</label>
-                    <input
-                      type="number"
-                      min={plan.minSeats || 2}
-                      max={plan.maxSeats || 25}
-                      value={teamSeats}
-                      onChange={(e) => setTeamSeats(Math.max(plan.minSeats || 2, Math.min(plan.maxSeats || 25, parseInt(e.target.value) || 2)))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
-                    />
-                  </div>
-                )}
               </div>
             );
           })}
@@ -427,7 +405,7 @@ export default function Pricing() {
             </div>
             <div className="bg-white border border-gray-200 rounded-lg p-6">
               <h3 className="font-medium text-gray-900 mb-2">Is there a free trial?</h3>
-              <p className="text-sm text-gray-600">The Free plan is available forever. Paid plans (Starter and Team) include a 7-day free trial.</p>
+              <p className="text-sm text-gray-600">The Free plan is available forever. Paid plans (Starter and Premium) include a 7-day free trial.</p>
             </div>
             <div className="bg-white border border-gray-200 rounded-lg p-6">
               <h3 className="font-medium text-gray-900 mb-2">Can I cancel anytime?</h3>

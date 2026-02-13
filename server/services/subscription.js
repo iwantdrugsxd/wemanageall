@@ -33,18 +33,32 @@ export const SUBSCRIPTION_PLANS = {
       support: 'community',
     },
   },
-  premium: {
+  starter: {
     name: 'Starter',
+    price: 149, // ₹149/month
+    priceAnnual: 1490, // ₹1,490/year
+    features: {
+      projects: 10,
+      calendarEvents: 300,
+      teamMembers: 0,
+      storage: 1024, // MB (1 GB)
+      analytics: true,
+      integrations: false,
+      support: 'email',
+    },
+  },
+  premium: {
+    name: 'Premium',
     price: 199, // ₹199/month
     priceAnnual: 1990, // ₹1,990/year
     features: {
       projects: -1, // Unlimited
       calendarEvents: -1, // Unlimited
       teamMembers: 0,
-      storage: 1024, // MB (1 GB)
+      storage: 5120, // MB (5 GB)
       analytics: true,
-      integrations: false,
-      support: 'email',
+      integrations: true,
+      support: 'priority',
     },
   },
   team_starter: {
