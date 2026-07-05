@@ -193,7 +193,7 @@ export default function TasksPanel({
                   </button>
                   <button
                     onClick={() => onDeleteTask(task.id)}
-                    className="p-1 transition-colors text-red-600"
+                    className="p-1 transition-colors text-[var(--error)]"
                     title="Delete task"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

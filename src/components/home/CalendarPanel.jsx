@@ -144,7 +144,7 @@ export default function CalendarPanel({
                     return (
                       <div key={event.id} className="group flex items-start gap-3 -mx-2 px-2 py-1 rounded transition-colors" style={{ backgroundColor: 'transparent' }} onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--bg-surface)'; }} onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}>
                         <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
-                          isActive ? 'bg-green-500' : isUpcoming ? 'bg-gray-400' : 'bg-gray-300'
+                          isActive ? 'bg-green-500' : isUpcoming ? 'bg-[var(--border-mid)]' : 'bg-[var(--border-subtle)]'
                         }`}></div>
                         <div className="flex-1 min-w-0">
                           {isActive && (

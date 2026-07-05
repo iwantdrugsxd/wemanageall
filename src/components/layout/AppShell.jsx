@@ -91,7 +91,7 @@ export default function AppShell({ children }) {
           >
             {/* Mobile menu content - simplified for Phase 1 */}
             <div className="p-4 border-b flex items-center justify-between" style={{ borderColor: 'var(--border-subtle)' }}>
-              <span className="font-display text-lg font-semibold transition-colors" style={{ color: 'var(--text-primary)' }}>
+              <span className="text-lg font-semibold tracking-tight transition-colors" style={{ color: 'var(--text-primary)' }}>
                 WeManageAll
               </span>
               <button
@@ -111,21 +111,26 @@ export default function AppShell({ children }) {
       {/* Quick Action Modal */}
       {showQuickAction && (
         <div
-          className="fixed inset-0 bg-black/20 dark:bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center transition-colors"
+          className="fixed inset-0 backdrop-blur-sm z-50 flex items-center justify-center transition-colors"
+          style={{ backgroundColor: 'rgba(28, 27, 25, 0.35)' }}
           onClick={() => setShowQuickAction(false)}
         >
           <div
-            className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4 border border-gray-300 dark:border-gray-700 transition-colors"
+            className="rounded-2xl shadow-calm-lg p-6 w-full max-w-md mx-4 border transition-colors"
+            style={{ backgroundColor: 'var(--bg-modal)', borderColor: 'var(--border-subtle)' }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="font-display text-xl text-black dark:text-white mb-4 transition-colors">Quick Actions</h2>
-            <div className="space-y-2">
+            <h2 className="text-lg font-semibold mb-4 transition-colors" style={{ color: 'var(--text-primary)' }}>Quick Actions</h2>
+            <div className="space-y-1.5">
               <button
                 onClick={() => {
                   navigate('/home');
                   setShowQuickAction(false);
                 }}
-                className="w-full text-left px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-black dark:text-white"
+                className="w-full text-left px-4 py-3 rounded-xl transition-colors"
+                style={{ color: 'var(--text-primary)' }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--bg-surface)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
               >
                 Go to Home
               </button>
@@ -134,14 +139,18 @@ export default function AppShell({ children }) {
                   navigate('/money?action=add-expense');
                   setShowQuickAction(false);
                 }}
-                className="w-full text-left px-4 py-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-black dark:text-white"
+                className="w-full text-left px-4 py-3 rounded-xl transition-colors"
+                style={{ color: 'var(--text-primary)' }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--bg-surface)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
               >
                 Log expense
               </button>
             </div>
             <button
               onClick={() => setShowQuickAction(false)}
-              className="mt-4 w-full px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
+              className="mt-4 w-full px-4 py-2 text-sm transition-colors"
+              style={{ color: 'var(--text-muted)' }}
             >
               Press ESC to close
             </button>

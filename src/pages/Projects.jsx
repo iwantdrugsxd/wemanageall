@@ -973,22 +973,22 @@ export default function Projects() {
             </div>
             
             {showTemplates && templates.length > 0 && (
-              <div className="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
-                <label className="block text-sm font-medium text-black mb-2">Start from Template</label>
+              <div className="mb-6 p-4 bg-[var(--bg-surface)] rounded-xl border border-[var(--border-subtle)]">
+                <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Start from Template</label>
                 <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
                   {templates.map((template) => (
                     <button
                       key={template.id}
                       type="button"
                       onClick={() => handleApplyTemplate(template.id)}
-                      className="p-3 text-left border border-gray-300 rounded-lg hover:border-black hover:bg-white transition-colors"
+                      className="p-3 text-left border border-[var(--border-subtle)] rounded-lg hover:border-[var(--accent)] hover:bg-[var(--bg-card)] transition-colors"
                     >
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-lg">{template.icon || '📋'}</span>
-                        <span className="text-sm font-medium text-black truncate">{template.name}</span>
+                        <span className="text-sm font-medium text-[var(--text-primary)] truncate">{template.name}</span>
                       </div>
                       {template.description && (
-                        <p className="text-xs text-gray-600 line-clamp-2">{template.description}</p>
+                        <p className="text-xs text-[var(--text-secondary)] line-clamp-2">{template.description}</p>
                       )}
                     </button>
                   ))}
@@ -997,45 +997,45 @@ export default function Projects() {
             )}
             
             {error && (
-              <div className="mb-4 p-3 bg-gray-100 border text-black rounded-xl">
-                <p className="text-sm text-black">{error}</p>
+              <div className="mb-4 p-3 bg-[var(--bg-surface)] border text-[var(--text-primary)] rounded-xl">
+                <p className="text-sm text-[var(--text-primary)]">{error}</p>
               </div>
             )}
             
             <form onSubmit={handleCreateProject}>
               <div className="mb-4">
-                <label className="block text-sm font-medium text-black mb-2">Project Name</label>
+                <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Project Name</label>
                 <input
                   type="text"
                   value={newProject.name}
                   onChange={(e) => setNewProject({ ...newProject, name: e.target.value })}
                   placeholder="e.g., Life OS Development"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-black"
+                  className="w-full px-4 py-3 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-[var(--accent)]"
                   required
                   autoFocus
                 />
           </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-medium text-black mb-2">Description (optional)</label>
+                <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Description (optional)</label>
                 <textarea
                   value={newProject.description}
                   onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
                   placeholder="What is this project about?"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-black resize-none"
+                  className="w-full px-4 py-3 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-[var(--accent)] resize-none"
                   rows={3}
                 />
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-medium text-black mb-2">Cover Image (optional)</label>
+                <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Cover Image (optional)</label>
                 <div className="space-y-3">
                   {imagePreview ? (
                     <div className="relative">
                       <img 
                         src={imagePreview} 
                         alt="Preview" 
-                        className="w-full h-48 object-cover rounded-xl border border-gray-300"
+                        className="w-full h-48 object-cover rounded-xl border border-[var(--border-subtle)]"
                       />
                       <button
                         type="button"
@@ -1043,7 +1043,7 @@ export default function Projects() {
                           setImagePreview(null);
                           setNewProject({ ...newProject, cover_image_url: null });
                         }}
-                        className="absolute top-2 right-2 p-2 bg-black/70 text-white rounded-lg hover:bg-black/90 transition-colors"
+                        className="absolute top-2 right-2 p-2 bg-black/70 text-white rounded-lg hover:opacity-90 transition-colors"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -1051,13 +1051,13 @@ export default function Projects() {
                       </button>
                     </div>
                   ) : (
-                    <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-gray-400 transition-colors">
+                    <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-[var(--border-subtle)] rounded-xl cursor-pointer hover:border-[var(--border-strong)] transition-colors">
                       <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                        <svg className="w-8 h-8 mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-8 h-8 mb-2 text-[var(--text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
-                        <p className="text-sm text-gray-500">Click to upload image</p>
-                        <p className="text-xs text-gray-400 mt-1">PNG, JPG, GIF up to 5MB</p>
+                        <p className="text-sm text-[var(--text-muted)]">Click to upload image</p>
+                        <p className="text-xs text-[var(--text-muted)] mt-1">PNG, JPG, GIF up to 5MB</p>
                       </div>
                       <input
                         type="file"
@@ -1097,7 +1097,7 @@ export default function Projects() {
                     </label>
                   )}
                   {uploadingImage && (
-                    <div className="text-center text-sm text-gray-500">
+                    <div className="text-center text-sm text-[var(--text-muted)]">
                       Uploading image...
                     </div>
                   )}
@@ -1105,12 +1105,12 @@ export default function Projects() {
               </div>
 
               <div className="mb-6">
-                <label className="block text-sm font-medium text-black mb-2">Start Date (optional)</label>
+                <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Start Date (optional)</label>
                 <input
                   type="date"
                   value={newProject.start_date}
                   onChange={(e) => setNewProject({ ...newProject, start_date: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-black"
+                  className="w-full px-4 py-3 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-[var(--accent)]"
                 />
               </div>
 
@@ -1118,7 +1118,7 @@ export default function Projects() {
                 <button
                   type="submit"
                   disabled={creating}
-                  className="flex-1 px-6 py-3 bg-black text-white rounded-xl hover:bg-gray-900 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="flex-1 px-6 py-3 bg-[var(--accent)] text-white rounded-xl hover:bg-[var(--accent-hover)] transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {creating ? (
                     <>
@@ -1141,7 +1141,7 @@ export default function Projects() {
                     setError(null);
                   }}
                   disabled={creating}
-                  className="px-6 py-3 bg-white border border-gray-300 text-gray-600 rounded-xl hover:bg-gray-100 transition-colors disabled:opacity-50"
+                  className="px-6 py-3 bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-secondary)] rounded-xl hover:bg-[var(--bg-surface)] transition-colors disabled:opacity-50"
                 >
                   Cancel
                 </button>
@@ -1162,15 +1162,15 @@ export default function Projects() {
           }}
         >
           <div
-            className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md"
+            className="bg-[var(--bg-card)] rounded-2xl shadow-2xl p-8 w-full max-w-md"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="font-display text-2xl font-semibold text-black mb-2">Join Project</h3>
-            <p className="text-sm text-gray-600 mb-6">Enter the share code to join a project.</p>
+            <h3 className="font-display text-2xl font-semibold text-[var(--text-primary)] mb-2">Join Project</h3>
+            <p className="text-sm text-[var(--text-secondary)] mb-6">Enter the share code to join a project.</p>
             
             {error && (
-              <div className="mb-4 p-3 bg-gray-100 border text-black rounded-xl">
-                <p className="text-sm text-black">{error}</p>
+              <div className="mb-4 p-3 bg-[var(--bg-surface)] border text-[var(--text-primary)] rounded-xl">
+                <p className="text-sm text-[var(--text-primary)]">{error}</p>
               </div>
             )}
             
@@ -1208,25 +1208,25 @@ export default function Projects() {
               }
             }}>
               <div className="mb-6">
-                <label className="block text-sm font-medium text-black mb-2">Share Code</label>
+                <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Share Code</label>
                 <input
                   type="text"
                   value={joinCode}
                   onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
                   placeholder="Enter 8-character code"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-black text-center text-2xl font-mono tracking-widest"
+                  className="w-full px-4 py-3 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-[var(--accent)] text-center text-2xl font-mono tracking-widest"
                   maxLength={8}
                   required
                   autoFocus
                 />
-                <p className="text-xs text-gray-500 mt-2 text-center">Ask the project owner for the share code</p>
+                <p className="text-xs text-[var(--text-muted)] mt-2 text-center">Ask the project owner for the share code</p>
               </div>
               
               <div className="flex gap-3">
                 <button
                   type="submit"
                   disabled={joining || !joinCode.trim()}
-                  className="flex-1 px-6 py-3 bg-black text-white rounded-xl hover:bg-gray-900 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="flex-1 px-6 py-3 bg-[var(--accent)] text-white rounded-xl hover:bg-[var(--accent-hover)] transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {joining ? (
                     <>
@@ -1248,7 +1248,7 @@ export default function Projects() {
                     setError(null);
                   }}
                   disabled={joining}
-                  className="px-6 py-3 bg-white border border-gray-300 text-gray-600 rounded-xl hover:bg-gray-100 transition-colors disabled:opacity-50"
+                  className="px-6 py-3 bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-secondary)] rounded-xl hover:bg-[var(--bg-surface)] transition-colors disabled:opacity-50"
                 >
                   Cancel
                   </button>
@@ -1268,56 +1268,56 @@ export default function Projects() {
           }}
         >
           <div
-            className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto"
+            className="bg-[var(--bg-card)] rounded-2xl shadow-2xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="font-display text-2xl font-semibold text-black mb-2">Edit Project</h3>
-            <p className="text-sm text-gray-600 mb-6">Update project details.</p>
+            <h3 className="font-display text-2xl font-semibold text-[var(--text-primary)] mb-2">Edit Project</h3>
+            <p className="text-sm text-[var(--text-secondary)] mb-6">Update project details.</p>
             
             <form onSubmit={handleUpdateProject}>
               <div className="mb-4">
-                <label className="block text-sm font-medium text-black mb-2">Project Name</label>
+                <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Project Name</label>
                 <input
                   type="text"
                   value={editProjectData.name}
                   onChange={(e) => setEditProjectData({ ...editProjectData, name: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-black"
+                  className="w-full px-4 py-3 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-[var(--accent)]"
                   required
                 />
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-medium text-black mb-2">Description</label>
+                <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Description</label>
                 <textarea
                   value={editProjectData.description || ''}
                   onChange={(e) => setEditProjectData({ ...editProjectData, description: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-black resize-none"
+                  className="w-full px-4 py-3 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-[var(--accent)] resize-none"
                   rows={3}
                 />
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-medium text-black mb-2">Start Date</label>
+                <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Start Date</label>
                 <input
                   type="date"
                   value={editProjectData.start_date}
                   onChange={(e) => setEditProjectData({ ...editProjectData, start_date: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-black"
+                  className="w-full px-4 py-3 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-[var(--accent)]"
                 />
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-medium text-black mb-2">Color</label>
+                <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Color</label>
                 <input
                   type="color"
                   value={editProjectData.color}
                   onChange={(e) => setEditProjectData({ ...editProjectData, color: e.target.value })}
-                  className="w-full h-12 border border-gray-300 rounded-xl"
+                  className="w-full h-12 border border-[var(--border-subtle)] rounded-xl"
                 />
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-medium text-black mb-2">Icon</label>
+                <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Icon</label>
                 <div className="grid grid-cols-10 gap-2">
                   {iconOptions.map((icon) => (
                     <button
@@ -1325,7 +1325,7 @@ export default function Projects() {
                       type="button"
                       onClick={() => setEditProjectData({ ...editProjectData, icon })}
                       className={`p-2 text-xl rounded-lg border-2 transition-colors ${
-                        editProjectData.icon === icon ? 'border-black bg-gray-100' : 'border-gray-300 hover:border-gray-400'
+                        editProjectData.icon === icon ? 'border-[var(--accent)] bg-[var(--bg-surface)]' : 'border-[var(--border-subtle)] hover:border-[var(--border-strong)]'
                       }`}
                     >
                       {icon}
@@ -1335,7 +1335,7 @@ export default function Projects() {
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-medium text-black mb-2">Tags (comma-separated)</label>
+                <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Tags (comma-separated)</label>
                 <input
                   type="text"
                   value={editProjectData.tags?.join(', ') || ''}
@@ -1344,14 +1344,14 @@ export default function Projects() {
                     tags: e.target.value.split(',').map(t => t.trim()).filter(t => t) 
                   })}
                   placeholder="e.g., work, personal, urgent"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-black"
+                  className="w-full px-4 py-3 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-[var(--accent)]"
                 />
               </div>
 
               <div className="flex gap-3">
                 <button
                   type="submit"
-                  className="flex-1 px-6 py-3 bg-black text-white rounded-xl hover:bg-gray-900 transition-colors font-medium"
+                  className="flex-1 px-6 py-3 bg-[var(--accent)] text-white rounded-xl hover:bg-[var(--accent-hover)] transition-colors font-medium"
                 >
                   Save Changes
                 </button>
@@ -1361,7 +1361,7 @@ export default function Projects() {
                     setEditingProject(null);
                     setEditProjectData({});
                   }}
-                  className="px-6 py-3 bg-white border border-gray-300 text-gray-600 rounded-xl hover:bg-gray-100 transition-colors"
+                  className="px-6 py-3 bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-secondary)] rounded-xl hover:bg-[var(--bg-surface)] transition-colors"
                 >
                   Cancel
                 </button>
@@ -1378,60 +1378,60 @@ export default function Projects() {
           onClick={() => setShowHealthModal(false)}
         >
           <div
-            className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md"
+            className="bg-[var(--bg-card)] rounded-2xl shadow-2xl p-8 w-full max-w-md"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="font-display text-2xl font-semibold text-black mb-2">Project Health</h3>
+            <h3 className="font-display text-2xl font-semibold text-[var(--text-primary)] mb-2">Project Health</h3>
             <div className="space-y-4">
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-gray-600">Health Score</span>
+                  <span className="text-sm text-[var(--text-secondary)]">Health Score</span>
                   <span className={`text-lg font-semibold ${
-                    healthData.status === 'healthy' ? 'text-green-600' :
-                    healthData.status === 'warning' ? 'text-yellow-600' : 'text-red-600'
+                    healthData.status === 'healthy' ? 'text-[var(--growth)]' :
+                    healthData.status === 'warning' ? 'text-yellow-600' : 'text-[var(--error)]'
                   }`}>
                     {healthData.score}/100
                   </span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="w-full bg-[var(--border-subtle)] rounded-full h-2">
                   <div 
                     className={`h-2 rounded-full ${
                       healthData.status === 'healthy' ? 'bg-green-600' :
-                      healthData.status === 'warning' ? 'bg-yellow-600' : 'bg-red-600'
+                      healthData.status === 'warning' ? 'bg-yellow-600' : 'bg-[var(--error)]'
                     }`}
                     style={{ width: `${healthData.score}%` }}
                   />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-xs text-gray-600 mb-1">Total Tasks</p>
-                  <p className="text-xl font-semibold text-black">{healthData.tasks.total}</p>
+                <div className="p-3 bg-[var(--bg-surface)] rounded-lg">
+                  <p className="text-xs text-[var(--text-secondary)] mb-1">Total Tasks</p>
+                  <p className="text-xl font-semibold text-[var(--text-primary)]">{healthData.tasks.total}</p>
                 </div>
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-xs text-gray-600 mb-1">Completed</p>
-                  <p className="text-xl font-semibold text-green-600">{healthData.tasks.completed}</p>
+                <div className="p-3 bg-[var(--bg-surface)] rounded-lg">
+                  <p className="text-xs text-[var(--text-secondary)] mb-1">Completed</p>
+                  <p className="text-xl font-semibold text-[var(--growth)]">{healthData.tasks.completed}</p>
                 </div>
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-xs text-gray-600 mb-1">In Progress</p>
+                <div className="p-3 bg-[var(--bg-surface)] rounded-lg">
+                  <p className="text-xs text-[var(--text-secondary)] mb-1">In Progress</p>
                   <p className="text-xl font-semibold text-blue-600">{healthData.tasks.in_progress}</p>
                 </div>
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-xs text-gray-600 mb-1">Overdue</p>
-                  <p className="text-xl font-semibold text-red-600">{healthData.tasks.overdue}</p>
+                <div className="p-3 bg-[var(--bg-surface)] rounded-lg">
+                  <p className="text-xs text-[var(--text-secondary)] mb-1">Overdue</p>
+                  <p className="text-xl font-semibold text-[var(--error)]">{healthData.tasks.overdue}</p>
                 </div>
               </div>
               <div className="pt-4 border-t">
-                <p className="text-xs text-gray-600 mb-2">Time Tracking</p>
+                <p className="text-xs text-[var(--text-secondary)] mb-2">Time Tracking</p>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Estimated: {Math.round(healthData.time.estimated_minutes / 60)}h</span>
-                  <span className="text-sm text-gray-600">Spent: {Math.round(healthData.time.spent_minutes / 60)}h</span>
+                  <span className="text-sm text-[var(--text-secondary)]">Estimated: {Math.round(healthData.time.estimated_minutes / 60)}h</span>
+                  <span className="text-sm text-[var(--text-secondary)]">Spent: {Math.round(healthData.time.spent_minutes / 60)}h</span>
                 </div>
               </div>
             </div>
             <button
               onClick={() => setShowHealthModal(false)}
-              className="mt-6 w-full px-6 py-3 bg-black text-white rounded-xl hover:bg-gray-900 transition-colors"
+              className="mt-6 w-full px-6 py-3 bg-[var(--accent)] text-white rounded-xl hover:bg-[var(--accent-hover)] transition-colors"
             >
               Close
             </button>
@@ -1446,18 +1446,18 @@ export default function Projects() {
           onClick={() => setShowActivityModal(false)}
         >
           <div
-            className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md max-h-[80vh] overflow-y-auto"
+            className="bg-[var(--bg-card)] rounded-2xl shadow-2xl p-8 w-full max-w-md max-h-[80vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="font-display text-2xl font-semibold text-black mb-2">Recent Activity</h3>
+            <h3 className="font-display text-2xl font-semibold text-[var(--text-primary)] mb-2">Recent Activity</h3>
             <div className="space-y-3 mt-4">
               {activityData.length === 0 ? (
-                <p className="text-sm text-gray-600 text-center py-8">No activity yet</p>
+                <p className="text-sm text-[var(--text-secondary)] text-center py-8">No activity yet</p>
               ) : (
                 activityData.map((activity) => (
-                  <div key={activity.id} className="p-3 bg-gray-50 rounded-lg">
-                    <p className="text-sm text-black">{activity.description || activity.action_type}</p>
-                    <p className="text-xs text-gray-500 mt-1">
+                  <div key={activity.id} className="p-3 bg-[var(--bg-surface)] rounded-lg">
+                    <p className="text-sm text-[var(--text-primary)]">{activity.description || activity.action_type}</p>
+                    <p className="text-xs text-[var(--text-muted)] mt-1">
                       {new Date(activity.created_at).toLocaleString()}
                     </p>
                   </div>
@@ -1466,7 +1466,7 @@ export default function Projects() {
             </div>
             <button
               onClick={() => setShowActivityModal(false)}
-              className="mt-6 w-full px-6 py-3 bg-black text-white rounded-xl hover:bg-gray-900 transition-colors"
+              className="mt-6 w-full px-6 py-3 bg-[var(--accent)] text-white rounded-xl hover:bg-[var(--accent-hover)] transition-colors"
             >
               Close
             </button>
@@ -1487,13 +1487,13 @@ export default function Projects() {
           }}
         >
           <div
-            className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md"
+            className="bg-[var(--bg-card)] rounded-2xl shadow-2xl p-8 w-full max-w-md"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="font-display text-2xl font-semibold text-black mb-2">Save as Template</h3>
-                <p className="text-sm text-gray-600">Create a reusable template from this project</p>
+                <h3 className="font-display text-2xl font-semibold text-[var(--text-primary)] mb-2">Save as Template</h3>
+                <p className="text-sm text-[var(--text-secondary)]">Create a reusable template from this project</p>
               </div>
               <button
                 onClick={() => {
@@ -1503,7 +1503,7 @@ export default function Projects() {
                   setTemplateDescription('');
                   setTemplateIsPublic(false);
                 }}
-                className="text-gray-500 hover:text-black transition-colors"
+                className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -1516,26 +1516,26 @@ export default function Projects() {
               handleSaveAsTemplate();
             }} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-black mb-2">Template Name</label>
+                <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Template Name</label>
                 <input
                   type="text"
                   value={templateName}
                   onChange={(e) => setTemplateName(e.target.value)}
                   placeholder="Template name"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-black"
+                  className="w-full px-4 py-3 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-[var(--accent)]"
                   required
                   autoFocus
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-black mb-2">Description (optional)</label>
+                <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Description (optional)</label>
                 <textarea
                   value={templateDescription}
                   onChange={(e) => setTemplateDescription(e.target.value)}
                   placeholder="Template description"
                   rows={3}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-black resize-none"
+                  className="w-full px-4 py-3 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-[var(--accent)] resize-none"
                 />
               </div>
               
@@ -1545,11 +1545,11 @@ export default function Projects() {
                     type="checkbox"
                     checked={templateIsPublic}
                     onChange={(e) => setTemplateIsPublic(e.target.checked)}
-                    className="w-5 h-5 rounded border-gray-300 text-black focus:ring-black"
+                    className="w-5 h-5 rounded border-[var(--border-subtle)] text-[var(--text-primary)] focus:ring-[var(--accent)]"
                   />
-                  <span className="text-sm text-black">Make this template public</span>
+                  <span className="text-sm text-[var(--text-primary)]">Make this template public</span>
                 </label>
-                <p className="text-xs text-gray-500 mt-1">Public templates can be used by other users</p>
+                <p className="text-xs text-[var(--text-muted)] mt-1">Public templates can be used by other users</p>
               </div>
               
               <div className="flex gap-3 pt-4">
@@ -1562,14 +1562,14 @@ export default function Projects() {
                     setTemplateDescription('');
                     setTemplateIsPublic(false);
                   }}
-                  className="flex-1 px-6 py-3 bg-white border border-gray-300 text-gray-600 rounded-xl hover:bg-gray-100 transition-colors"
+                  className="flex-1 px-6 py-3 bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-secondary)] rounded-xl hover:bg-[var(--bg-surface)] transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={savingTemplate || !templateName.trim()}
-                  className="flex-1 px-6 py-3 bg-black text-white rounded-xl hover:bg-gray-900 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-6 py-3 bg-[var(--accent)] text-white rounded-xl hover:bg-[var(--accent-hover)] transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {savingTemplate ? 'Saving...' : 'Save Template'}
                 </button>

@@ -27,10 +27,10 @@ export default function ProjectsTable({
   // Note: Projects are already filtered by searchQuery in parent component
 
   const getStatusColor = (progress) => {
-    if (progress >= 75) return 'text-green-600';
+    if (progress >= 75) return 'text-[var(--growth)]';
     if (progress >= 50) return 'text-blue-600';
     if (progress >= 25) return 'text-yellow-600';
-    return 'text-gray-600';
+    return 'text-[var(--text-secondary)]';
   };
 
   if (projects.length === 0) {
@@ -116,7 +116,7 @@ export default function ProjectsTable({
               </td>
               <td className="py-3 px-4">
                 <div className="flex items-center gap-2">
-                  <div className="flex-1 bg-gray-200 rounded-full h-2 max-w-[100px]">
+                  <div className="flex-1 bg-[var(--border-subtle)] rounded-full h-2 max-w-[100px]">
                     <div
                       className="h-2 rounded-full transition-all"
                       style={{

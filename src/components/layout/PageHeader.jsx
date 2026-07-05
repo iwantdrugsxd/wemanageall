@@ -6,7 +6,7 @@ export default function PageHeader({ title, subtitle, actions, className, ...pro
       <div className="flex items-center justify-between">
         <div>
           {title && (
-            <h1 className="text-3xl md:text-4xl font-light transition-colors mb-1" style={{ color: 'var(--text-primary)' }}>
+            <h1 className="text-2xl md:text-3xl font-semibold tracking-tight transition-colors mb-1" style={{ color: 'var(--text-primary)' }}>
               {title}
             </h1>
           )}

@@ -268,7 +268,7 @@ export default function Settings() {
                   }`}
                 >
                   <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    className={`inline-block h-4 w-4 transform rounded-full bg-[var(--bg-card)] transition-transform ${
                       emailNotifications ? 'translate-x-6' : 'translate-x-1'
                     }`}
                   />
@@ -290,7 +290,7 @@ export default function Settings() {
                   }`}
                 >
                   <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    className={`inline-block h-4 w-4 transform rounded-full bg-[var(--bg-card)] transition-transform ${
                       inAppNotifications ? 'translate-x-6' : 'translate-x-1'
                     }`}
                   />
@@ -312,7 +312,7 @@ export default function Settings() {
                   }`}
                 >
                   <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    className={`inline-block h-4 w-4 transform rounded-full bg-[var(--bg-card)] transition-transform ${
                       weeklySummary ? 'translate-x-6' : 'translate-x-1'
                     }`}
                   />
@@ -377,7 +377,7 @@ export default function Settings() {
                     }`}
                   >
                     <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      className={`inline-block h-4 w-4 transform rounded-full bg-[var(--bg-card)] transition-transform ${
                         twoFactorAuth ? 'translate-x-6' : 'translate-x-1'
                       }`}
                     />

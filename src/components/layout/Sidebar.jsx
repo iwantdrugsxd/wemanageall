@@ -37,11 +37,14 @@ export default function Sidebar({ collapsed, onToggleCollapse }) {
       {/* Logo */}
       <div className="p-4 border-b" style={{ borderColor: 'var(--border-subtle)' }}>
         <Link to="/home" className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-black flex items-center justify-center shadow-[0_8px_24px_rgba(0,0,0,0.6)] border border-gray-800/80 flex-shrink-0">
-            <span className="font-display text-white text-lg leading-none font-semibold">W</span>
+          <div
+            className="w-9 h-9 rounded-xl flex items-center justify-center shadow-calm-sm flex-shrink-0"
+            style={{ backgroundColor: 'var(--accent)' }}
+          >
+            <span className="text-white text-lg leading-none font-semibold">W</span>
           </div>
           {!collapsed && (
-            <span className="font-display text-lg font-semibold transition-colors" style={{ color: 'var(--text-primary)' }}>
+            <span className="text-lg font-semibold tracking-tight transition-colors" style={{ color: 'var(--text-primary)' }}>
               WeManageAll
             </span>
           )}
@@ -71,18 +74,18 @@ export default function Sidebar({ collapsed, onToggleCollapse }) {
               key={item.key}
               to={item.to}
               className={cn(
-                'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors',
+                'flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors duration-150 relative',
                 active && 'font-medium'
               )}
               style={{
-                backgroundColor: active ? 'var(--bg-surface)' : 'transparent',
-                color: active ? 'var(--text-primary)' : 'var(--text-muted)'
+                backgroundColor: active ? 'var(--accent-soft)' : 'transparent',
+                color: active ? 'var(--accent-hover)' : 'var(--text-muted)'
               }}
             >
-              <svg 
-                className="w-5 h-5 flex-shrink-0" 
-                fill="none" 
-                stroke="currentColor" 
+              <svg
+                className="w-5 h-5 flex-shrink-0"
+                fill="none"
+                stroke="currentColor"
                 viewBox="0 0 24 24"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
@@ -98,7 +101,7 @@ export default function Sidebar({ collapsed, onToggleCollapse }) {
             <div className="pt-4 mt-4 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
               <button
                 onClick={() => setShowMore(!showMore)}
-                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm font-medium"
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors text-sm font-medium"
                 style={{ color: 'var(--text-muted)' }}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -124,12 +127,12 @@ export default function Sidebar({ collapsed, onToggleCollapse }) {
                       key={item.key}
                       to={item.to}
                       className={cn(
-                        'flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm',
+                        'flex items-center gap-3 px-3 py-2 rounded-xl transition-colors text-sm',
                         active && 'font-medium'
                       )}
                       style={{
-                        backgroundColor: active ? 'var(--bg-surface)' : 'transparent',
-                        color: active ? 'var(--text-primary)' : 'var(--text-muted)'
+                        backgroundColor: active ? 'var(--accent-soft)' : 'transparent',
+                        color: active ? 'var(--accent-hover)' : 'var(--text-muted)'
                       }}
                     >
                       <svg 
@@ -154,7 +157,10 @@ export default function Sidebar({ collapsed, onToggleCollapse }) {
       <div className="p-4 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
         <Link
           to="/pricing"
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors bg-orange-500 hover:bg-orange-600 text-white"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors text-white shadow-calm-sm hover:shadow-calm-md"
+          style={{ backgroundColor: 'var(--accent)' }}
+          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--accent-hover)'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'var(--accent)'; }}
         >
           {!collapsed && (
             <>

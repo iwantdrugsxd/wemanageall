@@ -211,15 +211,15 @@ export default function Onboarding() {
   const firstName = user?.name?.split(' ')[0] || 'friend';
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-[var(--bg-card)] flex flex-col">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-300/50">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-[var(--border-subtle)]/50">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-[var(--accent)] flex items-center justify-center">
               <span className="font-display text-ofa-cream text-sm font-semibold">O</span>
             </div>
-            <span className="font-display text-lg font-semibold text-black">OFA</span>
+            <span className="font-display text-lg font-semibold text-[var(--text-primary)]">OFA</span>
           </div>
           
           {/* Progress Indicator */}
@@ -228,8 +228,8 @@ export default function Onboarding() {
               <div 
                 key={step}
                 className={`h-2 rounded-full transition-all duration-500 ${
-                  step === currentStep ? 'w-8 bg-black' : 
-                  step < currentStep ? 'w-2 bg-black' : 'w-2 bg-gray-200'
+                  step === currentStep ? 'w-8 bg-[var(--accent)]' : 
+                  step < currentStep ? 'w-2 bg-[var(--accent)]' : 'w-2 bg-[var(--border-subtle)]'
                 }`}
               />
             ))}
@@ -246,11 +246,11 @@ export default function Onboarding() {
           {currentStep === 1 && (
             <div className="animate-fade-in-up">
               <div className="mb-10">
-                <span className="text-sm font-mono text-black tracking-widest uppercase mb-3 block">Identity Stage</span>
-                <h1 className="font-display text-3xl md:text-4xl text-black mb-4">
+                <span className="text-sm font-mono text-[var(--text-primary)] tracking-widest uppercase mb-3 block">Identity Stage</span>
+                <h1 className="font-display text-3xl md:text-4xl text-[var(--text-primary)] mb-4">
                   In one sentence, who do you want to become in the next 3 years?
                 </h1>
-                <p className="text-lg text-gray-600">
+                <p className="text-lg text-[var(--text-secondary)]">
                   Not what you want to have — who you want to become.
                 </p>
               </div>
@@ -262,19 +262,19 @@ export default function Onboarding() {
                     onChange={(e) => setData({ ...data, vision: e.target.value })}
                     rows={4}
                     placeholder="e.g., A disciplined builder."
-                    className="w-full px-5 py-4 bg-white border border-gray-300 rounded-2xl text-black placeholder:text-gray-500 resize-none focus:outline-none focus:border-ofa-ink focus:ring-4 focus:ring-ofa-ink/5"
+                    className="w-full px-5 py-4 bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-2xl text-[var(--text-primary)] placeholder:text-[var(--text-muted)] resize-none focus:outline-none focus:border-ofa-ink focus:ring-4 focus:ring-ofa-ink/5"
                   />
                 </div>
                 
-                <div className="bg-gray-100/50 rounded-2xl p-6 border border-gray-300/50">
-                  <p className="text-sm font-medium text-black mb-3">Examples:</p>
+                <div className="bg-[var(--bg-surface)]/50 rounded-2xl p-6 border border-[var(--border-subtle)]/50">
+                  <p className="text-sm font-medium text-[var(--text-primary)] mb-3">Examples:</p>
                   <div className="space-y-2">
                     {['A disciplined builder.', 'A calm, confident leader.', 'Someone in control of their life.'].map((example, i) => (
                       <button 
                         key={i}
                         type="button"
                         onClick={() => setData({ ...data, vision: example })}
-                        className="text-left w-full px-4 py-3 bg-white rounded-xl text-sm text-gray-600 hover:bg-black hover:text-ofa-cream transition-all"
+                        className="text-left w-full px-4 py-3 bg-[var(--bg-card)] rounded-xl text-sm text-[var(--text-secondary)] hover:bg-[var(--accent-hover)] hover:text-ofa-cream transition-all"
                       >
                         "{example}"
                       </button>
@@ -289,11 +289,11 @@ export default function Onboarding() {
           {currentStep === 2 && (
             <div className="animate-fade-in-up">
               <div className="mb-10">
-                <span className="text-sm font-mono text-black tracking-widest uppercase mb-3 block">Identity Stage</span>
-                <h1 className="font-display text-3xl md:text-4xl text-black mb-4">
+                <span className="text-sm font-mono text-[var(--text-primary)] tracking-widest uppercase mb-3 block">Identity Stage</span>
+                <h1 className="font-display text-3xl md:text-4xl text-[var(--text-primary)] mb-4">
                   Which values matter most to you right now?
                 </h1>
-                <p className="text-lg text-gray-600">Choose up to 3–5.</p>
+                <p className="text-lg text-[var(--text-secondary)]">Choose up to 3–5.</p>
               </div>
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -302,23 +302,23 @@ export default function Onboarding() {
                     key={value.id}
                     type="button"
                     onClick={() => toggleSelection('values', value.id, 5)}
-                    className={`relative p-5 bg-white border rounded-2xl text-center transition-all ${
+                    className={`relative p-5 bg-[var(--bg-card)] border rounded-2xl text-center transition-all ${
                       data.values.includes(value.id) 
                         ? 'border-ofa-ink bg-black/5' 
-                        : 'border-gray-300 hover:border-ofa-cloud'
+                        : 'border-[var(--border-subtle)] hover:border-ofa-cloud'
                     }`}
                   >
                     {data.values.includes(value.id) && (
-                      <div className="absolute top-3 right-3 w-5 h-5 bg-black rounded-full flex items-center justify-center">
+                      <div className="absolute top-3 right-3 w-5 h-5 bg-[var(--accent)] rounded-full flex items-center justify-center">
                         <span className="text-white text-xs">✓</span>
                       </div>
                     )}
-                    <h3 className="font-medium text-black">{value.name}</h3>
+                    <h3 className="font-medium text-[var(--text-primary)]">{value.name}</h3>
                   </button>
                 ))}
               </div>
               
-              <p className="text-sm text-gray-500 mt-4 text-center">
+              <p className="text-sm text-[var(--text-muted)] mt-4 text-center">
                 {data.values.length}/5 values selected (minimum 3)
               </p>
             </div>
@@ -328,11 +328,11 @@ export default function Onboarding() {
           {currentStep === 3 && (
             <div className="animate-fade-in-up">
               <div className="mb-10">
-                <span className="text-sm font-mono text-black tracking-widest uppercase mb-3 block">Life Context Stage</span>
-                <h1 className="font-display text-3xl md:text-4xl text-black mb-4">
+                <span className="text-sm font-mono text-[var(--text-primary)] tracking-widest uppercase mb-3 block">Life Context Stage</span>
+                <h1 className="font-display text-3xl md:text-4xl text-[var(--text-primary)] mb-4">
                   Which roles best describe your life right now?
                 </h1>
-                <p className="text-lg text-gray-600">Multi-select.</p>
+                <p className="text-lg text-[var(--text-secondary)]">Multi-select.</p>
               </div>
               
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -341,18 +341,18 @@ export default function Onboarding() {
                     key={role.id}
                     type="button"
                     onClick={() => toggleSelection('roles', role.id)}
-                    className={`relative p-5 bg-white border rounded-2xl text-center transition-all ${
+                    className={`relative p-5 bg-[var(--bg-card)] border rounded-2xl text-center transition-all ${
                       data.roles.includes(role.id) 
                         ? 'border-ofa-ink bg-black/5' 
-                        : 'border-gray-300 hover:border-ofa-cloud'
+                        : 'border-[var(--border-subtle)] hover:border-ofa-cloud'
                     }`}
                   >
                     {data.roles.includes(role.id) && (
-                      <div className="absolute top-3 right-3 w-5 h-5 bg-black rounded-full flex items-center justify-center">
+                      <div className="absolute top-3 right-3 w-5 h-5 bg-[var(--accent)] rounded-full flex items-center justify-center">
                         <span className="text-white text-xs">✓</span>
                       </div>
                     )}
-                    <h3 className="font-medium text-black">{role.name}</h3>
+                    <h3 className="font-medium text-[var(--text-primary)]">{role.name}</h3>
                   </button>
                 ))}
               </div>
@@ -363,8 +363,8 @@ export default function Onboarding() {
           {currentStep === 4 && (
             <div className="animate-fade-in-up">
               <div className="mb-10">
-                <span className="text-sm font-mono text-black tracking-widest uppercase mb-3 block">Life Context Stage</span>
-                <h1 className="font-display text-3xl md:text-4xl text-black mb-4">
+                <span className="text-sm font-mono text-[var(--text-primary)] tracking-widest uppercase mb-3 block">Life Context Stage</span>
+                <h1 className="font-display text-3xl md:text-4xl text-[var(--text-primary)] mb-4">
                   How would you describe your life phase right now?
                 </h1>
               </div>
@@ -375,18 +375,18 @@ export default function Onboarding() {
                     key={phase.id}
                     type="button"
                     onClick={() => setData({ ...data, lifePhase: phase.id })}
-                    className={`relative p-5 bg-white border rounded-2xl text-left transition-all ${
+                    className={`relative p-5 bg-[var(--bg-card)] border rounded-2xl text-left transition-all ${
                       data.lifePhase === phase.id 
                         ? 'border-ofa-ink bg-black/5' 
-                        : 'border-gray-300 hover:border-ofa-cloud'
+                        : 'border-[var(--border-subtle)] hover:border-ofa-cloud'
                     }`}
                   >
                     {data.lifePhase === phase.id && (
-                      <div className="absolute top-3 right-3 w-5 h-5 bg-black rounded-full flex items-center justify-center">
+                      <div className="absolute top-3 right-3 w-5 h-5 bg-[var(--accent)] rounded-full flex items-center justify-center">
                         <span className="text-white text-xs">✓</span>
                       </div>
                     )}
-                    <h3 className="font-medium text-black">{phase.name}</h3>
+                    <h3 className="font-medium text-[var(--text-primary)]">{phase.name}</h3>
                   </button>
                 ))}
               </div>
@@ -397,11 +397,11 @@ export default function Onboarding() {
           {currentStep === 5 && (
             <div className="animate-fade-in-up">
               <div className="mb-10">
-                <span className="text-sm font-mono text-black tracking-widest uppercase mb-3 block">Focus & Struggles Stage</span>
-                <h1 className="font-display text-3xl md:text-4xl text-black mb-4">
+                <span className="text-sm font-mono text-[var(--text-primary)] tracking-widest uppercase mb-3 block">Focus & Struggles Stage</span>
+                <h1 className="font-display text-3xl md:text-4xl text-[var(--text-primary)] mb-4">
                   What do you struggle with most?
                 </h1>
-                <p className="text-lg text-gray-600">Choose up to 3.</p>
+                <p className="text-lg text-[var(--text-secondary)]">Choose up to 3.</p>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -410,23 +410,23 @@ export default function Onboarding() {
                     key={challenge.id}
                     type="button"
                     onClick={() => toggleSelection('challenges', challenge.id, 3)}
-                    className={`relative p-5 bg-white border rounded-2xl text-left transition-all ${
+                    className={`relative p-5 bg-[var(--bg-card)] border rounded-2xl text-left transition-all ${
                       data.challenges.includes(challenge.id) 
                         ? 'border-ofa-ink bg-black/5' 
-                        : 'border-gray-300 hover:border-ofa-cloud'
+                        : 'border-[var(--border-subtle)] hover:border-ofa-cloud'
                     }`}
                   >
                     {data.challenges.includes(challenge.id) && (
-                      <div className="absolute top-3 right-3 w-5 h-5 bg-black rounded-full flex items-center justify-center">
+                      <div className="absolute top-3 right-3 w-5 h-5 bg-[var(--accent)] rounded-full flex items-center justify-center">
                         <span className="text-white text-xs">✓</span>
                       </div>
                     )}
-                    <h3 className="font-medium text-black">{challenge.name}</h3>
+                    <h3 className="font-medium text-[var(--text-primary)]">{challenge.name}</h3>
                   </button>
                 ))}
               </div>
               
-              <p className="text-sm text-gray-500 mt-4 text-center">
+              <p className="text-sm text-[var(--text-muted)] mt-4 text-center">
                 {data.challenges.length}/3 challenges selected (minimum 1)
               </p>
             </div>
@@ -435,11 +435,11 @@ export default function Onboarding() {
       </main>
       
       {/* Footer Navigation */}
-      <footer className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-gray-300/50">
+      <footer className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-[var(--border-subtle)]/50">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <button 
             onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
-            className={`px-6 py-3 text-gray-600 hover:text-black transition-colors flex items-center gap-2 ${currentStep === 1 ? 'invisible' : ''}`}
+            className={`px-6 py-3 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors flex items-center gap-2 ${currentStep === 1 ? 'invisible' : ''}`}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />

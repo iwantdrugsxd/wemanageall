@@ -946,16 +946,16 @@ export default function Calendar({ embedded = false } = {}) {
     const dayEvents = getEventsForDay(currentDate);
     
     return (
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+      <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-subtle)] overflow-hidden shadow-sm">
         <div className="grid grid-cols-2 max-h-[calc(100vh-300px)] overflow-y-auto">
           {/* Time Column */}
-          <div className="border-r border-gray-200 bg-gray-50 sticky top-0">
+          <div className="border-r border-[var(--border-subtle)] bg-[var(--bg-surface)] sticky top-0">
             {timeSlots.map((hour) => (
               <div
                 key={hour}
-                className="h-[60px] border-b border-gray-200 flex items-start justify-end pr-4 pt-2"
+                className="h-[60px] border-b border-[var(--border-subtle)] flex items-start justify-end pr-4 pt-2"
               >
-                <span className="text-xs text-gray-600 font-medium">
+                <span className="text-xs text-[var(--text-secondary)] font-medium">
                   {hour === 0 ? '12 AM' : hour < 12 ? `${hour} AM` : hour === 12 ? '12 PM' : `${hour - 12} PM`}
                 </span>
               </div>
@@ -978,7 +978,7 @@ export default function Calendar({ embedded = false } = {}) {
               return (
                 <div
                   key={hour}
-                  className="h-[60px] border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors relative group"
+                  className="h-[60px] border-b border-[var(--border-subtle)] cursor-pointer hover:bg-[var(--bg-surface)] transition-colors relative group"
                   onMouseDown={(e) => handleSlotMouseDown(currentDate, hour, e)}
                   onClick={() => {
                     if (!rangeStart) {
@@ -989,7 +989,7 @@ export default function Calendar({ embedded = false } = {}) {
                   {/* Show creating range preview */}
                   {isInRange && (
                     <div 
-                      className="absolute left-0 right-0 bg-black/20 border-2 border-gray-900 rounded pointer-events-none z-0"
+                      className="absolute left-0 right-0 bg-black/20 border-2 border-[var(--border-strong)] rounded pointer-events-none z-0"
                       style={{
                         top: '0',
                         height: '100%'
@@ -997,7 +997,7 @@ export default function Calendar({ embedded = false } = {}) {
                     />
                   )}
                   {/* Hour indicator on hover */}
-                  <div className="absolute left-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs text-gray-400">
+                  <div className="absolute left-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs text-[var(--text-muted)]">
                     {hour === 0 ? '12 AM' : hour < 12 ? `${hour} AM` : hour === 12 ? '12 PM' : `${hour - 12} PM`}
                   </div>
                 </div>
@@ -1013,24 +1013,24 @@ export default function Calendar({ embedded = false } = {}) {
   // Render Week View
   const renderWeekView = () => {
     return (
-      <div className="bg-white rounded-2xl border border-gray-300 overflow-hidden shadow-sm">
+      <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-subtle)] overflow-hidden shadow-sm">
         {/* Days Header */}
-        <div className="grid grid-cols-8 border-b border-gray-300 bg-gray-100/50">
-          <div className="p-4 border-r border-gray-300"></div>
+        <div className="grid grid-cols-8 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]/50">
+          <div className="p-4 border-r border-[var(--border-subtle)]"></div>
           {weekDates.map((date, index) => {
             const isTodayDate = isToday(date);
             return (
               <div
                 key={index}
-                className={`p-4 text-center border-r border-gray-300 last:border-r-0 ${
+                className={`p-4 text-center border-r border-[var(--border-subtle)] last:border-r-0 ${
                   isTodayDate ? 'bg-black/10' : ''
                 }`}
               >
-                <div className="text-xs text-gray-500 mb-1 uppercase">
+                <div className="text-xs text-[var(--text-muted)] mb-1 uppercase">
                   {format(date, 'EEE')}
                 </div>
                 <div className={`text-lg font-medium ${
-                  isTodayDate ? 'text-black' : 'text-black'
+                  isTodayDate ? 'text-[var(--text-primary)]' : 'text-[var(--text-primary)]'
                 }`}>
                   {format(date, 'd')}
                 </div>
@@ -1042,13 +1042,13 @@ export default function Calendar({ embedded = false } = {}) {
         {/* Time Slots */}
         <div className="grid grid-cols-8 relative max-h-[calc(100vh-300px)] overflow-y-auto">
           {/* Time Column */}
-          <div className="border-r border-gray-200 bg-gray-50 sticky top-0">
+          <div className="border-r border-[var(--border-subtle)] bg-[var(--bg-surface)] sticky top-0">
             {timeSlots.map((hour) => (
               <div
                 key={hour}
-                className="h-[60px] border-b border-gray-200 flex items-start justify-end pr-4 pt-2"
+                className="h-[60px] border-b border-[var(--border-subtle)] flex items-start justify-end pr-4 pt-2"
               >
-                <span className="text-xs text-gray-600 font-medium">
+                <span className="text-xs text-[var(--text-secondary)] font-medium">
                   {hour === 0 ? '12 AM' : hour < 12 ? `${hour} AM` : hour === 12 ? '12 PM' : `${hour - 12} PM`}
                 </span>
               </div>
@@ -1061,7 +1061,7 @@ export default function Calendar({ embedded = false } = {}) {
             return (
               <div
                 key={dayIndex}
-                className="border-r border-gray-200 last:border-r-0 relative day-column-resize"
+                className="border-r border-[var(--border-subtle)] last:border-r-0 relative day-column-resize"
                 data-date={date.toISOString()}
               >
                 {timeSlots.map((hour) => {
@@ -1075,7 +1075,7 @@ export default function Calendar({ embedded = false } = {}) {
                   return (
                     <div
                       key={hour}
-                      className="h-[60px] border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors relative group"
+                      className="h-[60px] border-b border-[var(--border-subtle)] cursor-pointer hover:bg-[var(--bg-surface)] transition-colors relative group"
                       onMouseDown={(e) => handleSlotMouseDown(date, hour, e)}
                       onClick={() => {
                         if (!rangeStart) {
@@ -1086,7 +1086,7 @@ export default function Calendar({ embedded = false } = {}) {
                       {/* Show creating range preview */}
                       {isInRange && (
                         <div 
-                          className="absolute left-0 right-0 bg-black/20 border-2 border-gray-900 rounded pointer-events-none z-0"
+                          className="absolute left-0 right-0 bg-black/20 border-2 border-[var(--border-strong)] rounded pointer-events-none z-0"
                           style={{
                             top: '0',
                             height: '100%'
@@ -1114,11 +1114,11 @@ export default function Calendar({ embedded = false } = {}) {
     const paddingDays = firstDay === 0 ? 6 : firstDay - 1; // Monday = 0
     
     return (
-      <div className="bg-white rounded-2xl border border-gray-300 overflow-hidden shadow-sm">
+      <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-subtle)] overflow-hidden shadow-sm">
         {/* Days Header */}
-        <div className="grid grid-cols-7 border-b border-gray-300 bg-gray-100/50">
+        <div className="grid grid-cols-7 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]/50">
           {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
-            <div key={day} className="p-3 text-center text-xs font-medium text-gray-600 uppercase border-r border-gray-300 last:border-r-0">
+            <div key={day} className="p-3 text-center text-xs font-medium text-[var(--text-secondary)] uppercase border-r border-[var(--border-subtle)] last:border-r-0">
               {day}
             </div>
           ))}
@@ -1128,7 +1128,7 @@ export default function Calendar({ embedded = false } = {}) {
         <div className="grid grid-cols-7">
           {/* Padding days */}
           {Array.from({ length: paddingDays }).map((_, i) => (
-            <div key={`pad-${i}`} className="h-24 border-b border-r border-gray-300 bg-gray-100/20"></div>
+            <div key={`pad-${i}`} className="h-24 border-b border-r border-[var(--border-subtle)] bg-[var(--bg-surface)]/20"></div>
           ))}
           
           {/* Actual days */}
@@ -1138,12 +1138,12 @@ export default function Calendar({ embedded = false } = {}) {
             return (
               <div
                 key={date.toISOString()}
-                className={`h-24 border-b border-r border-gray-300 last:border-r-0 p-2 ${
+                className={`h-24 border-b border-r border-[var(--border-subtle)] last:border-r-0 p-2 ${
                   isTodayDate ? 'bg-black/5' : ''
                 }`}
               >
                 <div className={`text-sm font-medium mb-1 ${
-                  isTodayDate ? 'text-black' : 'text-black'
+                  isTodayDate ? 'text-[var(--text-primary)]' : 'text-[var(--text-primary)]'
                 }`}>
                   {format(date, 'd')}
                 </div>
@@ -1172,7 +1172,7 @@ export default function Calendar({ embedded = false } = {}) {
                     </div>
                   ))}
                   {dayEvents.length > 3 && (
-                    <div className="text-[10px] text-gray-600 px-1">
+                    <div className="text-[10px] text-[var(--text-secondary)] px-1">
                       +{dayEvents.length - 3} more
                     </div>
                   )}
@@ -1195,11 +1195,11 @@ export default function Calendar({ embedded = false } = {}) {
       .sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
 
     return (
-      <div className="bg-white rounded-2xl border border-gray-300 overflow-hidden shadow-sm p-6">
-        <h3 className="font-display text-xl text-black mb-4">Timeline</h3>
+      <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-subtle)] overflow-hidden shadow-sm p-6">
+        <h3 className="font-display text-xl text-[var(--text-primary)] mb-4">Timeline</h3>
         <div className="space-y-3">
           {weekEvents.length === 0 ? (
-            <p className="text-gray-600 text-center py-8">No events planned for this week</p>
+            <p className="text-[var(--text-secondary)] text-center py-8">No events planned for this week</p>
           ) : (
             weekEvents.map(event => {
               const start = new Date(event.start_time);
@@ -1209,7 +1209,7 @@ export default function Calendar({ embedded = false } = {}) {
               return (
                 <div
                   key={event.id}
-                  className="flex items-start gap-4 p-4 rounded-lg border border-gray-300 hover:shadow-md transition-shadow cursor-pointer"
+                  className="flex items-start gap-4 p-4 rounded-lg border border-[var(--border-subtle)] hover:shadow-md transition-shadow cursor-pointer"
                   onClick={() => {
                     setSelectedEvent(event);
                     setEditingEvent(event);
@@ -1227,14 +1227,14 @@ export default function Calendar({ embedded = false } = {}) {
                   ></div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between mb-1">
-                      <h4 className="font-medium text-black">{event.title}</h4>
-                      <span className="text-xs text-gray-600 capitalize">{event.type}</span>
+                      <h4 className="font-medium text-[var(--text-primary)]">{event.title}</h4>
+                      <span className="text-xs text-[var(--text-secondary)] capitalize">{event.type}</span>
                     </div>
-                    <p className="text-sm text-gray-600 mb-2">
+                    <p className="text-sm text-[var(--text-secondary)] mb-2">
                       {format(start, 'EEEE, MMM d')} • {formatTime(event.start_time)} - {formatTime(event.end_time)}
                     </p>
                     {event.description && (
-                      <p className="text-sm text-gray-500 line-clamp-2">{event.description}</p>
+                      <p className="text-sm text-[var(--text-muted)] line-clamp-2">{event.description}</p>
                     )}
                   </div>
                 </div>
@@ -1256,7 +1256,7 @@ export default function Calendar({ embedded = false } = {}) {
     }
     return (
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
-        <div className="text-center text-gray-600">Loading calendar...</div>
+        <div className="text-center text-[var(--text-secondary)]">Loading calendar...</div>
       </div>
     );
   }
@@ -1359,24 +1359,24 @@ export default function Calendar({ embedded = false } = {}) {
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="font-display text-3xl text-black">Calendar</h1>
+          <h1 className="font-display text-3xl text-[var(--text-primary)]">Calendar</h1>
           
           <div className="flex items-center gap-4">
             <button
               onClick={handleExportEvents}
-              className="px-4 py-2 bg-white border border-gray-300 text-black rounded-lg hover:bg-gray-100 transition-colors text-sm"
+              className="px-4 py-2 bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] rounded-lg hover:bg-[var(--bg-surface)] transition-colors text-sm"
               title="Export to ICS"
             >
               Export
             </button>
             <button
               onClick={handlePrev}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-[var(--bg-surface)] rounded-lg transition-colors"
             >
               ←
             </button>
             <div className="flex items-center gap-3">
-              <span className="font-medium text-black min-w-[200px] text-center">
+              <span className="font-medium text-[var(--text-primary)] min-w-[200px] text-center">
                 {view === 'week' && format(currentDate, 'MMMM yyyy')}
                 {view === 'day' && format(currentDate, 'EEEE, MMMM d, yyyy')}
                 {view === 'month' && format(currentDate, 'MMMM yyyy')}
@@ -1384,14 +1384,14 @@ export default function Calendar({ embedded = false } = {}) {
               </span>
               <button
                 onClick={handleToday}
-                className="px-4 py-2 bg-black text-white rounded-lg hover:bg-black transition-colors text-sm"
+                className="px-4 py-2 bg-[var(--accent)] text-white rounded-lg hover:bg-[var(--accent-hover)] transition-colors text-sm"
               >
                 Today
               </button>
             </div>
             <button
               onClick={handleNext}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-[var(--bg-surface)] rounded-lg transition-colors"
             >
               →
             </button>
@@ -1406,8 +1406,8 @@ export default function Calendar({ embedded = false } = {}) {
               onClick={() => setView(v)}
               className={`px-4 py-2 rounded-lg transition-colors text-sm capitalize ${
                 view === v
-                  ? 'bg-black text-white'
-                  : 'bg-white border border-gray-300 text-black hover:bg-gray-100'
+                  ? 'bg-[var(--accent)] text-white'
+                  : 'bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] hover:bg-[var(--bg-surface)]'
               }`}
             >
               {v}
@@ -1446,14 +1446,14 @@ export default function Calendar({ embedded = false } = {}) {
           }}
         >
           <div
-            className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4"
+            className="bg-[var(--bg-card)] rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="font-display text-xl text-black mb-2">New Entry</h3>
-            <p className="text-xs text-gray-600 mb-4">💡 Tip: Click and drag on time slots to select a time range</p>
+            <h3 className="font-display text-xl text-[var(--text-primary)] mb-2">New Entry</h3>
+            <p className="text-xs text-[var(--text-secondary)] mb-4">💡 Tip: Click and drag on time slots to select a time range</p>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm text-gray-600 mb-2">Type</label>
+                <label className="block text-sm text-[var(--text-secondary)] mb-2">Type</label>
                 <div className="grid grid-cols-4 gap-2">
                   {Object.entries(typeColors).map(([type, color]) => (
                     <button
@@ -1462,7 +1462,7 @@ export default function Calendar({ embedded = false } = {}) {
                       className={`px-3 py-2 rounded-lg text-sm capitalize transition-colors ${
                         newEventData.type === type
                           ? 'ring-2 ring-ofa-ink'
-                          : 'bg-gray-100 hover:bg-gray-200'
+                          : 'bg-[var(--bg-surface)] hover:bg-[var(--border-subtle)]'
                       }`}
                       style={{
                         backgroundColor: newEventData.type === type ? color : undefined,
@@ -1476,20 +1476,20 @@ export default function Calendar({ embedded = false } = {}) {
               </div>
               
               <div>
-                <label className="block text-sm text-gray-600 mb-2">Title</label>
+                <label className="block text-sm text-[var(--text-secondary)] mb-2">Title</label>
                 <input
                   type="text"
                   value={newEventData.title}
                   onChange={(e) => setNewEventData({ ...newEventData, title: e.target.value })}
                   onKeyPress={(e) => e.key === 'Enter' && handleCreateEvent()}
                   placeholder="Entry title..."
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-ofa-ink"
+                  className="w-full px-4 py-2 border border-[var(--border-subtle)] rounded-lg focus:outline-none focus:border-ofa-ink"
                   autoFocus
                 />
               </div>
               
               <div>
-                <label className="block text-sm text-gray-600 mb-2">Start Time</label>
+                <label className="block text-sm text-[var(--text-secondary)] mb-2">Start Time</label>
                 <input
                   type="time"
                   value={newEventData.startTime}
@@ -1502,12 +1502,12 @@ export default function Calendar({ embedded = false } = {}) {
                       setNewEventData({ ...newEventData, startTime: e.target.value, endTime: newEnd });
                     }
                   }}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-ofa-ink"
+                  className="w-full px-4 py-2 border border-[var(--border-subtle)] rounded-lg focus:outline-none focus:border-ofa-ink"
                 />
               </div>
               
               <div>
-                <label className="block text-sm text-gray-600 mb-2">End Time</label>
+                <label className="block text-sm text-[var(--text-secondary)] mb-2">End Time</label>
                 <input
                   type="time"
                   value={newEventData.endTime}
@@ -1520,27 +1520,27 @@ export default function Calendar({ embedded = false } = {}) {
                     setNewEventData({ ...newEventData, endTime: e.target.value });
                   }}
                   min={newEventData.startTime || undefined}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-ofa-ink"
+                  className="w-full px-4 py-2 border border-[var(--border-subtle)] rounded-lg focus:outline-none focus:border-ofa-ink"
                 />
               </div>
               
               <div>
-                <label className="block text-sm text-gray-600 mb-2">Description (optional)</label>
+                <label className="block text-sm text-[var(--text-secondary)] mb-2">Description (optional)</label>
                 <textarea
                   value={newEventData.description}
                   onChange={(e) => setNewEventData({ ...newEventData, description: e.target.value })}
                   placeholder="Add details..."
                   rows="3"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-ofa-ink resize-none"
+                  className="w-full px-4 py-2 border border-[var(--border-subtle)] rounded-lg focus:outline-none focus:border-ofa-ink resize-none"
                 />
               </div>
 
               <div>
-                <label className="block text-sm text-gray-600 mb-2">Timezone</label>
+                <label className="block text-sm text-[var(--text-secondary)] mb-2">Timezone</label>
                 <select
                   value={newEventData.timezone}
                   onChange={(e) => setNewEventData({ ...newEventData, timezone: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-ofa-ink"
+                  className="w-full px-4 py-2 border border-[var(--border-subtle)] rounded-lg focus:outline-none focus:border-ofa-ink"
                 >
                   <option value={Intl.DateTimeFormat().resolvedOptions().timeZone}>
                     {Intl.DateTimeFormat().resolvedOptions().timeZone}
@@ -1554,11 +1554,11 @@ export default function Calendar({ embedded = false } = {}) {
               </div>
 
               <div>
-                <label className="block text-sm text-gray-600 mb-2">Reminder</label>
+                <label className="block text-sm text-[var(--text-secondary)] mb-2">Reminder</label>
                 <select
                   value={newEventData.reminder_minutes || ''}
                   onChange={(e) => setNewEventData({ ...newEventData, reminder_minutes: e.target.value ? parseInt(e.target.value) : null })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-ofa-ink"
+                  className="w-full px-4 py-2 border border-[var(--border-subtle)] rounded-lg focus:outline-none focus:border-ofa-ink"
                 >
                   <option value="">None</option>
                   <option value="5">5 minutes before</option>
@@ -1569,11 +1569,11 @@ export default function Calendar({ embedded = false } = {}) {
               </div>
 
               <div>
-                <label className="block text-sm text-gray-600 mb-2">Repeat</label>
+                <label className="block text-sm text-[var(--text-secondary)] mb-2">Repeat</label>
                 <select
                   value={newEventData.recurrence_freq}
                   onChange={(e) => setNewEventData({ ...newEventData, recurrence_freq: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-ofa-ink"
+                  className="w-full px-4 py-2 border border-[var(--border-subtle)] rounded-lg focus:outline-none focus:border-ofa-ink"
                 >
                   <option value="none">None</option>
                   <option value="daily">Daily</option>
@@ -1585,7 +1585,7 @@ export default function Calendar({ embedded = false } = {}) {
               {newEventData.recurrence_freq !== 'none' && (
                 <div className="space-y-2">
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">End repeat</label>
+                    <label className="block text-xs text-[var(--text-muted)] mb-1">End repeat</label>
                     <select
                       value={newEventData.recurrence_end_date ? 'date' : newEventData.recurrence_count ? 'count' : 'never'}
                       onChange={(e) => {
@@ -1597,7 +1597,7 @@ export default function Calendar({ embedded = false } = {}) {
                           setNewEventData({ ...newEventData, recurrence_end_date: '', recurrence_count: '10' });
                         }
                       }}
-                      className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-ofa-ink"
+                      className="w-full px-3 py-1.5 text-sm border border-[var(--border-subtle)] rounded-lg focus:outline-none focus:border-ofa-ink"
                     >
                       <option value="never">Never</option>
                       <option value="date">On date</option>
@@ -1609,7 +1609,7 @@ export default function Calendar({ embedded = false } = {}) {
                       type="date"
                       value={newEventData.recurrence_end_date}
                       onChange={(e) => setNewEventData({ ...newEventData, recurrence_end_date: e.target.value })}
-                      className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-ofa-ink"
+                      className="w-full px-3 py-1.5 text-sm border border-[var(--border-subtle)] rounded-lg focus:outline-none focus:border-ofa-ink"
                     />
                   )}
                   {newEventData.recurrence_count && (
@@ -1619,13 +1619,13 @@ export default function Calendar({ embedded = false } = {}) {
                       onChange={(e) => setNewEventData({ ...newEventData, recurrence_count: e.target.value })}
                       placeholder="Number of occurrences"
                       min="1"
-                      className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-ofa-ink"
+                      className="w-full px-3 py-1.5 text-sm border border-[var(--border-subtle)] rounded-lg focus:outline-none focus:border-ofa-ink"
                     />
                   )}
                 </div>
               )}
               
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-[var(--text-secondary)]">
                 {format(quickAddSlot.date, 'EEEE, MMM d, yyyy')}
               </div>
               
@@ -1633,7 +1633,7 @@ export default function Calendar({ embedded = false } = {}) {
                 <button
                   onClick={handleCreateEvent}
                   disabled={!newEventData.title.trim()}
-                  className="px-4 py-2 bg-black text-white rounded-lg hover:bg-black disabled:opacity-50 transition-colors"
+                  className="px-4 py-2 bg-[var(--accent)] text-white rounded-lg hover:bg-[var(--accent-hover)] disabled:opacity-50 transition-colors"
                 >
                   Add {newEventData.type}
                 </button>
@@ -1656,7 +1656,7 @@ export default function Calendar({ embedded = false } = {}) {
                     setCreatingRange(null);
                     setRangeStart(null);
                   }}
-                  className="px-4 py-2 bg-white border border-gray-300 text-black rounded-lg hover:bg-gray-100 transition-colors"
+                  className="px-4 py-2 bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] rounded-lg hover:bg-[var(--bg-surface)] transition-colors"
                 >
                   Cancel
                 </button>
@@ -1676,17 +1676,17 @@ export default function Calendar({ embedded = false } = {}) {
           }}
         >
           <div
-            className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4"
+            className="bg-[var(--bg-card)] rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-display text-xl text-black">{selectedEvent.title}</h3>
+              <h3 className="font-display text-xl text-[var(--text-primary)]">{selectedEvent.title}</h3>
               <button
                 onClick={() => {
                   setShowEventDetail(false);
                   setSelectedEvent(null);
                 }}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-[var(--text-muted)] hover:text-[var(--text-secondary)]"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -1696,30 +1696,30 @@ export default function Calendar({ embedded = false } = {}) {
             
             <div className="space-y-3 mb-6">
               <div>
-                <div className="text-xs text-gray-500 mb-1">Time</div>
-                <div className="text-sm text-gray-900">
+                <div className="text-xs text-[var(--text-muted)] mb-1">Time</div>
+                <div className="text-sm text-[var(--text-primary)]">
                   {format(new Date(selectedEvent.start_time), 'EEEE, MMM d, yyyy')} • {formatTime(selectedEvent.start_time)} - {formatTime(selectedEvent.end_time)}
                 </div>
               </div>
               
               {selectedEvent.description && (
                 <div>
-                  <div className="text-xs text-gray-500 mb-1">Description</div>
-                  <div className="text-sm text-gray-900">{selectedEvent.description}</div>
+                  <div className="text-xs text-[var(--text-muted)] mb-1">Description</div>
+                  <div className="text-sm text-[var(--text-primary)]">{selectedEvent.description}</div>
                 </div>
               )}
               
               {selectedEvent.timezone && (
                 <div>
-                  <div className="text-xs text-gray-500 mb-1">Timezone</div>
-                  <div className="text-sm text-gray-900">{selectedEvent.timezone}</div>
+                  <div className="text-xs text-[var(--text-muted)] mb-1">Timezone</div>
+                  <div className="text-sm text-[var(--text-primary)]">{selectedEvent.timezone}</div>
                 </div>
               )}
               
               {selectedEvent.reminder_minutes && (
                 <div>
-                  <div className="text-xs text-gray-500 mb-1">Reminder</div>
-                  <div className="text-sm text-gray-900">
+                  <div className="text-xs text-[var(--text-muted)] mb-1">Reminder</div>
+                  <div className="text-sm text-[var(--text-primary)]">
                     {selectedEvent.reminder_minutes < 60 
                       ? `${selectedEvent.reminder_minutes} minutes before`
                       : selectedEvent.reminder_minutes < 1440
@@ -1731,8 +1731,8 @@ export default function Calendar({ embedded = false } = {}) {
               
               {selectedEvent.recurrence_rule && (
                 <div>
-                  <div className="text-xs text-gray-500 mb-1">Repeats</div>
-                  <div className="text-sm text-gray-900">
+                  <div className="text-xs text-[var(--text-muted)] mb-1">Repeats</div>
+                  <div className="text-sm text-[var(--text-primary)]">
                     {(() => {
                       try {
                         const rule = typeof selectedEvent.recurrence_rule === 'string' 
@@ -1762,19 +1762,19 @@ export default function Calendar({ embedded = false } = {}) {
                     recurrence_rule: selectedEvent.recurrence_rule ? (typeof selectedEvent.recurrence_rule === 'string' ? JSON.parse(selectedEvent.recurrence_rule) : selectedEvent.recurrence_rule) : null
                   });
                 }}
-                className="flex-1 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors text-sm"
+                className="flex-1 px-4 py-2 bg-[var(--accent)] text-white rounded-lg hover:bg-[var(--accent-hover)] transition-colors text-sm"
               >
                 Edit
               </button>
               <button
                 onClick={() => handleDuplicateEvent(selectedEvent)}
-                className="px-4 py-2 bg-white border border-gray-300 text-black rounded-lg hover:bg-gray-100 transition-colors text-sm"
+                className="px-4 py-2 bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] rounded-lg hover:bg-[var(--bg-surface)] transition-colors text-sm"
               >
                 Duplicate
               </button>
               <button
                 onClick={() => handleDeleteEvent(selectedEvent.id)}
-                className="px-4 py-2 bg-white border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors text-sm"
+                className="px-4 py-2 bg-[var(--bg-card)] border border-red-300 text-[var(--error)] rounded-lg hover:bg-red-50 transition-colors text-sm"
               >
                 Delete
               </button>
@@ -1794,17 +1794,17 @@ export default function Calendar({ embedded = false } = {}) {
               setEditFormData({});
             }}
           ></div>
-          <div className="fixed inset-y-0 right-0 w-96 bg-white border-l border-gray-300 shadow-2xl z-50 overflow-y-auto">
+          <div className="fixed inset-y-0 right-0 w-96 bg-[var(--bg-card)] border-l border-[var(--border-subtle)] shadow-2xl z-50 overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="font-display text-2xl text-black">Edit Entry</h2>
+                <h2 className="font-display text-2xl text-[var(--text-primary)]">Edit Entry</h2>
                 <button
                   onClick={() => {
                     setSelectedEvent(null);
                     setEditingEvent(null);
                     setEditFormData({});
                   }}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-[var(--bg-surface)] rounded-lg transition-colors"
                 >
                   ✕
                 </button>
@@ -1812,7 +1812,7 @@ export default function Calendar({ embedded = false } = {}) {
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm text-gray-600 mb-2">Type</label>
+                  <label className="block text-sm text-[var(--text-secondary)] mb-2">Type</label>
                   <div className="grid grid-cols-4 gap-2">
                     {Object.entries(typeColors).map(([type, color]) => (
                       <button
@@ -1821,7 +1821,7 @@ export default function Calendar({ embedded = false } = {}) {
                         className={`px-3 py-2 rounded-lg text-sm capitalize transition-colors ${
                           editFormData.type === type
                             ? 'ring-2 ring-ofa-ink'
-                            : 'bg-gray-100 hover:bg-gray-200'
+                            : 'bg-[var(--bg-surface)] hover:bg-[var(--border-subtle)]'
                         }`}
                         style={{
                           backgroundColor: editFormData.type === type ? color : undefined,
@@ -1835,39 +1835,39 @@ export default function Calendar({ embedded = false } = {}) {
                 </div>
                 
                 <div>
-                  <label className="block text-sm text-gray-600 mb-2">Title</label>
+                  <label className="block text-sm text-[var(--text-secondary)] mb-2">Title</label>
                   <input
                     type="text"
                     value={editFormData.title || ''}
                     onChange={(e) => setEditFormData({ ...editFormData, title: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-ofa-ink"
+                    className="w-full px-4 py-2 border border-[var(--border-subtle)] rounded-lg focus:outline-none focus:border-ofa-ink"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm text-gray-600 mb-2">Description</label>
+                  <label className="block text-sm text-[var(--text-secondary)] mb-2">Description</label>
                   <textarea
                     value={editFormData.description || ''}
                     onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
                     rows="4"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-ofa-ink resize-none"
+                    className="w-full px-4 py-2 border border-[var(--border-subtle)] rounded-lg focus:outline-none focus:border-ofa-ink resize-none"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm text-gray-600 mb-2">Time</label>
-                  <div className="text-sm text-black space-y-1">
+                  <label className="block text-sm text-[var(--text-secondary)] mb-2">Time</label>
+                  <div className="text-sm text-[var(--text-primary)] space-y-1">
                     <div>Start: {format(new Date(selectedEvent.start_time), 'MMM d, yyyy h:mm a')}</div>
                     <div>End: {format(new Date(selectedEvent.end_time), 'MMM d, yyyy h:mm a')}</div>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm text-gray-600 mb-2">Timezone</label>
+                  <label className="block text-sm text-[var(--text-secondary)] mb-2">Timezone</label>
                   <select
                     value={editFormData.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone}
                     onChange={(e) => setEditFormData({ ...editFormData, timezone: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-ofa-ink"
+                    className="w-full px-4 py-2 border border-[var(--border-subtle)] rounded-lg focus:outline-none focus:border-ofa-ink"
                   >
                     <option value={Intl.DateTimeFormat().resolvedOptions().timeZone}>
                       {Intl.DateTimeFormat().resolvedOptions().timeZone}
@@ -1881,11 +1881,11 @@ export default function Calendar({ embedded = false } = {}) {
                 </div>
 
                 <div>
-                  <label className="block text-sm text-gray-600 mb-2">Reminder</label>
+                  <label className="block text-sm text-[var(--text-secondary)] mb-2">Reminder</label>
                   <select
                     value={editFormData.reminder_minutes || ''}
                     onChange={(e) => setEditFormData({ ...editFormData, reminder_minutes: e.target.value ? parseInt(e.target.value) : null })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-ofa-ink"
+                    className="w-full px-4 py-2 border border-[var(--border-subtle)] rounded-lg focus:outline-none focus:border-ofa-ink"
                   >
                     <option value="">None</option>
                     <option value="5">5 minutes before</option>
@@ -1899,13 +1899,13 @@ export default function Calendar({ embedded = false } = {}) {
                   <button
                     onClick={handleUpdateEvent}
                     disabled={!editFormData.title?.trim()}
-                    className="flex-1 px-4 py-2 bg-black text-white rounded-lg hover:bg-black disabled:opacity-50 transition-colors"
+                    className="flex-1 px-4 py-2 bg-[var(--accent)] text-white rounded-lg hover:bg-[var(--accent-hover)] disabled:opacity-50 transition-colors"
                   >
                     Save Changes
                   </button>
                   <button
                     onClick={() => handleDeleteEvent(selectedEvent.id)}
-                    className="px-4 py-2 bg-gray-100 text-black rounded-lg hover:text-black transition-colors"
+                    className="px-4 py-2 bg-[var(--bg-surface)] text-[var(--text-primary)] rounded-lg hover:text-[var(--text-primary)] transition-colors"
                   >
                     Delete
                   </button>
@@ -1921,7 +1921,7 @@ export default function Calendar({ embedded = false } = {}) {
         {Object.entries(typeColors).map(([type, color]) => (
           <div key={type} className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color }}></div>
-            <span className="text-gray-500 capitalize">{type}s</span>
+            <span className="text-[var(--text-muted)] capitalize">{type}s</span>
           </div>
         ))}
       </div>

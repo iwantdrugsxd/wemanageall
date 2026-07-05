@@ -205,8 +205,8 @@ export default function Pricing() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-gray-900 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading pricing...</p>
+          <div className="w-12 h-12 border-4 border-[var(--border-strong)] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-[var(--text-secondary)]">Loading pricing...</p>
         </div>
       </div>
     );
@@ -215,31 +215,31 @@ export default function Pricing() {
   const currentPlan = getCurrentPlan();
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[var(--bg-surface)] py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-light text-gray-900 mb-4">Choose Your Plan</h1>
-          <p className="text-gray-600 text-lg mb-8">Start free, upgrade when you need more</p>
+          <h1 className="text-4xl md:text-5xl font-light text-[var(--text-primary)] mb-4">Choose Your Plan</h1>
+          <p className="text-[var(--text-secondary)] text-lg mb-8">Start free, upgrade when you need more</p>
           
           {/* Billing Toggle */}
           <div className="flex items-center justify-center gap-4 mb-8">
-            <span className={`text-sm ${billingCycle === 'monthly' ? 'text-gray-900 font-medium' : 'text-gray-500'}`}>
+            <span className={`text-sm ${billingCycle === 'monthly' ? 'text-[var(--text-primary)] font-medium' : 'text-[var(--text-muted)]'}`}>
               Monthly
             </span>
             <button
               onClick={() => setBillingCycle(billingCycle === 'monthly' ? 'annual' : 'monthly')}
-              className="relative w-14 h-8 bg-gray-200 rounded-full transition-colors"
+              className="relative w-14 h-8 bg-[var(--border-subtle)] rounded-full transition-colors"
             >
               <div
-                className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full shadow-md transition-transform ${
+                className={`absolute top-1 left-1 w-6 h-6 bg-[var(--bg-card)] rounded-full shadow-md transition-transform ${
                   billingCycle === 'annual' ? 'transform translate-x-6' : ''
                 }`}
               />
             </button>
-            <span className={`text-sm ${billingCycle === 'annual' ? 'text-gray-900 font-medium' : 'text-gray-500'}`}>
+            <span className={`text-sm ${billingCycle === 'annual' ? 'text-[var(--text-primary)] font-medium' : 'text-[var(--text-muted)]'}`}>
               Annual
-              <span className="ml-2 text-xs text-green-600">(Save 17%)</span>
+              <span className="ml-2 text-xs text-[var(--growth)]">(Save 17%)</span>
             </span>
           </div>
         </div>
@@ -265,24 +265,24 @@ export default function Pricing() {
             return (
               <div
                 key={plan.id}
-                className={`bg-white border rounded-lg p-6 relative ${
+                className={`bg-[var(--bg-card)] border rounded-lg p-6 relative ${
                   plan.id === 'premium'
-                    ? 'border-gray-900 border-2 shadow-lg'
-                    : 'border-gray-200'
+                    ? 'border-[var(--border-strong)] border-2 shadow-lg'
+                    : 'border-[var(--border-subtle)]'
                 }`}
               >
                 {/* Plan Header */}
                 <div className="mb-6">
-                  <h3 className="text-xl font-medium text-gray-900 mb-2">{plan.name}</h3>
+                  <h3 className="text-xl font-medium text-[var(--text-primary)] mb-2">{plan.name}</h3>
                   <div className="mb-4">
                     <div>
-                      <span className="text-3xl font-light text-gray-900">
+                      <span className="text-3xl font-light text-[var(--text-primary)]">
                         {formatPrice(monthlyPrice)}
                       </span>
-                      <span className="text-sm text-gray-500 ml-1">/month</span>
+                      <span className="text-sm text-[var(--text-muted)] ml-1">/month</span>
                     </div>
                     {billingCycle === 'annual' && plan.priceAnnual && (
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-[var(--text-muted)] mt-1">
                         Billed annually: {formatPrice(plan.priceAnnual)}
                       </p>
                     )}
@@ -292,64 +292,64 @@ export default function Pricing() {
                 {/* Features */}
                 <ul className="space-y-3 mb-6">
                   <li className="flex items-start gap-2">
-                    <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-[var(--growth)] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span className="text-sm text-gray-700">
+                    <span className="text-sm text-[var(--text-secondary)]">
                       {plan.features.projects === -1 ? 'Unlimited' : plan.features.projects} Projects
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-[var(--growth)] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span className="text-sm text-gray-700">
+                    <span className="text-sm text-[var(--text-secondary)]">
                       {plan.features.calendarEvents === -1 ? 'Unlimited' : plan.features.calendarEvents} Calendar Events
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-[var(--growth)] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span className="text-sm text-gray-700">
+                    <span className="text-sm text-[var(--text-secondary)]">
                       Library storage: {formatStorage(plan.features.storage)}
                     </span>
                   </li>
                   {plan.features.analytics ? (
                     <li className="flex items-start gap-2">
-                      <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-[var(--growth)] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      <span className="text-sm text-gray-700">Analytics / Insights</span>
+                      <span className="text-sm text-[var(--text-secondary)]">Analytics / Insights</span>
                     </li>
                   ) : (
                     <li className="flex items-start gap-2">
-                      <svg className="w-5 h-5 text-gray-300 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-[var(--text-muted)] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                       </svg>
-                      <span className="text-sm text-gray-400">Analytics / Insights: Off</span>
+                      <span className="text-sm text-[var(--text-muted)]">Analytics / Insights: Off</span>
                     </li>
                   )}
                   {plan.features.integrations ? (
                     <li className="flex items-start gap-2">
-                      <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-[var(--growth)] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      <span className="text-sm text-gray-700">Integrations</span>
+                      <span className="text-sm text-[var(--text-secondary)]">Integrations</span>
                     </li>
                   ) : (
                     <li className="flex items-start gap-2">
-                      <svg className="w-5 h-5 text-gray-300 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-[var(--text-muted)] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                       </svg>
-                      <span className="text-sm text-gray-400">Integrations: Off</span>
+                      <span className="text-sm text-[var(--text-muted)]">Integrations: Off</span>
                     </li>
                   )}
                   <li className="flex items-start gap-2">
-                    <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-[var(--growth)] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span className="text-sm text-gray-700 capitalize">Support: {plan.features.support}</span>
+                    <span className="text-sm text-[var(--text-secondary)] capitalize">Support: {plan.features.support}</span>
                   </li>
                 </ul>
 
@@ -357,14 +357,14 @@ export default function Pricing() {
                 {isCurrentPlan && (currentSubscription.status === 'active' || currentSubscription.status === 'trial') ? (
                   <button
                     disabled
-                    className="w-full px-4 py-2 bg-gray-100 text-gray-500 rounded-lg cursor-not-allowed"
+                    className="w-full px-4 py-2 bg-[var(--bg-surface)] text-[var(--text-muted)] rounded-lg cursor-not-allowed"
                   >
                     {currentSubscription.status === 'trial' ? 'Trial Active' : 'Current Plan'}
                   </button>
                 ) : plan.id === 'free' ? (
                   <button
                     onClick={() => navigate('/signup')}
-                    className="w-full px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
+                    className="w-full px-4 py-2 bg-[var(--text-primary)] text-white rounded-lg hover:bg-[var(--accent-hover)] transition-colors"
                   >
                     Get Started
                   </button>
@@ -380,7 +380,7 @@ export default function Pricing() {
                     <button
                       onClick={() => handleSubscribe(plan.id)}
                       disabled={selectedPlan === plan.id}
-                      className="w-full px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 text-sm"
+                      className="w-full px-4 py-2 bg-[var(--text-primary)] text-white rounded-lg hover:bg-[var(--accent-hover)] transition-colors disabled:opacity-50 text-sm"
                     >
                       {selectedPlan === plan.id ? 'Processing...' : 'Subscribe'}
                     </button>
@@ -393,23 +393,23 @@ export default function Pricing() {
 
         {/* FAQ Section */}
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-2xl font-light text-gray-900 mb-6 text-center">Frequently Asked Questions</h2>
+          <h2 className="text-2xl font-light text-[var(--text-primary)] mb-6 text-center">Frequently Asked Questions</h2>
           <div className="space-y-4">
-            <div className="bg-white border border-gray-200 rounded-lg p-6">
-              <h3 className="font-medium text-gray-900 mb-2">Can I change plans later?</h3>
-              <p className="text-sm text-gray-600">Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately.</p>
+            <div className="bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-lg p-6">
+              <h3 className="font-medium text-[var(--text-primary)] mb-2">Can I change plans later?</h3>
+              <p className="text-sm text-[var(--text-secondary)]">Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately.</p>
             </div>
-            <div className="bg-white border border-gray-200 rounded-lg p-6">
-              <h3 className="font-medium text-gray-900 mb-2">What payment methods do you accept?</h3>
-              <p className="text-sm text-gray-600">We accept all major credit cards, debit cards, UPI, and net banking through Razorpay.</p>
+            <div className="bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-lg p-6">
+              <h3 className="font-medium text-[var(--text-primary)] mb-2">What payment methods do you accept?</h3>
+              <p className="text-sm text-[var(--text-secondary)]">We accept all major credit cards, debit cards, UPI, and net banking through Razorpay.</p>
             </div>
-            <div className="bg-white border border-gray-200 rounded-lg p-6">
-              <h3 className="font-medium text-gray-900 mb-2">Is there a free trial?</h3>
-              <p className="text-sm text-gray-600">The Free plan is available forever. Paid plans (Starter and Premium) include a 7-day free trial.</p>
+            <div className="bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-lg p-6">
+              <h3 className="font-medium text-[var(--text-primary)] mb-2">Is there a free trial?</h3>
+              <p className="text-sm text-[var(--text-secondary)]">The Free plan is available forever. Paid plans (Starter and Premium) include a 7-day free trial.</p>
             </div>
-            <div className="bg-white border border-gray-200 rounded-lg p-6">
-              <h3 className="font-medium text-gray-900 mb-2">Can I cancel anytime?</h3>
-              <p className="text-sm text-gray-600">Yes, you can cancel your subscription at any time. You'll continue to have access until the end of your billing period.</p>
+            <div className="bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-lg p-6">
+              <h3 className="font-medium text-[var(--text-primary)] mb-2">Can I cancel anytime?</h3>
+              <p className="text-sm text-[var(--text-secondary)]">Yes, you can cancel your subscription at any time. You'll continue to have access until the end of your billing period.</p>
             </div>
           </div>
         </div>

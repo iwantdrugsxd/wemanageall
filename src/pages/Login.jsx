@@ -38,12 +38,12 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex">
+    <div className="min-h-screen bg-[var(--bg-card)] flex">
       {/* Left Panel - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-black relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 bg-[var(--accent)] relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-1/4 -left-24 w-96 h-96 bg-black rounded-full blur-3xl"></div>
-          <div className="absolute bottom-1/4 -right-24 w-96 h-96 bg-black rounded-full blur-3xl"></div>
+          <div className="absolute top-1/4 -left-24 w-96 h-96 bg-[var(--accent)] rounded-full blur-3xl"></div>
+          <div className="absolute bottom-1/4 -right-24 w-96 h-96 bg-[var(--accent)] rounded-full blur-3xl"></div>
         </div>
         
         <div className="relative z-10 flex flex-col justify-center px-16 xl:px-24">
@@ -56,7 +56,7 @@ export default function Login() {
           
           <blockquote className="mb-12">
             <p className="font-display text-4xl xl:text-5xl text-ofa-cream leading-tight mb-6">
-              "The best time to plant a tree was 20 years ago. The second best time is <span className="text-black italic">now</span>."
+              "The best time to plant a tree was 20 years ago. The second best time is <span className="text-[var(--text-primary)] italic">now</span>."
             </p>
             <footer className="text-ofa-cloud/60 text-sm">— Chinese Proverb</footer>
           </blockquote>
@@ -64,7 +64,7 @@ export default function Login() {
           <div className="space-y-4">
             {['Design your life with intention', 'See patterns you never noticed', 'Make decisions with clarity'].map((item, i) => (
               <div key={i} className="flex items-center gap-3 text-ofa-cloud/80">
-                <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-[var(--text-primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
                 <span>{item}</span>
@@ -79,21 +79,21 @@ export default function Login() {
         <div className="w-full max-w-md">
           {/* Mobile Logo */}
           <Link to="/" className="lg:hidden flex items-center gap-3 mb-12">
-            <div className="w-10 h-10 rounded-xl bg-black flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-[var(--accent)] flex items-center justify-center">
               <span className="font-display text-ofa-cream text-lg font-semibold">O</span>
             </div>
-            <span className="font-display text-xl font-semibold text-black">OFA</span>
+            <span className="font-display text-xl font-semibold text-[var(--text-primary)]">OFA</span>
           </Link>
           
           {/* Header */}
           <div className="mb-10">
-            <h1 className="font-display text-3xl md:text-4xl text-black mb-3">Welcome back</h1>
-            <p className="text-gray-600">Continue designing your life.</p>
+            <h1 className="font-display text-3xl md:text-4xl text-[var(--text-primary)] mb-3">Welcome back</h1>
+            <p className="text-[var(--text-secondary)]">Continue designing your life.</p>
           </div>
           
           {/* Error Message */}
           {error && (
-            <div className="mb-6 p-4 rounded-xl bg-gray-100 border text-black text-black text-sm">
+            <div className="mb-6 p-4 rounded-xl border text-sm" style={{ backgroundColor: 'var(--error-bg)', borderColor: 'var(--error)', color: 'var(--status-danger-fg)' }}>
               {error}
             </div>
           )}
@@ -101,7 +101,7 @@ export default function Login() {
           {/* Google OAuth Button */}
           <a
             href="/api/auth/google"
-            className="w-full flex items-center justify-center gap-3 px-6 py-3 border-2 border-gray-300 rounded-xl hover:border-gray-400 transition-colors mb-6"
+            className="w-full flex items-center justify-center gap-3 px-6 py-3 border-2 border-[var(--border-subtle)] rounded-xl hover:border-[var(--border-strong)] transition-colors mb-6"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -109,22 +109,22 @@ export default function Login() {
               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
             </svg>
-            <span className="text-sm font-medium text-gray-700">Continue with Google</span>
+            <span className="text-sm font-medium text-[var(--text-secondary)]">Continue with Google</span>
           </a>
 
           <div className="relative mb-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
+              <div className="w-full border-t border-[var(--border-subtle)]"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Or continue with email</span>
+              <span className="px-2 bg-[var(--bg-card)] text-[var(--text-muted)]">Or continue with email</span>
             </div>
           </div>
 
           {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-black mb-2">Email</label>
+              <label htmlFor="email" className="block text-sm font-medium text-[var(--text-primary)] mb-2">Email</label>
               <input 
                 type="email" 
                 id="email"
@@ -139,11 +139,11 @@ export default function Login() {
             
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label htmlFor="password" className="block text-sm font-medium text-black">Password</label>
+                <label htmlFor="password" className="block text-sm font-medium text-[var(--text-primary)]">Password</label>
                 <button 
                   type="button" 
                   onClick={() => setShowForgotPassword(true)}
-                  className="text-sm text-black hover:text-black-deep transition-colors"
+                  className="text-sm text-[var(--text-primary)] hover:text-[var(--text-primary)]-deep transition-colors"
                 >
                   Forgot password?
                 </button>
@@ -162,7 +162,7 @@ export default function Login() {
                 <button 
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
                 >
                   {showPassword ? (
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -202,9 +202,9 @@ export default function Login() {
             </button>
           </form>
           
-          <p className="mt-8 text-center text-gray-600">
+          <p className="mt-8 text-center text-[var(--text-secondary)]">
             Don't have an account?{' '}
-            <Link to="/signup" className="text-black font-medium hover:text-black transition-colors">
+            <Link to="/signup" className="text-[var(--text-primary)] font-medium hover:text-[var(--text-primary)] transition-colors">
               Create one
             </Link>
           </p>
@@ -215,18 +215,18 @@ export default function Login() {
       {showForgotPassword && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div
-            className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md"
+            className="bg-[var(--bg-card)] rounded-2xl shadow-2xl p-6 w-full max-w-md"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-display text-lg font-semibold text-black">Reset Password</h3>
+              <h3 className="font-display text-lg font-semibold text-[var(--text-primary)]">Reset Password</h3>
               <button
                 onClick={() => {
                   setShowForgotPassword(false);
                   setForgotEmail('');
                   setForgotSuccess(false);
                 }}
-                className="p-2 hover:bg-gray-100 rounded-lg"
+                className="p-2 hover:bg-[var(--bg-surface)] rounded-lg"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -236,7 +236,7 @@ export default function Login() {
 
             {forgotSuccess ? (
               <div className="text-center py-4">
-                <p className="text-gray-600 mb-4">
+                <p className="text-[var(--text-secondary)] mb-4">
                   If an account exists, a reset link was sent to <strong>{forgotEmail}</strong>.
                 </p>
                 <button
@@ -245,7 +245,7 @@ export default function Login() {
                     setForgotEmail('');
                     setForgotSuccess(false);
                   }}
-                  className="px-6 py-2 bg-black text-white rounded-xl hover:bg-gray-900 transition-colors"
+                  className="px-6 py-2 bg-[var(--accent)] text-white rounded-xl hover:bg-[var(--accent-hover)] transition-colors"
                 >
                   Close
                 </button>
@@ -278,13 +278,13 @@ export default function Login() {
                 className="space-y-4"
               >
                 <div>
-                  <label className="block text-sm font-medium text-black mb-2">Email</label>
+                  <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Email</label>
                   <input
                     type="email"
                     value={forgotEmail}
                     onChange={(e) => setForgotEmail(e.target.value)}
                     placeholder="you@example.com"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-black"
+                    className="w-full px-4 py-3 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-[var(--accent)]"
                     required
                   />
                 </div>
@@ -298,7 +298,7 @@ export default function Login() {
                 <button
                   type="submit"
                   disabled={forgotLoading}
-                  className="w-full px-6 py-3 bg-black text-white rounded-xl hover:bg-gray-900 transition-colors disabled:opacity-50"
+                  className="w-full px-6 py-3 bg-[var(--accent)] text-white rounded-xl hover:bg-[var(--accent-hover)] transition-colors disabled:opacity-50"
                 >
                   {forgotLoading ? 'Sending...' : 'Send Reset Link'}
                 </button>

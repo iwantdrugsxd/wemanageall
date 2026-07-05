@@ -249,6 +249,64 @@ router.delete('/intention/:id', requireAuth, async (req, res) => {
   }
 });
 
+// GET /api/today/momentum - Daily streak of "showing up" (habit-formation feature)
+// A day counts as active if the user set an intention or wrote a reflection.
+// Streak psychology: small, visible, honestly-earned wins compound motivation
+// far better than points/badges - so this stays simple and truthful (no
+// streak inflation, no artificial resets beyond an actual missed day).
+router.get('/momentum', requireAuth, async (req, res) => {
+  try {
+    const result = await query(
+      `SELECT DISTINCT entry_date::text AS entry_date FROM (
+         SELECT entry_date FROM daily_intentions WHERE user_id = $1
+         UNION
+         SELECT entry_date FROM journal_entries WHERE user_id = $1 AND content IS NOT NULL AND content <> ''
+       ) active_days
+       ORDER BY entry_date DESC
+       LIMIT 90`,
+      [req.user.id]
+    );
+
+    const activeDates = new Set(result.rows.map(r => r.entry_date));
+
+    const toDateStr = (d) => d.toISOString().split('T')[0];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Walk backwards from today counting a streak. If today has no activity
+    // yet, that's fine (the day isn't over) - we start counting from
+    // yesterday so the streak number doesn't punish someone for not having
+    // acted yet at 8am.
+    let cursor = new Date(today);
+    if (!activeDates.has(toDateStr(cursor))) {
+      cursor.setDate(cursor.getDate() - 1);
+    }
+    let streak = 0;
+    while (activeDates.has(toDateStr(cursor))) {
+      streak += 1;
+      cursor.setDate(cursor.getDate() - 1);
+    }
+
+    // Last 14 days activity map for a lightweight visual history.
+    const history = [];
+    for (let i = 13; i >= 0; i -= 1) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const dateStr = toDateStr(d);
+      history.push({ date: dateStr, active: activeDates.has(dateStr) });
+    }
+
+    res.json({
+      streak,
+      activeToday: activeDates.has(toDateStr(today)),
+      history,
+    });
+  } catch (error) {
+    console.error('Get momentum error:', error);
+    res.status(500).json({ streak: 0, activeToday: false, history: [] });
+  }
+});
+
 // Legacy endpoint for backward compatibility
 router.post('/focus', requireAuth, async (req, res) => {
   try {

@@ -1,19 +1,22 @@
 import { cn } from '../../lib/cn';
 
+// Color-to-meaning mapping stays consistent with the rest of the app:
+// terracotta/brand = needs action, sage/success = done or growing,
+// slate-blue/info = neutral information, amber/warning, red/danger.
 const variantStyles = {
-  neutral: 'bg-[var(--bg-surface)] text-[var(--text-primary)]',
-  info: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
-  success: 'bg-[var(--success-bg)] text-[var(--success)]',
-  warning: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300',
-  danger: 'bg-[var(--error-bg)] text-[var(--error)]',
-  brand: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300'
+  neutral: 'bg-[var(--bg-surface)] text-[var(--text-secondary)]',
+  info: 'bg-[var(--status-info-bg)] text-[var(--status-info-fg)]',
+  success: 'bg-[var(--status-success-bg)] text-[var(--status-success-fg)]',
+  warning: 'bg-[var(--status-warning-bg)] text-[var(--status-warning-fg)]',
+  danger: 'bg-[var(--status-danger-bg)] text-[var(--status-danger-fg)]',
+  brand: 'bg-[var(--accent-soft)] text-[var(--accent-hover)]'
 };
 
 export default function Badge({ children, variant = 'neutral', className }) {
   return (
     <span
       className={cn(
-        'inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium',
+        'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium transition-colors',
         variantStyles[variant],
         className
       )}

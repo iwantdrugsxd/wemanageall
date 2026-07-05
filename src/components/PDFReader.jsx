@@ -166,16 +166,16 @@ export default function PDFReader({ resourceId, onClose }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <p className="text-gray-600">Loading resource...</p>
+      <div className="min-h-screen bg-[var(--bg-card)] flex items-center justify-center">
+        <p className="text-[var(--text-secondary)]">Loading resource...</p>
       </div>
     );
   }
 
   if (!resource) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <p className="text-gray-600">Resource not found</p>
+      <div className="min-h-screen bg-[var(--bg-card)] flex items-center justify-center">
+        <p className="text-[var(--text-secondary)]">Resource not found</p>
       </div>
     );
   }
@@ -183,9 +183,9 @@ export default function PDFReader({ resourceId, onClose }) {
   const pdfUrl = `/api/resources/${resourceId}/file`;
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-black' : 'bg-white'} transition-colors`}>
+    <div className={`min-h-screen ${darkMode ? 'bg-[var(--accent)]' : 'bg-[var(--bg-card)]'} transition-colors`}>
       {/* Header */}
-      <div className={`sticky top-0 z-40 ${darkMode ? 'bg-black border-ofa-charcoal' : 'bg-white border-gray-300'} border-b`}>
+      <div className={`sticky top-0 z-40 ${darkMode ? 'bg-[var(--accent)] border-ofa-charcoal' : 'bg-[var(--bg-card)] border-[var(--border-subtle)]'} border-b`}>
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -193,18 +193,18 @@ export default function PDFReader({ resourceId, onClose }) {
                 onClick={onClose}
                 className={`px-4 py-2 rounded-xl transition-colors ${
                   darkMode
-                    ? 'bg-black text-white hover:bg-black/80'
-                    : 'bg-gray-100 text-black hover:bg-gray-200'
+                    ? 'bg-[var(--accent)] text-white hover:opacity-90'
+                    : 'bg-[var(--bg-surface)] text-[var(--text-primary)] hover:bg-[var(--border-subtle)]'
                 }`}
               >
                 ← Back
               </button>
               <div>
-                <h1 className={`font-display text-lg ${darkMode ? 'text-white' : 'text-black'}`}>
+                <h1 className={`font-display text-lg ${darkMode ? 'text-white' : 'text-[var(--text-primary)]'}`}>
                   {resource.title}
                 </h1>
                 {resource.author && (
-                  <p className={`text-sm ${darkMode ? 'text-gray-600' : 'text-gray-600'}`}>
+                  <p className={`text-sm ${darkMode ? 'text-[var(--text-secondary)]' : 'text-[var(--text-secondary)]'}`}>
                     {resource.author}
                   </p>
                 )}
@@ -213,8 +213,8 @@ export default function PDFReader({ resourceId, onClose }) {
 
             <div className="flex items-center gap-2">
               {/* Progress */}
-              <div className={`px-4 py-2 rounded-xl ${darkMode ? 'bg-black' : 'bg-gray-100'}`}>
-                <span className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-black'}`}>
+              <div className={`px-4 py-2 rounded-xl ${darkMode ? 'bg-[var(--accent)]' : 'bg-[var(--bg-surface)]'}`}>
+                <span className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-[var(--text-primary)]'}`}>
                   {Math.round(resource.progress || 0)}%
                 </span>
               </div>
@@ -224,8 +224,8 @@ export default function PDFReader({ resourceId, onClose }) {
                 onClick={() => setDarkMode(!darkMode)}
                 className={`p-2 rounded-xl transition-colors ${
                   darkMode
-                    ? 'bg-black text-white hover:bg-black/80'
-                    : 'bg-gray-100 text-black hover:bg-gray-200'
+                    ? 'bg-[var(--accent)] text-white hover:opacity-90'
+                    : 'bg-[var(--bg-surface)] text-[var(--text-primary)] hover:bg-[var(--border-subtle)]'
                 }`}
                 title="Toggle dark mode"
               >
@@ -237,8 +237,8 @@ export default function PDFReader({ resourceId, onClose }) {
                 onClick={toggleFullscreen}
                 className={`p-2 rounded-xl transition-colors ${
                   darkMode
-                    ? 'bg-black text-white hover:bg-black/80'
-                    : 'bg-gray-100 text-black hover:bg-gray-200'
+                    ? 'bg-[var(--accent)] text-white hover:opacity-90'
+                    : 'bg-[var(--bg-surface)] text-[var(--text-primary)] hover:bg-[var(--border-subtle)]'
                 }`}
                 title="Toggle fullscreen"
               >
@@ -253,15 +253,15 @@ export default function PDFReader({ resourceId, onClose }) {
       <div className="flex min-h-[calc(100vh-80px)]">
         {/* Metadata Sidebar */}
         {showSidebar && (
-          <div className={`w-80 border-r ${darkMode ? 'bg-black border-ofa-charcoal' : 'bg-gray-50 border-gray-300'} p-6 overflow-y-auto`}>
+          <div className={`w-80 border-r ${darkMode ? 'bg-[var(--accent)] border-ofa-charcoal' : 'bg-[var(--bg-surface)] border-[var(--border-subtle)]'} p-6 overflow-y-auto`}>
             <div className="flex items-center justify-between mb-6">
-              <h2 className={`font-display text-lg ${darkMode ? 'text-white' : 'text-black'}`}>Metadata</h2>
+              <h2 className={`font-display text-lg ${darkMode ? 'text-white' : 'text-[var(--text-primary)]'}`}>Metadata</h2>
               <button
                 onClick={() => setShowSidebar(false)}
-                className={`p-1 rounded ${darkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-200'}`}
+                className={`p-1 rounded ${darkMode ? 'hover:bg-[var(--accent-hover)]' : 'hover:bg-[var(--border-subtle)]'}`}
                 title="Hide sidebar"
               >
-                <svg className={`w-4 h-4 ${darkMode ? 'text-white' : 'text-gray-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className={`w-4 h-4 ${darkMode ? 'text-white' : 'text-[var(--text-secondary)]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -269,43 +269,43 @@ export default function PDFReader({ resourceId, onClose }) {
 
             <div className="space-y-6">
               <div>
-                <label className={`text-xs font-medium uppercase mb-2 block ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Title</label>
-                <p className={`${darkMode ? 'text-white' : 'text-black'}`}>{resource.title}</p>
+                <label className={`text-xs font-medium uppercase mb-2 block ${darkMode ? 'text-[var(--text-muted)]' : 'text-[var(--text-secondary)]'}`}>Title</label>
+                <p className={`${darkMode ? 'text-white' : 'text-[var(--text-primary)]'}`}>{resource.title}</p>
               </div>
 
               {resource.author && (
                 <div>
-                  <label className={`text-xs font-medium uppercase mb-2 block ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Author</label>
-                  <p className={`${darkMode ? 'text-white' : 'text-black'}`}>{resource.author}</p>
+                  <label className={`text-xs font-medium uppercase mb-2 block ${darkMode ? 'text-[var(--text-muted)]' : 'text-[var(--text-secondary)]'}`}>Author</label>
+                  <p className={`${darkMode ? 'text-white' : 'text-[var(--text-primary)]'}`}>{resource.author}</p>
                 </div>
               )}
 
               {resource.category && (
                 <div>
-                  <label className={`text-xs font-medium uppercase mb-2 block ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Category</label>
-                  <p className={`${darkMode ? 'text-white' : 'text-black'}`}>{resource.category}</p>
+                  <label className={`text-xs font-medium uppercase mb-2 block ${darkMode ? 'text-[var(--text-muted)]' : 'text-[var(--text-secondary)]'}`}>Category</label>
+                  <p className={`${darkMode ? 'text-white' : 'text-[var(--text-primary)]'}`}>{resource.category}</p>
                 </div>
               )}
 
               {resource.folder && (
                 <div>
-                  <label className={`text-xs font-medium uppercase mb-2 block ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Folder</label>
-                  <p className={`${darkMode ? 'text-white' : 'text-black'}`}>{resource.folder}</p>
+                  <label className={`text-xs font-medium uppercase mb-2 block ${darkMode ? 'text-[var(--text-muted)]' : 'text-[var(--text-secondary)]'}`}>Folder</label>
+                  <p className={`${darkMode ? 'text-white' : 'text-[var(--text-primary)]'}`}>{resource.folder}</p>
                 </div>
               )}
 
               <div>
-                <label className={`text-xs font-medium uppercase mb-2 block ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Progress</label>
+                <label className={`text-xs font-medium uppercase mb-2 block ${darkMode ? 'text-[var(--text-muted)]' : 'text-[var(--text-secondary)]'}`}>Progress</label>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className={`text-sm ${darkMode ? 'text-white' : 'text-black'}`}>{Math.round(resource.progress || 0)}%</span>
-                    <span className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <span className={`text-sm ${darkMode ? 'text-white' : 'text-[var(--text-primary)]'}`}>{Math.round(resource.progress || 0)}%</span>
+                    <span className={`text-xs ${darkMode ? 'text-[var(--text-muted)]' : 'text-[var(--text-secondary)]'}`}>
                       Page {resource.current_page || 1} of {resource.total_pages || numPages || '?'}
                     </span>
                   </div>
-                  <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="w-full h-2 bg-[var(--border-subtle)] rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-black transition-all"
+                      className="h-full bg-[var(--accent)] transition-all"
                       style={{ width: `${resource.progress || 0}%` }}
                     />
                   </div>
@@ -314,11 +314,11 @@ export default function PDFReader({ resourceId, onClose }) {
 
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className={`text-xs font-medium uppercase block ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Notes</label>
+                  <label className={`text-xs font-medium uppercase block ${darkMode ? 'text-[var(--text-muted)]' : 'text-[var(--text-secondary)]'}`}>Notes</label>
                   {!editingNotes && (
                     <button
                       onClick={() => setEditingNotes(true)}
-                      className={`text-xs ${darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'}`}
+                      className={`text-xs ${darkMode ? 'text-[var(--text-muted)] hover:text-white' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}
                     >
                       Edit
                     </button>
@@ -332,8 +332,8 @@ export default function PDFReader({ resourceId, onClose }) {
                       rows={6}
                       className={`w-full px-3 py-2 rounded-lg border resize-none focus:outline-none ${
                         darkMode
-                          ? 'bg-gray-900 border-gray-700 text-white focus:border-gray-600'
-                          : 'bg-white border-gray-300 text-black focus:border-black'
+                          ? 'bg-[var(--text-primary)] border-[var(--border-mid)] text-white focus:border-[var(--border-mid)]'
+                          : 'bg-[var(--bg-card)] border-[var(--border-subtle)] text-[var(--text-primary)] focus:border-[var(--accent)]'
                       }`}
                       placeholder="Add your notes here..."
                     />
@@ -341,7 +341,7 @@ export default function PDFReader({ resourceId, onClose }) {
                       <button
                         onClick={handleSaveNotes}
                         disabled={savingNotes}
-                        className="px-3 py-1.5 text-sm bg-black text-white rounded-lg hover:bg-gray-900 disabled:opacity-50"
+                        className="px-3 py-1.5 text-sm bg-[var(--accent)] text-white rounded-lg hover:bg-[var(--accent-hover)] disabled:opacity-50"
                       >
                         {savingNotes ? 'Saving...' : 'Save'}
                       </button>
@@ -352,8 +352,8 @@ export default function PDFReader({ resourceId, onClose }) {
                         }}
                         className={`px-3 py-1.5 text-sm rounded-lg ${
                           darkMode
-                            ? 'bg-gray-800 text-white hover:bg-gray-700'
-                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            ? 'bg-[var(--text-secondary)] text-white hover:bg-[var(--accent-hover)]'
+                            : 'bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:bg-[var(--border-subtle)]'
                         }`}
                       >
                         Cancel
@@ -361,7 +361,7 @@ export default function PDFReader({ resourceId, onClose }) {
                     </div>
                   </div>
                 ) : (
-                  <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'} whitespace-pre-wrap`}>
+                  <p className={`text-sm ${darkMode ? 'text-[var(--text-muted)]' : 'text-[var(--text-secondary)]'} whitespace-pre-wrap`}>
                     {resource.notes || 'No notes yet. Click Edit to add notes.'}
                   </p>
                 )}
@@ -376,9 +376,9 @@ export default function PDFReader({ resourceId, onClose }) {
             onClick={() => setShowSidebar(true)}
             className={`fixed left-4 top-1/2 -translate-y-1/2 p-2 rounded-lg ${
               darkMode
-                ? 'bg-black text-white hover:bg-gray-800'
-                : 'bg-white text-black hover:bg-gray-100'
-            } shadow-lg border ${darkMode ? 'border-gray-700' : 'border-gray-300'}`}
+                ? 'bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)]'
+                : 'bg-[var(--bg-card)] text-[var(--text-primary)] hover:bg-[var(--bg-surface)]'
+            } shadow-lg border ${darkMode ? 'border-[var(--border-mid)]' : 'border-[var(--border-subtle)]'}`}
             title="Show metadata"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -392,22 +392,22 @@ export default function PDFReader({ resourceId, onClose }) {
           <div className="w-full max-w-4xl">
           {pdfLoading && (
             <div className="text-center py-12">
-              <p className={darkMode ? 'text-white' : 'text-gray-600'}>Loading PDF...</p>
+              <p className={darkMode ? 'text-white' : 'text-[var(--text-secondary)]'}>Loading PDF...</p>
             </div>
           )}
 
-          <div className={`${darkMode ? 'bg-black' : 'bg-white'} rounded-xl p-4 shadow-lg`}>
+          <div className={`${darkMode ? 'bg-[var(--accent)]' : 'bg-[var(--bg-card)]'} rounded-xl p-4 shadow-lg`}>
             <Document
               file={pdfUrl}
               onLoadSuccess={onDocumentLoadSuccess}
               loading={
                 <div className="text-center py-12">
-                  <p className={darkMode ? 'text-white' : 'text-gray-600'}>Loading PDF...</p>
+                  <p className={darkMode ? 'text-white' : 'text-[var(--text-secondary)]'}>Loading PDF...</p>
                 </div>
               }
               error={
                 <div className="text-center py-12">
-                  <p className="text-black">Failed to load PDF</p>
+                  <p className="text-[var(--text-primary)]">Failed to load PDF</p>
                 </div>
               }
             >
@@ -425,7 +425,7 @@ export default function PDFReader({ resourceId, onClose }) {
       </div>
 
       {/* Controls */}
-      <div className={`fixed bottom-0 left-0 right-0 ${darkMode ? 'bg-black border-ofa-charcoal' : 'bg-white border-gray-300'} border-t`}>
+      <div className={`fixed bottom-0 left-0 right-0 ${darkMode ? 'bg-[var(--accent)] border-ofa-charcoal' : 'bg-[var(--bg-card)] border-[var(--border-subtle)]'} border-t`}>
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between gap-4">
             {/* Page Navigation */}
@@ -435,8 +435,8 @@ export default function PDFReader({ resourceId, onClose }) {
                 disabled={pageNumber <= 1}
                 className={`px-4 py-2 rounded-xl transition-colors disabled:opacity-50 ${
                   darkMode
-                    ? 'bg-black text-white hover:bg-black/80'
-                    : 'bg-gray-100 text-black hover:bg-gray-200'
+                    ? 'bg-[var(--accent)] text-white hover:opacity-90'
+                    : 'bg-[var(--bg-surface)] text-[var(--text-primary)] hover:bg-[var(--border-subtle)]'
                 }`}
               >
                 ← Prev
@@ -449,11 +449,11 @@ export default function PDFReader({ resourceId, onClose }) {
                 onChange={handlePageChange}
                 className={`w-20 px-3 py-2 rounded-xl text-center border ${
                   darkMode
-                    ? 'bg-black border-ofa-charcoal text-white'
-                    : 'bg-white border-gray-300 text-black'
+                    ? 'bg-[var(--accent)] border-ofa-charcoal text-white'
+                    : 'bg-[var(--bg-card)] border-[var(--border-subtle)] text-[var(--text-primary)]'
                 }`}
               />
-              <span className={`px-2 ${darkMode ? 'text-white' : 'text-gray-600'}`}>
+              <span className={`px-2 ${darkMode ? 'text-white' : 'text-[var(--text-secondary)]'}`}>
                 of {numPages || '?'}
               </span>
               <form onSubmit={handleJumpToPage} className="flex items-center gap-2">
@@ -464,16 +464,16 @@ export default function PDFReader({ resourceId, onClose }) {
                   placeholder="Jump to..."
                   className={`w-24 px-3 py-2 rounded-xl text-center border text-sm ${
                     darkMode
-                      ? 'bg-black border-ofa-charcoal text-white placeholder-gray-500'
-                      : 'bg-white border-gray-300 text-black placeholder-gray-400'
+                      ? 'bg-[var(--accent)] border-ofa-charcoal text-white placeholder-gray-500'
+                      : 'bg-[var(--bg-card)] border-[var(--border-subtle)] text-[var(--text-primary)] placeholder-gray-400'
                   }`}
                 />
                 <button
                   type="submit"
                   className={`px-3 py-2 rounded-xl text-sm transition-colors ${
                     darkMode
-                      ? 'bg-black text-white hover:bg-black/80'
-                      : 'bg-gray-100 text-black hover:bg-gray-200'
+                      ? 'bg-[var(--accent)] text-white hover:opacity-90'
+                      : 'bg-[var(--bg-surface)] text-[var(--text-primary)] hover:bg-[var(--border-subtle)]'
                   }`}
                 >
                   Go
@@ -484,8 +484,8 @@ export default function PDFReader({ resourceId, onClose }) {
                 disabled={pageNumber >= numPages}
                 className={`px-4 py-2 rounded-xl transition-colors disabled:opacity-50 ${
                   darkMode
-                    ? 'bg-black text-white hover:bg-black/80'
-                    : 'bg-gray-100 text-black hover:bg-gray-200'
+                    ? 'bg-[var(--accent)] text-white hover:opacity-90'
+                    : 'bg-[var(--bg-surface)] text-[var(--text-primary)] hover:bg-[var(--border-subtle)]'
                 }`}
               >
                 Next →
@@ -498,22 +498,22 @@ export default function PDFReader({ resourceId, onClose }) {
                 onClick={zoomOut}
                 className={`p-2 rounded-xl transition-colors ${
                   darkMode
-                    ? 'bg-black text-white hover:bg-black/80'
-                    : 'bg-gray-100 text-black hover:bg-gray-200'
+                    ? 'bg-[var(--accent)] text-white hover:opacity-90'
+                    : 'bg-[var(--bg-surface)] text-[var(--text-primary)] hover:bg-[var(--border-subtle)]'
                 }`}
                 title="Zoom out"
               >
                 −
               </button>
-              <span className={`px-3 ${darkMode ? 'text-white' : 'text-gray-600'}`}>
+              <span className={`px-3 ${darkMode ? 'text-white' : 'text-[var(--text-secondary)]'}`}>
                 {Math.round(scale * 100)}%
               </span>
               <button
                 onClick={zoomIn}
                 className={`p-2 rounded-xl transition-colors ${
                   darkMode
-                    ? 'bg-black text-white hover:bg-black/80'
-                    : 'bg-gray-100 text-black hover:bg-gray-200'
+                    ? 'bg-[var(--accent)] text-white hover:opacity-90'
+                    : 'bg-[var(--bg-surface)] text-[var(--text-primary)] hover:bg-[var(--border-subtle)]'
                 }`}
                 title="Zoom in"
               >
@@ -523,8 +523,8 @@ export default function PDFReader({ resourceId, onClose }) {
                 onClick={resetZoom}
                 className={`px-3 py-2 rounded-xl transition-colors ${
                   darkMode
-                    ? 'bg-black text-white hover:bg-black/80'
-                    : 'bg-gray-100 text-black hover:bg-gray-200'
+                    ? 'bg-[var(--accent)] text-white hover:opacity-90'
+                    : 'bg-[var(--bg-surface)] text-[var(--text-primary)] hover:bg-[var(--border-subtle)]'
                 }`}
                 title="Reset zoom"
               >
@@ -535,9 +535,9 @@ export default function PDFReader({ resourceId, onClose }) {
 
           {/* Progress Bar */}
           <div className="mt-4">
-            <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div className="w-full h-2 bg-[var(--border-subtle)] rounded-full overflow-hidden">
               <div
-                className="h-full bg-black transition-all"
+                className="h-full bg-[var(--accent)] transition-all"
                 style={{ width: `${resource.progress || 0}%` }}
               />
             </div>

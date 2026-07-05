@@ -8,14 +8,14 @@ export default function UpgradeModal({ open, message, onClose }) {
   return (
     <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div
-        className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md"
+        className="bg-[var(--bg-card)] rounded-2xl shadow-2xl p-6 w-full max-w-md"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-display text-lg font-semibold text-black">Upgrade Required</h3>
+          <h3 className="font-display text-lg font-semibold text-[var(--text-primary)]">Upgrade Required</h3>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg"
+            className="p-2 hover:bg-[var(--bg-surface)] rounded-lg"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -23,12 +23,12 @@ export default function UpgradeModal({ open, message, onClose }) {
           </button>
         </div>
 
-        <p className="text-gray-600 mb-6">{message || 'Upgrade required to access this feature.'}</p>
+        <p className="text-[var(--text-secondary)] mb-6">{message || 'Upgrade required to access this feature.'}</p>
 
         <div className="flex gap-3">
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            className="flex-1 px-4 py-2 border border-[var(--border-subtle)] rounded-lg hover:bg-[var(--bg-surface)] transition-colors"
           >
             Cancel
           </button>
@@ -37,7 +37,7 @@ export default function UpgradeModal({ open, message, onClose }) {
               navigate('/pricing');
               onClose();
             }}
-            className="flex-1 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-900 transition-colors"
+            className="flex-1 px-4 py-2 bg-[var(--accent)] text-white rounded-lg hover:bg-[var(--accent-hover)] transition-colors"
           >
             View Pricing
           </button>

@@ -58,8 +58,8 @@ export default function WorkspaceLayout({
                   className={cn(
                     'flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors border-b-2',
                     activeView === view.id
-                      ? 'text-black border-black'
-                      : 'text-gray-500 border-transparent hover:text-black'
+                      ? 'text-[var(--text-primary)] border-[var(--accent)]'
+                      : 'text-[var(--text-muted)] border-transparent hover:text-[var(--text-primary)]'
                   )}
                 >
                   {getIcon(view.icon)}

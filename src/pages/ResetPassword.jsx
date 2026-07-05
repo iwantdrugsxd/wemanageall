@@ -70,21 +70,21 @@ export default function ResetPassword() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center p-8">
+      <div className="min-h-screen bg-[var(--bg-card)] flex items-center justify-center p-8">
         <div className="w-full max-w-md">
           <div className="text-center">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-8 h-8 text-[var(--growth)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h1 className="font-display text-2xl font-semibold text-black mb-2">Password Reset Successful</h1>
-            <p className="text-gray-600 mb-6">
+            <h1 className="font-display text-2xl font-semibold text-[var(--text-primary)] mb-2">Password Reset Successful</h1>
+            <p className="text-[var(--text-secondary)] mb-6">
               Your password has been reset. Redirecting to login...
             </p>
             <Link
               to="/login"
-              className="inline-block px-6 py-3 bg-black text-white rounded-xl hover:bg-gray-900 transition-colors"
+              className="inline-block px-6 py-3 bg-[var(--accent)] text-white rounded-xl hover:bg-[var(--accent-hover)] transition-colors"
             >
               Go to Login
             </Link>
@@ -95,20 +95,20 @@ export default function ResetPassword() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-8">
+    <div className="min-h-screen bg-[var(--bg-card)] flex items-center justify-center p-8">
       <div className="w-full max-w-md">
         {/* Mobile Logo */}
         <Link to="/" className="flex items-center gap-3 mb-12">
-          <div className="w-10 h-10 rounded-xl bg-black flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-[var(--accent)] flex items-center justify-center">
             <span className="font-display text-white text-lg font-semibold">O</span>
           </div>
-          <span className="font-display text-xl font-semibold text-black">OFA</span>
+          <span className="font-display text-xl font-semibold text-[var(--text-primary)]">OFA</span>
         </Link>
 
         {/* Header */}
         <div className="mb-8">
-          <h1 className="font-display text-3xl font-semibold text-black mb-2">Reset Password</h1>
-          <p className="text-gray-600">Enter your new password below.</p>
+          <h1 className="font-display text-3xl font-semibold text-[var(--text-primary)] mb-2">Reset Password</h1>
+          <p className="text-[var(--text-secondary)]">Enter your new password below.</p>
         </div>
 
         {/* Error Message */}
@@ -121,21 +121,21 @@ export default function ResetPassword() {
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-black mb-2">New Password</label>
+            <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">New Password</label>
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 placeholder="At least 8 characters"
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-black"
+                className="w-full px-4 py-3 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-[var(--accent)]"
                 required
                 minLength={8}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
               >
                 {showPassword ? (
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -152,21 +152,21 @@ export default function ResetPassword() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-black mb-2">Confirm Password</label>
+            <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Confirm Password</label>
             <div className="relative">
               <input
                 type={showConfirmPassword ? 'text' : 'password'}
                 value={formData.confirmPassword}
                 onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                 placeholder="Confirm your password"
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-black"
+                className="w-full px-4 py-3 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-[var(--accent)]"
                 required
                 minLength={8}
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
               >
                 {showConfirmPassword ? (
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -185,14 +185,14 @@ export default function ResetPassword() {
           <button
             type="submit"
             disabled={loading || !token}
-            className="w-full px-6 py-3 bg-black text-white rounded-xl hover:bg-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-6 py-3 bg-[var(--accent)] text-white rounded-xl hover:bg-[var(--accent-hover)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Resetting...' : 'Reset Password'}
           </button>
         </form>
 
         <div className="mt-6 text-center">
-          <Link to="/login" className="text-sm text-gray-600 hover:text-black transition-colors">
+          <Link to="/login" className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
             Back to Login
           </Link>
         </div>

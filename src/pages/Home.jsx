@@ -11,6 +11,7 @@ import TimeAllocationPanel from '../components/home/TimeAllocationPanel';
 import CalendarPanel from '../components/home/CalendarPanel';
 import InsightsPanel from '../components/home/InsightsPanel';
 import ThinkingSpacePanel from '../components/home/ThinkingSpacePanel';
+import FocusModeOverlay from '../components/home/FocusModeOverlay';
 import Panel from '../components/layout/Panel';
 
 export default function Home() {
@@ -78,6 +79,7 @@ export default function Home() {
   const [editingThoughtId, setEditingThoughtId] = useState(null);
   const [editingThoughtContent, setEditingThoughtContent] = useState('');
   const [editingThoughtMode, setEditingThoughtMode] = useState('freewrite');
+  const [showFocusMode, setShowFocusMode] = useState(false);
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -935,6 +937,7 @@ export default function Home() {
         onQuickAddTask={() => setShowTaskInput(true)}
         onQuickAddEvent={() => setShowAddEvent(true)}
         onQuickAddThought={() => setShowThinkingSpace(true)}
+        onEnterFocusMode={() => setShowFocusMode(true)}
       />
 
       {/* KPI Strip */}
@@ -1077,6 +1080,14 @@ export default function Home() {
           />
         </div>
       </div>
+
+      <FocusModeOverlay
+        open={showFocusMode}
+        onClose={() => setShowFocusMode(false)}
+        intention={intentions?.[0]?.intention}
+        tasks={filteredTasks}
+        onToggleTask={handleToggleTask}
+      />
     </Page>
   );
 }

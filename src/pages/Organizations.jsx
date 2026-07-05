@@ -139,19 +139,19 @@ export default function Organizations() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <div className="w-12 h-12 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-[var(--text-secondary)]">Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white p-6 lg:p-8">
+    <div className="min-h-screen bg-[var(--bg-card)] p-6 lg:p-8">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-serif text-black mb-2">Workspaces</h1>
-          <p className="text-gray-600">Manage your teams and organizations</p>
+          <h1 className="text-3xl md:text-4xl font-serif text-[var(--text-primary)] mb-2">Workspaces</h1>
+          <p className="text-[var(--text-secondary)]">Manage your teams and organizations</p>
         </div>
 
         {/* Mode Selection */}
@@ -161,13 +161,13 @@ export default function Organizations() {
             onClick={switchToIndividual}
             className={`p-6 border-2 rounded-lg cursor-pointer transition-all ${
               !user?.current_organization_id
-                ? 'border-black bg-black text-white'
-                : 'border-gray-300 hover:border-black'
+                ? 'border-[var(--accent)] bg-[var(--accent)] text-white'
+                : 'border-[var(--border-subtle)] hover:border-[var(--accent)]'
             }`}
           >
             <div className="flex items-center gap-4 mb-4">
               <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                !user?.current_organization_id ? 'bg-white/20' : 'bg-gray-100'
+                !user?.current_organization_id ? 'bg-white/20' : 'bg-[var(--bg-surface)]'
               }`}>
                 <span className="text-2xl">👤</span>
               </div>
@@ -185,29 +185,29 @@ export default function Organizations() {
           </div>
 
           {/* Team Mode */}
-          <div className="p-6 border-2 border-dashed border-gray-300 rounded-lg">
+          <div className="p-6 border-2 border-dashed border-[var(--border-subtle)] rounded-lg">
             <div className="flex items-center gap-4 mb-4">
-              <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-lg bg-[var(--bg-surface)] flex items-center justify-center">
                 <span className="text-2xl">👥</span>
               </div>
               <div>
-                <h3 className="text-xl font-semibold text-black">Team Workspace</h3>
-                <p className="text-sm text-gray-600">Create or join a team</p>
+                <h3 className="text-xl font-semibold text-[var(--text-primary)]">Team Workspace</h3>
+                <p className="text-sm text-[var(--text-secondary)]">Create or join a team</p>
               </div>
             </div>
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-sm text-[var(--text-secondary)] mb-4">
               Collaborate with your team on projects, tasks, and goals.
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="flex-1 px-4 py-2 bg-black text-white rounded-lg hover:bg-black/90 transition-colors text-sm font-medium"
+                className="flex-1 px-4 py-2 bg-[var(--accent)] text-white rounded-lg hover:opacity-90 transition-colors text-sm font-medium"
               >
                 Create Workspace
               </button>
               <button
                 onClick={() => setShowJoinModal(true)}
-                className="flex-1 px-4 py-2 border border-gray-300 text-black rounded-lg hover:border-black transition-colors text-sm font-medium"
+                className="flex-1 px-4 py-2 border border-[var(--border-subtle)] text-[var(--text-primary)] rounded-lg hover:border-[var(--accent)] transition-colors text-sm font-medium"
               >
                 Join by Code
               </button>
@@ -218,7 +218,7 @@ export default function Organizations() {
         {/* Existing Organizations */}
         {organizations.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-xl font-semibold text-black mb-4">Your Workspaces</h2>
+            <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-4">Your Workspaces</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {organizations.map((org) => (
                 <div
@@ -226,15 +226,15 @@ export default function Organizations() {
                   onClick={() => switchToOrganization(org.id)}
                   className={`p-6 border rounded-lg cursor-pointer transition-all ${
                     user?.current_organization_id === org.id
-                      ? 'border-black bg-black text-white'
-                      : 'border-gray-300 hover:border-black'
+                      ? 'border-[var(--accent)] bg-[var(--accent)] text-white'
+                      : 'border-[var(--border-subtle)] hover:border-[var(--accent)]'
                   }`}
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div>
                       <h3 className="text-lg font-semibold mb-1">{org.name}</h3>
                       {org.description && (
-                        <p className={`text-sm ${user?.current_organization_id === org.id ? 'opacity-80' : 'text-gray-600'}`}>
+                        <p className={`text-sm ${user?.current_organization_id === org.id ? 'opacity-80' : 'text-[var(--text-secondary)]'}`}>
                           {org.description}
                         </p>
                       )}
@@ -245,11 +245,11 @@ export default function Organizations() {
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4 text-xs">
-                      <span className={user?.current_organization_id === org.id ? 'opacity-70' : 'text-gray-500'}>
+                      <span className={user?.current_organization_id === org.id ? 'opacity-70' : 'text-[var(--text-muted)]'}>
                         {org.member_count || 0} members
                       </span>
                       <span className={`px-2 py-1 rounded ${
-                        user?.current_organization_id === org.id ? 'bg-white/20' : 'bg-gray-100'
+                        user?.current_organization_id === org.id ? 'bg-white/20' : 'bg-[var(--bg-surface)]'
                       }`}>
                         {org.role}
                       </span>
@@ -263,7 +263,7 @@ export default function Organizations() {
                         className={`text-xs px-3 py-1 rounded border transition-all ${
                           user?.current_organization_id === org.id
                             ? 'border-white/30 hover:bg-white/10 text-white'
-                            : 'border-gray-300 hover:border-black text-gray-600'
+                            : 'border-[var(--border-subtle)] hover:border-[var(--accent)] text-[var(--text-secondary)]'
                         }`}
                         title="Copy workspace code"
                       >
@@ -284,18 +284,18 @@ export default function Organizations() {
             onClick={() => setShowJoinModal(false)}
           >
             <div
-              className="bg-white rounded-lg border border-gray-200 shadow-xl w-full max-w-md"
+              className="bg-[var(--bg-card)] rounded-lg border border-[var(--border-subtle)] shadow-xl w-full max-w-md"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="p-6">
                 <div className="flex items-start justify-between mb-6">
                   <div>
-                    <h2 className="text-xl font-semibold text-black mb-1">Join Workspace</h2>
-                    <p className="text-sm text-gray-600">Enter the workspace code to join</p>
+                    <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-1">Join Workspace</h2>
+                    <p className="text-sm text-[var(--text-secondary)]">Enter the workspace code to join</p>
                   </div>
                   <button
                     onClick={() => setShowJoinModal(false)}
-                    className="text-gray-500 hover:text-black"
+                    className="text-[var(--text-muted)] hover:text-[var(--text-primary)]"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -305,7 +305,7 @@ export default function Organizations() {
 
                 <form onSubmit={handleJoinByCode} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-black mb-2">Workspace Code</label>
+                    <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Workspace Code</label>
                     <input
                       type="text"
                       value={joinCode}
@@ -313,9 +313,9 @@ export default function Organizations() {
                       placeholder="Enter 8-character code"
                       maxLength={8}
                       required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-black text-center text-2xl font-mono tracking-widest uppercase"
+                      className="w-full px-4 py-3 border border-[var(--border-subtle)] rounded-lg focus:outline-none focus:border-[var(--accent)] text-center text-2xl font-mono tracking-widest uppercase"
                     />
-                    <p className="mt-2 text-xs text-gray-500 text-center">
+                    <p className="mt-2 text-xs text-[var(--text-muted)] text-center">
                       Ask your workspace admin for the code
                     </p>
                   </div>
@@ -324,14 +324,14 @@ export default function Organizations() {
                     <button
                       type="button"
                       onClick={() => setShowJoinModal(false)}
-                      className="px-4 py-2 text-sm text-black hover:bg-gray-100 rounded-lg transition-colors"
+                      className="px-4 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--bg-surface)] rounded-lg transition-colors"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
                       disabled={joining || !joinCode.trim()}
-                      className="px-4 py-2 text-sm bg-black text-white rounded-lg hover:bg-black/90 disabled:opacity-50 transition-colors"
+                      className="px-4 py-2 text-sm bg-[var(--accent)] text-white rounded-lg hover:opacity-90 disabled:opacity-50 transition-colors"
                     >
                       {joining ? 'Joining...' : 'Join Workspace'}
                     </button>
@@ -349,18 +349,18 @@ export default function Organizations() {
             onClick={() => setShowCreateModal(false)}
           >
             <div
-              className="bg-white rounded-lg border border-gray-200 shadow-xl w-full max-w-md"
+              className="bg-[var(--bg-card)] rounded-lg border border-[var(--border-subtle)] shadow-xl w-full max-w-md"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="p-6">
                 <div className="flex items-start justify-between mb-6">
                   <div>
-                    <h2 className="text-xl font-semibold text-black mb-1">Create Workspace</h2>
-                    <p className="text-sm text-gray-600">Start collaborating with your team</p>
+                    <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-1">Create Workspace</h2>
+                    <p className="text-sm text-[var(--text-secondary)]">Start collaborating with your team</p>
                   </div>
                   <button
                     onClick={() => setShowCreateModal(false)}
-                    className="text-gray-500 hover:text-black"
+                    className="text-[var(--text-muted)] hover:text-[var(--text-primary)]"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -370,25 +370,25 @@ export default function Organizations() {
 
                 <form onSubmit={handleCreateOrganization} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-black mb-2">Workspace Name</label>
+                    <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Workspace Name</label>
                     <input
                       type="text"
                       value={newOrg.name}
                       onChange={(e) => setNewOrg({ ...newOrg, name: e.target.value })}
                       placeholder="e.g. Acme Startup"
                       required
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black"
+                      className="w-full px-4 py-2 border border-[var(--border-subtle)] rounded-lg focus:outline-none focus:border-[var(--accent)]"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-black mb-2">Description (Optional)</label>
+                    <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Description (Optional)</label>
                     <textarea
                       value={newOrg.description}
                       onChange={(e) => setNewOrg({ ...newOrg, description: e.target.value })}
                       placeholder="What is this workspace for?"
                       rows={3}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black resize-none"
+                      className="w-full px-4 py-2 border border-[var(--border-subtle)] rounded-lg focus:outline-none focus:border-[var(--accent)] resize-none"
                     />
                   </div>
 
@@ -396,14 +396,14 @@ export default function Organizations() {
                     <button
                       type="button"
                       onClick={() => setShowCreateModal(false)}
-                      className="px-4 py-2 text-sm text-black hover:bg-gray-100 rounded-lg transition-colors"
+                      className="px-4 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--bg-surface)] rounded-lg transition-colors"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
                       disabled={creating || !newOrg.name.trim()}
-                      className="px-4 py-2 text-sm bg-black text-white rounded-lg hover:bg-black/90 disabled:opacity-50 transition-colors"
+                      className="px-4 py-2 text-sm bg-[var(--accent)] text-white rounded-lg hover:opacity-90 disabled:opacity-50 transition-colors"
                     >
                       {creating ? 'Creating...' : 'Create Workspace'}
                     </button>

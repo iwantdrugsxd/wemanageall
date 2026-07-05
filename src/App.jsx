@@ -1,43 +1,52 @@
+import { Suspense, lazy } from 'react';
 import { Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 
 // Pages
+// Landing/Login/Signup stay eager: they sit on the critical path for a
+// cold visit and lazy-loading them would just add a round trip with no
+// benefit. Everything behind auth is lazy-loaded so a first-time visitor
+// (or someone who never leaves Home) never downloads code for Money,
+// Emotions, Admin, etc. - smaller initial bundle, faster first paint.
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-import Onboarding from './pages/Onboarding';
-import Welcome from './pages/Welcome';
-import Dashboard from './pages/Dashboard';
-import Home from './pages/Home';
-import Projects from './pages/Projects';
-import ProjectWorkspace from './pages/ProjectWorkspace';
-import Calendar from './pages/Calendar';
-import Emotions from './pages/Emotions';
-import Money from './pages/Money';
-import Settings from './pages/Settings';
-import Notifications from './pages/Notifications';
-import Library from './pages/Library';
-import Lists from './pages/Lists';
-import ListShare from './pages/ListShare';
-import Pricing from './pages/Pricing';
-import Work from './pages/Work';
-import DocsHub from './pages/DocsHub';
-import Admin from './pages/Admin';
-import Organizations from './pages/Organizations';
-import Terms from './pages/Terms';
-import Privacy from './pages/Privacy';
-import ResetPassword from './pages/ResetPassword';
 import Layout from './components/Layout';
+
+const Onboarding = lazy(() => import('./pages/Onboarding'));
+const Welcome = lazy(() => import('./pages/Welcome'));
+const Home = lazy(() => import('./pages/Home'));
+const Projects = lazy(() => import('./pages/Projects'));
+const ProjectWorkspace = lazy(() => import('./pages/ProjectWorkspace'));
+const Calendar = lazy(() => import('./pages/Calendar'));
+const Emotions = lazy(() => import('./pages/Emotions'));
+const Money = lazy(() => import('./pages/Money'));
+const Settings = lazy(() => import('./pages/Settings'));
+const Notifications = lazy(() => import('./pages/Notifications'));
+const Library = lazy(() => import('./pages/Library'));
+const Lists = lazy(() => import('./pages/Lists'));
+const ListShare = lazy(() => import('./pages/ListShare'));
+const Pricing = lazy(() => import('./pages/Pricing'));
+const Work = lazy(() => import('./pages/Work'));
+const DocsHub = lazy(() => import('./pages/DocsHub'));
+const Admin = lazy(() => import('./pages/Admin'));
+const Organizations = lazy(() => import('./pages/Organizations'));
+const Terms = lazy(() => import('./pages/Terms'));
+const Privacy = lazy(() => import('./pages/Privacy'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 
 // Loading spinner component
 function LoadingScreen() {
   return (
-    <div className="min-h-screen bg-ofa-cream flex items-center justify-center">
+    <div className="min-h-screen flex items-center justify-center transition-colors" style={{ backgroundColor: 'var(--bg-base)' }}>
       <div className="text-center">
-        <div className="w-12 h-12 rounded-xl bg-ofa-ink flex items-center justify-center mx-auto mb-4 animate-pulse">
-          <span className="font-display text-ofa-cream text-xl font-semibold">O</span>
+        <div
+          className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-[breathe_1.6s_ease-in-out_infinite]"
+          style={{ backgroundColor: 'var(--accent)' }}
+        >
+          <span className="text-white text-xl font-semibold">W</span>
         </div>
-        <p className="text-ofa-slate text-sm">Loading...</p>
+        <p className="text-sm transition-colors" style={{ color: 'var(--text-muted)' }}>Loading...</p>
       </div>
     </div>
   );
@@ -97,6 +106,7 @@ function LibraryRedirect() {
 
 function App() {
   return (
+    <Suspense fallback={<LoadingScreen />}>
     <Routes>
       {/* Public routes */}
       <Route path="/" element={<Landing />} />
@@ -383,6 +393,7 @@ function App() {
       {/* Catch all - redirect to home */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </Suspense>
   );
 }
 

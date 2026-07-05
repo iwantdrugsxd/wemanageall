@@ -12,7 +12,7 @@ export default function Panel({
   return (
     <div
       className={cn(
-        'rounded-lg border transition-colors',
+        'rounded-2xl border transition-all duration-200',
         'bg-[var(--bg-card)] border-[var(--border-subtle)]',
         className
       )}
@@ -21,7 +21,7 @@ export default function Panel({
       {(title || actions) && (
         <div className={cn('px-6 py-4 border-b border-[var(--border-subtle)] flex items-center justify-between', headerClassName)}>
           {title && (
-            <h3 className="text-lg font-medium transition-colors" style={{ color: 'var(--text-primary)' }}>
+            <h3 className="text-base font-semibold transition-colors" style={{ color: 'var(--text-primary)' }}>
               {title}
             </h3>
           )}

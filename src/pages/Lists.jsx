@@ -360,7 +360,7 @@ export default function Lists({ embedded = false }) {
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12 text-center">
-        <p className="text-gray-600">Loading lists...</p>
+        <p className="text-[var(--text-secondary)]">Loading lists...</p>
       </div>
     );
   }
@@ -383,12 +383,12 @@ export default function Lists({ embedded = false }) {
       {!embedded && (
         <div className="flex items-start justify-between mb-8">
           <div>
-            <h1 className="font-display text-4xl md:text-5xl text-black mb-2">My Lists</h1>
-            <p className="text-gray-600 text-lg">Manage your personal intentions and collections.</p>
+            <h1 className="font-display text-4xl md:text-5xl text-[var(--text-primary)] mb-2">My Lists</h1>
+            <p className="text-[var(--text-secondary)] text-lg">Manage your personal intentions and collections.</p>
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="px-6 py-3 bg-black text-white rounded-xl hover:bg-black transition-colors flex items-center gap-2 font-medium"
+            className="px-6 py-3 bg-[var(--accent)] text-white rounded-xl hover:bg-[var(--accent-hover)] transition-colors flex items-center gap-2 font-medium"
           >
             <span className="text-xl">+</span>
             <span>Create New List</span>
@@ -398,15 +398,15 @@ export default function Lists({ embedded = false }) {
 
       {/* Navigation/Filter Bar - only show if no error */}
       {!error && (
-        <div className="flex items-center gap-6 mb-6 border-b border-gray-300 pb-4">
+        <div className="flex items-center gap-6 mb-6 border-b border-[var(--border-subtle)] pb-4">
           {['all', 'recent', 'pinned', 'shared'].map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
               className={`text-sm font-medium transition-colors pb-2 capitalize ${
                 filter === f
-                  ? 'text-black border-b-2 border-ofa-ink'
-                  : 'text-gray-600 hover:text-black'
+                  ? 'text-[var(--text-primary)] border-b-2 border-ofa-ink'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
               {f === 'all' ? 'All Lists' : f}
@@ -418,18 +418,18 @@ export default function Lists({ embedded = false }) {
       {/* Controls - only show if no error */}
       {!error && (
         <div className="flex items-center justify-between mb-6">
-        <p className="text-gray-600 text-sm">
+        <p className="text-[var(--text-secondary)] text-sm">
           Showing {filteredLists.length} {filteredLists.length === 1 ? 'list' : 'lists'}
         </p>
         <div className="flex items-center gap-4">
           {/* View Toggles */}
-          <div className="flex items-center gap-2 bg-gray-100 rounded-xl p-1">
+          <div className="flex items-center gap-2 bg-[var(--bg-surface)] rounded-xl p-1">
             <button
               onClick={() => setViewMode('grid')}
               className={`p-2 rounded-lg transition-colors ${
                 viewMode === 'grid'
-                  ? 'bg-white text-black shadow-sm'
-                  : 'text-gray-600 hover:text-black'
+                  ? 'bg-[var(--bg-card)] text-[var(--text-primary)] shadow-sm'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -440,8 +440,8 @@ export default function Lists({ embedded = false }) {
               onClick={() => setViewMode('list')}
               className={`p-2 rounded-lg transition-colors ${
                 viewMode === 'list'
-                  ? 'bg-white text-black shadow-sm'
-                  : 'text-gray-600 hover:text-black'
+                  ? 'bg-[var(--bg-card)] text-[var(--text-primary)] shadow-sm'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -456,7 +456,7 @@ export default function Lists({ embedded = false }) {
             value={searchQuery}
             onChange={(e) => handleSearchChange(e.target.value)}
             placeholder="Search lists..."
-            className="px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-ofa-ink text-sm"
+            className="px-4 py-2 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-ofa-ink text-sm"
           />
         </div>
         </div>
@@ -466,13 +466,13 @@ export default function Lists({ embedded = false }) {
       {!error && filteredLists.length === 0 ? (
         <div className="text-center py-16">
           <div className="text-6xl mb-4">⭐</div>
-          <p className="text-gray-600 text-lg mb-2">Start a new collection</p>
-          <p className="text-gray-500 text-sm mb-6">
+          <p className="text-[var(--text-secondary)] text-lg mb-2">Start a new collection</p>
+          <p className="text-[var(--text-muted)] text-sm mb-6">
             Organize your thoughts, plans, and inspirations into beautifully structured lists.
           </p>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="px-6 py-3 bg-black text-white rounded-xl hover:bg-black transition-colors flex items-center gap-2 mx-auto"
+            className="px-6 py-3 bg-[var(--accent)] text-white rounded-xl hover:bg-[var(--accent-hover)] transition-colors flex items-center gap-2 mx-auto"
           >
             <span className="text-xl">+</span>
             <span>Create New List</span>
@@ -509,15 +509,15 @@ export default function Lists({ embedded = false }) {
           }}
         >
           <div
-            className="bg-white rounded-2xl shadow-2xl w-full max-w-md"
+            className="bg-[var(--bg-card)] rounded-2xl shadow-2xl w-full max-w-md"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-8">
               {/* Header */}
               <div className="flex items-start justify-between mb-6">
                 <div>
-                  <h2 className="font-display text-2xl text-black mb-2">Create New List</h2>
-                  <p className="text-gray-600 text-sm">
+                  <h2 className="font-display text-2xl text-[var(--text-primary)] mb-2">Create New List</h2>
+                  <p className="text-[var(--text-secondary)] text-sm">
                     Organize your thoughts and intentions. Give your list a name, an icon, and a clear purpose.
                   </p>
                 </div>
@@ -530,7 +530,7 @@ export default function Lists({ embedded = false }) {
                     setListCoverImage(null);
                     setListImagePreview(null);
                   }}
-                  className="text-gray-600 hover:text-black transition-colors text-2xl"
+                  className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors text-2xl"
                 >
                   ×
                 </button>
@@ -539,19 +539,19 @@ export default function Lists({ embedded = false }) {
               {/* Form */}
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-black mb-2">List Name</label>
+                  <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">List Name</label>
                   <input
                     type="text"
                     value={listName}
                     onChange={(e) => setListName(e.target.value)}
                     placeholder="e.g. Weekly Intentions, Reading List..."
-                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-ofa-ink"
+                    className="w-full px-4 py-2 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-ofa-ink"
                     autoFocus
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-black mb-2">Visual Representation</label>
+                  <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Visual Representation</label>
                   <div className="flex items-center gap-2 flex-wrap">
                     {icons.map((icon) => (
                       <button
@@ -561,7 +561,7 @@ export default function Lists({ embedded = false }) {
                         className={`w-12 h-12 rounded-xl border-2 flex items-center justify-center text-2xl transition-all ${
                           listIcon === icon
                             ? 'border-ofa-ink bg-black/10'
-                            : 'border-gray-300 hover:border-ofa-ink'
+                            : 'border-[var(--border-subtle)] hover:border-ofa-ink'
                         }`}
                       >
                         {icon}
@@ -571,21 +571,21 @@ export default function Lists({ embedded = false }) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-black mb-2">
-                    Description <span className="text-gray-500 font-normal">(Optional)</span>
+                  <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
+                    Description <span className="text-[var(--text-muted)] font-normal">(Optional)</span>
                   </label>
                   <textarea
                     value={listDescription}
                     onChange={(e) => setListDescription(e.target.value)}
                     placeholder="Describe the objective of this list..."
                     rows={3}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-ofa-ink resize-none"
+                    className="w-full px-4 py-2 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-ofa-ink resize-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-black mb-2">
-                    Cover Image <span className="text-gray-500 font-normal">(Optional)</span>
+                  <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
+                    Cover Image <span className="text-[var(--text-muted)] font-normal">(Optional)</span>
                   </label>
                   <div className="space-y-3">
                     {listImagePreview ? (
@@ -593,7 +593,7 @@ export default function Lists({ embedded = false }) {
                         <img 
                           src={listImagePreview} 
                           alt="Preview" 
-                          className="w-full h-48 object-cover rounded-xl border border-gray-300"
+                          className="w-full h-48 object-cover rounded-xl border border-[var(--border-subtle)]"
                         />
                         <button
                           type="button"
@@ -601,7 +601,7 @@ export default function Lists({ embedded = false }) {
                             setListImagePreview(null);
                             setListCoverImage(null);
                           }}
-                          className="absolute top-2 right-2 p-2 bg-black/70 text-white rounded-lg hover:bg-black/90 transition-colors"
+                          className="absolute top-2 right-2 p-2 bg-black/70 text-white rounded-lg hover:opacity-90 transition-colors"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -609,13 +609,13 @@ export default function Lists({ embedded = false }) {
                         </button>
                       </div>
                     ) : (
-                      <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-gray-400 transition-colors">
+                      <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-[var(--border-subtle)] rounded-xl cursor-pointer hover:border-[var(--border-strong)] transition-colors">
                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                          <svg className="w-8 h-8 mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-8 h-8 mb-2 text-[var(--text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
-                          <p className="text-sm text-gray-500">Click to upload image</p>
-                          <p className="text-xs text-gray-400 mt-1">PNG, JPG, GIF up to 5MB</p>
+                          <p className="text-sm text-[var(--text-muted)]">Click to upload image</p>
+                          <p className="text-xs text-[var(--text-muted)] mt-1">PNG, JPG, GIF up to 5MB</p>
                         </div>
                         <input
                           type="file"
@@ -655,7 +655,7 @@ export default function Lists({ embedded = false }) {
                       </label>
                     )}
                     {uploadingListImage && (
-                      <div className="text-center text-sm text-gray-500">
+                      <div className="text-center text-sm text-[var(--text-muted)]">
                         Uploading image...
                       </div>
                     )}
@@ -664,7 +664,7 @@ export default function Lists({ embedded = false }) {
               </div>
 
               {/* Actions */}
-              <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-300">
+              <div className="flex items-center justify-between mt-8 pt-6 border-t border-[var(--border-subtle)]">
                 <button
                   onClick={() => {
                     setShowCreateModal(false);
@@ -674,14 +674,14 @@ export default function Lists({ embedded = false }) {
                     setListCoverImage(null);
                     setListImagePreview(null);
                   }}
-                  className="text-gray-600 hover:text-black transition-colors"
+                  className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleCreateList}
                   disabled={!listName.trim()}
-                  className="px-6 py-3 bg-black text-white rounded-xl hover:bg-black/90 disabled:opacity-50 transition-colors"
+                  className="px-6 py-3 bg-[var(--accent)] text-white rounded-xl hover:opacity-90 disabled:opacity-50 transition-colors"
                 >
                   Create List
                 </button>
@@ -709,14 +709,14 @@ export default function Lists({ embedded = false }) {
           }}
         >
           <div
-            className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto"
+            className="bg-[var(--bg-card)] rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-8">
               <div className="flex items-start justify-between mb-6">
                 <div>
-                  <h2 className="font-display text-2xl text-black mb-2">Edit List</h2>
-                  <p className="text-gray-600 text-sm">Update your list details.</p>
+                  <h2 className="font-display text-2xl text-[var(--text-primary)] mb-2">Edit List</h2>
+                  <p className="text-[var(--text-secondary)] text-sm">Update your list details.</p>
                 </div>
                 <button
                   onClick={() => {
@@ -731,7 +731,7 @@ export default function Lists({ embedded = false }) {
                     });
                     setEditListImagePreview(null);
                   }}
-                  className="text-gray-600 hover:text-black transition-colors text-2xl"
+                  className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors text-2xl"
                 >
                   ×
                 </button>
@@ -739,18 +739,18 @@ export default function Lists({ embedded = false }) {
 
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-black mb-2">List Name</label>
+                  <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">List Name</label>
                   <input
                     type="text"
                     value={editListForm.name}
                     onChange={(e) => setEditListForm({ ...editListForm, name: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-ofa-ink"
+                    className="w-full px-4 py-2 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-ofa-ink"
                     autoFocus
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-black mb-2">Icon</label>
+                  <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Icon</label>
                   <div className="flex items-center gap-2 flex-wrap">
                     {icons.map((icon) => (
                       <button
@@ -760,7 +760,7 @@ export default function Lists({ embedded = false }) {
                         className={`w-12 h-12 rounded-xl border-2 flex items-center justify-center text-2xl transition-all ${
                           editListForm.icon === icon
                             ? 'border-ofa-ink bg-black/10'
-                            : 'border-gray-300 hover:border-ofa-ink'
+                            : 'border-[var(--border-subtle)] hover:border-ofa-ink'
                         }`}
                       >
                         {icon}
@@ -770,24 +770,24 @@ export default function Lists({ embedded = false }) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-black mb-2">Description</label>
+                  <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Description</label>
                   <textarea
                     value={editListForm.description}
                     onChange={(e) => setEditListForm({ ...editListForm, description: e.target.value })}
                     rows={3}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-ofa-ink resize-none"
+                    className="w-full px-4 py-2 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-ofa-ink resize-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-black mb-2">Cover Image</label>
+                  <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Cover Image</label>
                   <div className="space-y-3">
                     {editListImagePreview ? (
                       <div className="relative">
                         <img 
                           src={editListImagePreview} 
                           alt="Preview" 
-                          className="w-full h-48 object-cover rounded-xl border border-gray-300"
+                          className="w-full h-48 object-cover rounded-xl border border-[var(--border-subtle)]"
                         />
                         <button
                           type="button"
@@ -795,7 +795,7 @@ export default function Lists({ embedded = false }) {
                             setEditListImagePreview(null);
                             setEditListForm({ ...editListForm, cover_image_url: null });
                           }}
-                          className="absolute top-2 right-2 p-2 bg-black/70 text-white rounded-lg hover:bg-black/90 transition-colors"
+                          className="absolute top-2 right-2 p-2 bg-black/70 text-white rounded-lg hover:opacity-90 transition-colors"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -803,12 +803,12 @@ export default function Lists({ embedded = false }) {
                         </button>
                       </div>
                     ) : (
-                      <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-gray-400 transition-colors">
+                      <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-[var(--border-subtle)] rounded-xl cursor-pointer hover:border-[var(--border-strong)] transition-colors">
                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                          <svg className="w-8 h-8 mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-8 h-8 mb-2 text-[var(--text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
-                          <p className="text-sm text-gray-500">Click to upload image</p>
+                          <p className="text-sm text-[var(--text-muted)]">Click to upload image</p>
                         </div>
                         <input
                           type="file"
@@ -856,23 +856,23 @@ export default function Lists({ embedded = false }) {
                       type="checkbox"
                       checked={editListForm.is_pinned}
                       onChange={(e) => setEditListForm({ ...editListForm, is_pinned: e.target.checked })}
-                      className="w-4 h-4 rounded border-gray-300 text-black focus:ring-black"
+                      className="w-4 h-4 rounded border-[var(--border-subtle)] text-[var(--text-primary)] focus:ring-[var(--accent)]"
                     />
-                    <span className="text-sm text-black">Pin to top</span>
+                    <span className="text-sm text-[var(--text-primary)]">Pin to top</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={editListForm.is_shared}
                       onChange={(e) => setEditListForm({ ...editListForm, is_shared: e.target.checked })}
-                      className="w-4 h-4 rounded border-gray-300 text-black focus:ring-black"
+                      className="w-4 h-4 rounded border-[var(--border-subtle)] text-[var(--text-primary)] focus:ring-[var(--accent)]"
                     />
-                    <span className="text-sm text-black">Share list</span>
+                    <span className="text-sm text-[var(--text-primary)]">Share list</span>
                   </label>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-300">
+              <div className="flex items-center justify-between mt-8 pt-6 border-t border-[var(--border-subtle)]">
                 <button
                   onClick={() => {
                     setEditingList(null);
@@ -886,14 +886,14 @@ export default function Lists({ embedded = false }) {
                     });
                     setEditListImagePreview(null);
                   }}
-                  className="text-gray-600 hover:text-black transition-colors"
+                  className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleUpdateList}
                   disabled={!editListForm.name.trim()}
-                  className="px-6 py-3 bg-black text-white rounded-xl hover:bg-black/90 disabled:opacity-50 transition-colors"
+                  className="px-6 py-3 bg-[var(--accent)] text-white rounded-xl hover:opacity-90 disabled:opacity-50 transition-colors"
                 >
                   Save Changes
                 </button>
@@ -907,18 +907,18 @@ export default function Lists({ embedded = false }) {
       {showShareModal && shareList && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div
-            className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md"
+            className="bg-[var(--bg-card)] rounded-2xl shadow-2xl p-6 w-full max-w-md"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-display text-lg font-semibold text-black">Share List</h3>
+              <h3 className="font-display text-lg font-semibold text-[var(--text-primary)]">Share List</h3>
               <button
                 onClick={() => {
                   setShowShareModal(false);
                   setShareList(null);
                   setShareCode(null);
                 }}
-                className="p-2 hover:bg-gray-100 rounded-lg"
+                className="p-2 hover:bg-[var(--bg-surface)] rounded-lg"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -929,13 +929,13 @@ export default function Lists({ embedded = false }) {
             {shareCode ? (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-black mb-2">Share Code</label>
+                  <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Share Code</label>
                   <div className="flex items-center gap-2">
                     <input
                       type="text"
                       value={shareCode}
                       readOnly
-                      className="flex-1 px-4 py-3 border border-gray-300 rounded-xl bg-gray-100 text-center text-lg font-mono tracking-widest"
+                      className="flex-1 px-4 py-3 border border-[var(--border-subtle)] rounded-xl bg-[var(--bg-surface)] text-center text-lg font-mono tracking-widest"
                     />
                     <button
                       onClick={async () => {
@@ -946,7 +946,7 @@ export default function Lists({ embedded = false }) {
                           console.error('Failed to copy:', error);
                         }
                       }}
-                      className="px-4 py-3 bg-black text-white rounded-xl hover:bg-gray-900 transition-colors"
+                      className="px-4 py-3 bg-[var(--accent)] text-white rounded-xl hover:bg-[var(--accent-hover)] transition-colors"
                     >
                       Copy
                     </button>
@@ -954,13 +954,13 @@ export default function Lists({ embedded = false }) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-black mb-2">Share Link</label>
+                  <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Share Link</label>
                   <div className="flex items-center gap-2">
                     <input
                       type="text"
                       value={`${window.location.origin}/lists/share/${shareCode}`}
                       readOnly
-                      className="flex-1 px-4 py-3 border border-gray-300 rounded-xl bg-gray-100 text-sm"
+                      className="flex-1 px-4 py-3 border border-[var(--border-subtle)] rounded-xl bg-[var(--bg-surface)] text-sm"
                     />
                     <button
                       onClick={async () => {
@@ -971,7 +971,7 @@ export default function Lists({ embedded = false }) {
                           console.error('Failed to copy:', error);
                         }
                       }}
-                      className="px-4 py-3 bg-black text-white rounded-xl hover:bg-gray-900 transition-colors"
+                      className="px-4 py-3 bg-[var(--accent)] text-white rounded-xl hover:bg-[var(--accent-hover)] transition-colors"
                     >
                       Copy
                     </button>
@@ -981,13 +981,13 @@ export default function Lists({ embedded = false }) {
                 <div>
                   <a
                     href={`mailto:?subject=Check out this list: ${shareList.name}&body=Check out this shared list: ${window.location.origin}/lists/share/${shareCode}`}
-                    className="block w-full px-4 py-3 bg-gray-100 text-black rounded-xl hover:bg-gray-200 transition-colors text-center text-sm"
+                    className="block w-full px-4 py-3 bg-[var(--bg-surface)] text-[var(--text-primary)] rounded-xl hover:bg-[var(--border-subtle)] transition-colors text-center text-sm"
                   >
                     Email Link
                   </a>
                 </div>
 
-                <div className="pt-4 border-t border-gray-300">
+                <div className="pt-4 border-t border-[var(--border-subtle)]">
                   <button
                     onClick={async () => {
                       await handleToggleShare(shareList.id, true);
@@ -995,7 +995,7 @@ export default function Lists({ embedded = false }) {
                       setShareList(null);
                       setShareCode(null);
                     }}
-                    className="w-full px-4 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors text-sm"
+                    className="w-full px-4 py-3 bg-[var(--error)] text-white rounded-xl hover:bg-red-700 transition-colors text-sm"
                   >
                     Disable Sharing
                   </button>
@@ -1003,7 +1003,7 @@ export default function Lists({ embedded = false }) {
               </div>
             ) : (
               <div className="text-center py-8">
-                <p className="text-gray-600 mb-4">Generating share code...</p>
+                <p className="text-[var(--text-secondary)] mb-4">Generating share code...</p>
               </div>
             )}
           </div>
@@ -1017,7 +1017,7 @@ export default function Lists({ embedded = false }) {
 function ListCard({ list, onOpen, onDelete, onEdit, onTogglePin, onToggleShare, onShare, progress, timeAgo }) {
   return (
     <div
-      className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:border-black cursor-pointer transition-all duration-200 group relative"
+      className="bg-[var(--bg-card)] rounded-lg border border-[var(--border-subtle)] overflow-hidden hover:border-[var(--accent)] cursor-pointer transition-all duration-200 group relative"
       onClick={onOpen}
     >
       {/* Icon Badge */}
@@ -1028,7 +1028,7 @@ function ListCard({ list, onOpen, onDelete, onEdit, onTogglePin, onToggleShare, 
       </div>
 
       {/* Cover Image */}
-      <div className="h-28 relative overflow-hidden bg-gray-50">
+      <div className="h-28 relative overflow-hidden bg-[var(--bg-surface)]">
         {list.cover_image_url ? (
           <img 
             src={list.cover_image_url} 
@@ -1037,7 +1037,7 @@ function ListCard({ list, onOpen, onDelete, onEdit, onTogglePin, onToggleShare, 
           />
         ) : null}
         {/* Progress Bar */}
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-200">
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-[var(--border-subtle)]">
           <div
             className="h-full transition-all duration-300"
             style={{ width: `${progress}%`, backgroundColor: '#000000' }}
@@ -1046,32 +1046,32 @@ function ListCard({ list, onOpen, onDelete, onEdit, onTogglePin, onToggleShare, 
         
         {/* Progress Percentage Badge */}
         {progress > 0 && (
-          <div className="absolute top-3 right-3 px-2 py-0.5 bg-white rounded">
-            <span className="text-xs text-black" style={{ color: '#000000' }}>{progress}%</span>
+          <div className="absolute top-3 right-3 px-2 py-0.5 bg-[var(--bg-card)] rounded">
+            <span className="text-xs text-[var(--text-primary)]" style={{ color: '#000000' }}>{progress}%</span>
           </div>
         )}
       </div>
 
       {/* Content */}
       <div className="p-4">
-        <h3 className="text-base text-black mb-2 line-clamp-2" style={{ color: '#000000' }}>{list.name}</h3>
+        <h3 className="text-base text-[var(--text-primary)] mb-2 line-clamp-2" style={{ color: '#000000' }}>{list.name}</h3>
         
         {list.description && (
-          <p className="text-sm text-black mb-3 line-clamp-2" style={{ color: '#000000', opacity: 0.6 }}>{list.description}</p>
+          <p className="text-sm text-[var(--text-primary)] mb-3 line-clamp-2" style={{ color: '#000000', opacity: 0.6 }}>{list.description}</p>
         )}
         
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 px-2 py-0.5 bg-gray-100 rounded">
-              <span className="text-xs text-black" style={{ color: '#000000' }}>{list.total_items || 0} items</span>
+            <div className="flex items-center gap-1 px-2 py-0.5 bg-[var(--bg-surface)] rounded">
+              <span className="text-xs text-[var(--text-primary)]" style={{ color: '#000000' }}>{list.total_items || 0} items</span>
             </div>
             {list.completed_items > 0 && (
-              <div className="flex items-center gap-1 px-2 py-0.5 bg-gray-100 rounded">
-                <span className="text-xs text-black" style={{ color: '#000000' }}>{list.completed_items} done</span>
+              <div className="flex items-center gap-1 px-2 py-0.5 bg-[var(--bg-surface)] rounded">
+                <span className="text-xs text-[var(--text-primary)]" style={{ color: '#000000' }}>{list.completed_items} done</span>
               </div>
             )}
           </div>
-          <span className="text-xs text-black" style={{ color: '#000000', opacity: 0.5 }}>{timeAgo}</span>
+          <span className="text-xs text-[var(--text-primary)]" style={{ color: '#000000', opacity: 0.5 }}>{timeAgo}</span>
         </div>
 
         {/* Actions */}
@@ -1082,12 +1082,12 @@ function ListCard({ list, onOpen, onDelete, onEdit, onTogglePin, onToggleShare, 
                 e.stopPropagation();
                 onTogglePin(list.id, list.is_pinned);
               }}
-              className={`p-1.5 rounded hover:bg-gray-100 transition-all ${
+              className={`p-1.5 rounded hover:bg-[var(--bg-surface)] transition-all ${
                 list.is_pinned ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
               }`}
               title={list.is_pinned ? 'Unpin list' : 'Pin list'}
             >
-              <svg className={`w-4 h-4 ${list.is_pinned ? 'text-black fill-current' : 'text-gray-400'}`} fill={list.is_pinned ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
+              <svg className={`w-4 h-4 ${list.is_pinned ? 'text-[var(--text-primary)] fill-current' : 'text-[var(--text-muted)]'}`} fill={list.is_pinned ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
               </svg>
             </button>
@@ -1096,12 +1096,12 @@ function ListCard({ list, onOpen, onDelete, onEdit, onTogglePin, onToggleShare, 
                 e.stopPropagation();
                 onShare(list);
               }}
-              className={`p-1.5 rounded hover:bg-gray-100 transition-all opacity-0 group-hover:opacity-100 ${
+              className={`p-1.5 rounded hover:bg-[var(--bg-surface)] transition-all opacity-0 group-hover:opacity-100 ${
                 list.is_shared ? 'opacity-100' : ''
               }`}
               title="Share list"
             >
-              <svg className={`w-4 h-4 ${list.is_shared ? 'text-black' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className={`w-4 h-4 ${list.is_shared ? 'text-[var(--text-primary)]' : 'text-[var(--text-muted)]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
               </svg>
             </button>
@@ -1112,16 +1112,16 @@ function ListCard({ list, onOpen, onDelete, onEdit, onTogglePin, onToggleShare, 
                 e.stopPropagation();
                 onEdit(list);
               }}
-              className="opacity-0 group-hover:opacity-100 p-1.5 rounded hover:bg-gray-100 transition-all"
+              className="opacity-0 group-hover:opacity-100 p-1.5 rounded hover:bg-[var(--bg-surface)] transition-all"
               title="Edit list"
             >
-              <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 text-[var(--text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
             </button>
             <button
               onClick={(e) => onDelete(list.id, e)}
-              className="opacity-0 group-hover:opacity-100 p-1.5 rounded hover:bg-gray-100 transition-all"
+              className="opacity-0 group-hover:opacity-100 p-1.5 rounded hover:bg-[var(--bg-surface)] transition-all"
               style={{ color: '#000000' }}
               title="Delete list"
             >
@@ -1415,7 +1415,7 @@ function ListDetail({ listId, onBack }) {
   if (loading) {
     return (
       <div className="max-w-4xl mx-auto px-6 lg:px-8 py-12 text-center">
-        <p className="text-gray-600">Loading list...</p>
+        <p className="text-[var(--text-secondary)]">Loading list...</p>
       </div>
     );
   }
@@ -1423,8 +1423,8 @@ function ListDetail({ listId, onBack }) {
   if (!list) {
     return (
       <div className="max-w-4xl mx-auto px-6 lg:px-8 py-12 text-center">
-        <p className="text-gray-600">List not found</p>
-        <button onClick={onBack} className="mt-4 text-black hover:text-black">
+        <p className="text-[var(--text-secondary)]">List not found</p>
+        <button onClick={onBack} className="mt-4 text-[var(--text-primary)] hover:text-[var(--text-primary)]">
           ← Back to Lists
         </button>
       </div>
@@ -1437,23 +1437,23 @@ function ListDetail({ listId, onBack }) {
       <div className="mb-8">
         <button
           onClick={onBack}
-          className="text-gray-600 hover:text-black mb-4 flex items-center gap-2"
+          className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] mb-4 flex items-center gap-2"
         >
           <span>←</span>
           <span>Back to Lists</span>
         </button>
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="font-display text-4xl text-black mb-2 flex items-center gap-3">
+            <h1 className="font-display text-4xl text-[var(--text-primary)] mb-2 flex items-center gap-3">
               {list.icon && <span>{list.icon}</span>}
               <span>{list.name}</span>
             </h1>
             {list.description && (
-              <p className="text-gray-600">{list.description}</p>
+              <p className="text-[var(--text-secondary)]">{list.description}</p>
             )}
           </div>
           <div className="text-right">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-[var(--text-secondary)]">
               {items.filter(i => !i.is_done).length} REMAINING • {items.filter(i => i.is_done).length} DONE
             </p>
           </div>
@@ -1468,7 +1468,7 @@ function ListDetail({ listId, onBack }) {
             value={itemSearchQuery}
             onChange={(e) => setItemSearchQuery(e.target.value)}
             placeholder="Search items..."
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-ofa-ink"
+            className="flex-1 px-4 py-2 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-ofa-ink"
           />
           <div className="flex items-center gap-2">
             {['all', 'active', 'completed', 'tagged'].map((filter) => (
@@ -1477,8 +1477,8 @@ function ListDetail({ listId, onBack }) {
                 onClick={() => setItemFilter(filter)}
                 className={`px-3 py-1.5 text-sm rounded-lg transition-colors capitalize ${
                   itemFilter === filter
-                    ? 'bg-black text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    ? 'bg-[var(--accent)] text-white'
+                    : 'bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:bg-[var(--border-subtle)]'
                 }`}
               >
                 {filter}
@@ -1493,20 +1493,20 @@ function ListDetail({ listId, onBack }) {
             <button
               onClick={handleBulkComplete}
               disabled={items.filter(i => !i.is_done).length === 0}
-              className="px-3 py-1.5 text-sm bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 disabled:opacity-50 transition-colors"
+              className="px-3 py-1.5 text-sm bg-[var(--bg-surface)] text-[var(--text-secondary)] rounded-lg hover:bg-[var(--border-subtle)] disabled:opacity-50 transition-colors"
             >
               Mark All Done
             </button>
             <button
               onClick={handleClearCompleted}
               disabled={items.filter(i => i.is_done).length === 0}
-              className="px-3 py-1.5 text-sm bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 disabled:opacity-50 transition-colors"
+              className="px-3 py-1.5 text-sm bg-[var(--bg-surface)] text-[var(--text-secondary)] rounded-lg hover:bg-[var(--border-subtle)] disabled:opacity-50 transition-colors"
             >
               Clear Completed
             </button>
             <button
               onClick={handleDeleteAll}
-              className="px-3 py-1.5 text-sm bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
+              className="px-3 py-1.5 text-sm bg-red-100 text-[var(--error)] rounded-lg hover:bg-red-200 transition-colors"
             >
               Delete All
             </button>
@@ -1516,15 +1516,15 @@ function ListDetail({ listId, onBack }) {
 
       {/* Active Items */}
       <div className="mb-8">
-        <h2 className="text-sm font-medium text-gray-600 uppercase mb-4">Active Items</h2>
+        <h2 className="text-sm font-medium text-[var(--text-secondary)] uppercase mb-4">Active Items</h2>
         <div className="space-y-2">
           {activeItems.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-500 text-sm mb-2">No active items</p>
+              <p className="text-[var(--text-muted)] text-sm mb-2">No active items</p>
               {itemSearchQuery || itemFilter !== 'all' ? (
-                <p className="text-xs text-gray-400">Try adjusting your search or filter</p>
+                <p className="text-xs text-[var(--text-muted)]">Try adjusting your search or filter</p>
               ) : (
-                <p className="text-xs text-gray-400">Add your first item below</p>
+                <p className="text-xs text-[var(--text-muted)]">Add your first item below</p>
               )}
             </div>
           ) : (
@@ -1559,7 +1559,7 @@ function ListDetail({ listId, onBack }) {
       {completedItems.length > 0 && (
         <div className="mb-8">
           <details className="group">
-            <summary className="text-sm font-medium text-gray-600 uppercase mb-4 cursor-pointer flex items-center gap-2">
+            <summary className="text-sm font-medium text-[var(--text-secondary)] uppercase mb-4 cursor-pointer flex items-center gap-2">
               <span>▼</span>
               <span>Completed ({completedItems.length})</span>
             </summary>
@@ -1587,7 +1587,7 @@ function ListDetail({ listId, onBack }) {
       )}
 
       {/* Add Item Input */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-300 p-4">
+      <div className="fixed bottom-0 left-0 right-0 bg-[var(--bg-card)] border-t border-[var(--border-subtle)] p-4">
         <div className="max-w-4xl mx-auto">
           {showAddItem ? (
             <div className="space-y-2">
@@ -1605,7 +1605,7 @@ function ListDetail({ listId, onBack }) {
                   }
                 }}
                 placeholder="Item name..."
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-ofa-ink"
+                className="w-full px-4 py-3 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-ofa-ink"
                 autoFocus
               />
               <input
@@ -1618,7 +1618,7 @@ function ListDetail({ listId, onBack }) {
                   }
                 }}
                 placeholder="Note (optional)..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-ofa-ink text-sm"
+                className="w-full px-4 py-2 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-ofa-ink text-sm"
               />
               <input
                 type="text"
@@ -1630,7 +1630,7 @@ function ListDetail({ listId, onBack }) {
                   }
                 }}
                 placeholder="Tag (optional)..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-ofa-ink text-sm"
+                className="w-full px-4 py-2 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-ofa-ink text-sm"
               />
               <div className="flex items-center justify-end gap-2">
                 <button
@@ -1639,14 +1639,14 @@ function ListDetail({ listId, onBack }) {
                     setNewItemTitle('');
                     setNewItemNote('');
                   }}
-                  className="px-4 py-2 text-gray-600 hover:text-black"
+                  className="px-4 py-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleAddItem}
                   disabled={!newItemTitle.trim()}
-                  className="px-6 py-2 bg-black text-white rounded-xl hover:bg-black disabled:opacity-50"
+                  className="px-6 py-2 bg-[var(--accent)] text-white rounded-xl hover:bg-[var(--accent-hover)] disabled:opacity-50"
                 >
                   Add
                 </button>
@@ -1655,7 +1655,7 @@ function ListDetail({ listId, onBack }) {
           ) : (
             <button
               onClick={() => setShowAddItem(true)}
-              className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-xl hover:bg-gray-200 transition-colors flex items-center gap-2 text-gray-600"
+              className="w-full px-4 py-3 bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-xl hover:bg-[var(--border-subtle)] transition-colors flex items-center gap-2 text-[var(--text-secondary)]"
             >
               <span>+</span>
               <span>Add a new item or press CMD + N...</span>
@@ -1687,14 +1687,14 @@ function ListItem({
 }) {
   if (isEditing) {
     return (
-      <div className="p-3 bg-white rounded-xl border-2 border-black">
+      <div className="p-3 bg-[var(--bg-card)] rounded-xl border-2 border-[var(--accent)]">
         <div className="space-y-2">
           <input
             type="text"
             value={editingForm.title}
             onChange={(e) => onFormChange({ ...editingForm, title: e.target.value })}
             placeholder="Item title"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black"
+            className="w-full px-3 py-2 border border-[var(--border-subtle)] rounded-lg focus:outline-none focus:border-[var(--accent)]"
             autoFocus
           />
           <input
@@ -1702,26 +1702,26 @@ function ListItem({
             value={editingForm.note}
             onChange={(e) => onFormChange({ ...editingForm, note: e.target.value })}
             placeholder="Note (optional)"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black text-sm"
+            className="w-full px-3 py-2 border border-[var(--border-subtle)] rounded-lg focus:outline-none focus:border-[var(--accent)] text-sm"
           />
           <input
             type="text"
             value={editingForm.tag}
             onChange={(e) => onFormChange({ ...editingForm, tag: e.target.value })}
             placeholder="Tag (optional)"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black text-sm"
+            className="w-full px-3 py-2 border border-[var(--border-subtle)] rounded-lg focus:outline-none focus:border-[var(--accent)] text-sm"
           />
           <div className="flex items-center justify-end gap-2">
             <button
               onClick={onCancel}
-              className="px-3 py-1.5 text-sm text-gray-600 hover:text-black"
+              className="px-3 py-1.5 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
             >
               Cancel
             </button>
             <button
               onClick={onUpdate}
               disabled={!editingForm.title.trim()}
-              className="px-4 py-1.5 text-sm bg-black text-white rounded-lg hover:bg-gray-900 disabled:opacity-50"
+              className="px-4 py-1.5 text-sm bg-[var(--accent)] text-white rounded-lg hover:bg-[var(--accent-hover)] disabled:opacity-50"
             >
               Save
             </button>
@@ -1738,12 +1738,12 @@ function ListItem({
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
       onDrop={onDrop}
-      className={`flex items-start gap-3 p-3 bg-gray-100 rounded-xl border border-gray-300 hover:bg-white transition-colors group ${
+      className={`flex items-start gap-3 p-3 bg-[var(--bg-surface)] rounded-xl border border-[var(--border-subtle)] hover:bg-[var(--bg-card)] transition-colors group ${
         isDragging ? 'opacity-50' : ''
-      } ${isDraggedOver ? 'border-black border-2' : ''}`}
+      } ${isDraggedOver ? 'border-[var(--accent)] border-2' : ''}`}
     >
       {!item.is_done && (
-        <div className="mt-1 cursor-move text-gray-400 hover:text-gray-600">
+        <div className="mt-1 cursor-move text-[var(--text-muted)] hover:text-[var(--text-secondary)]">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
           </svg>
@@ -1753,8 +1753,8 @@ function ListItem({
         onClick={onToggle}
         className={`mt-1 w-5 h-5 rounded border-2 flex items-center justify-center transition-colors flex-shrink-0 ${
           item.is_done
-            ? 'bg-black border-black'
-            : 'border-gray-300 hover:border-black'
+            ? 'bg-[var(--accent)] border-[var(--accent)]'
+            : 'border-[var(--border-subtle)] hover:border-[var(--accent)]'
         }`}
       >
         {item.is_done && (
@@ -1764,14 +1764,14 @@ function ListItem({
         )}
       </button>
       <div className="flex-1 min-w-0">
-        <p className={`text-black ${item.is_done ? 'line-through text-gray-500' : ''}`}>
+        <p className={`text-[var(--text-primary)] ${item.is_done ? 'line-through text-[var(--text-muted)]' : ''}`}>
           {item.title}
         </p>
         {item.note && (
-          <p className="text-sm text-gray-600 mt-1">{item.note}</p>
+          <p className="text-sm text-[var(--text-secondary)] mt-1">{item.note}</p>
         )}
         {item.tag && (
-          <span className="inline-block mt-1 px-2 py-0.5 text-xs bg-gray-200 text-gray-700 rounded">
+          <span className="inline-block mt-1 px-2 py-0.5 text-xs bg-[var(--border-subtle)] text-[var(--text-secondary)] rounded">
             {item.tag}
           </span>
         )}
@@ -1779,7 +1779,7 @@ function ListItem({
       <div className="flex items-center gap-1">
         <button
           onClick={onEdit}
-          className="opacity-0 group-hover:opacity-100 p-1 text-gray-600 hover:text-black transition-all"
+          className="opacity-0 group-hover:opacity-100 p-1 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all"
           title="Edit"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1788,7 +1788,7 @@ function ListItem({
         </button>
         <button
           onClick={onDelete}
-          className="opacity-0 group-hover:opacity-100 p-1 text-gray-600 hover:text-red-600 transition-all"
+          className="opacity-0 group-hover:opacity-100 p-1 text-[var(--text-secondary)] hover:text-[var(--error)] transition-all"
           title="Delete"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

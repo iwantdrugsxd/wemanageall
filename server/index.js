@@ -1,4 +1,5 @@
 import express from 'express';
+import compression from 'compression';
 import cors from 'cors';
 import session from 'express-session';
 import connectPgSimple from 'connect-pg-simple';
@@ -62,6 +63,10 @@ const allowedOrigins = [
   'https://wemanageall.in',
   'https://www.wemanageall.in',
 ].filter(Boolean); // Remove undefined values
+
+// Gzip/brotli-eligible compression for JSON API responses and static assets.
+// Cheap, safe win: smaller payloads over the wire on every request.
+app.use(compression());
 
 app.use(cors({
   origin: function (origin, callback) {
@@ -139,9 +144,18 @@ const cookieConfig = {
   path: '/', // Cookie available for all paths
 };
 
-// In production, use domain and secure settings
+// In production, use domain and secure settings.
+// IMPORTANT: only set a cookie `domain` if COOKIE_DOMAIN is explicitly
+// provided. A browser silently REJECTS a Set-Cookie whose domain doesn't
+// match the current host - so hardcoding wemanageall.in here would break
+// login on any other deploy target (a Railway/Render *.up.railway.app /
+// *.onrender.com preview URL, a staging domain, etc.) with no visible
+// error beyond "login doesn't stick". Leaving domain unset scopes the
+// cookie to the exact host, which always works.
 if (isProduction) {
-  cookieConfig.domain = process.env.COOKIE_DOMAIN || '.wemanageall.in';
+  if (process.env.COOKIE_DOMAIN) {
+    cookieConfig.domain = process.env.COOKIE_DOMAIN;
+  }
   cookieConfig.secure = true;
   cookieConfig.sameSite = process.env.SESSION_SAMESITE || 'none';
 } else {
@@ -184,48 +198,50 @@ app.use(session(sessionConfig));
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Ensure passport session is properly restored
-app.use((req, res, next) => {
-  // Log cookie info for debugging
-  const cookieHeader = req.headers.cookie || '';
-  const hasOfaSid = cookieHeader.includes('ofa.sid');
-  
-  // If session exists but passport data is missing, try to restore it
-  if (req.session && !req.session.passport && req.sessionID) {
-    console.warn('⚠️  Session exists but passport data is missing. Session ID:', req.sessionID, {
-      hasCookie: hasOfaSid,
-      cookieHeader: cookieHeader.substring(0, 100)
-    });
-  }
-  
-  // If no cookie but session exists, log it
-  if (req.session && !hasOfaSid && req.path.startsWith('/api/')) {
-    console.warn('⚠️  Session exists but ofa.sid cookie is missing:', {
-      path: req.path,
-      sessionID: req.sessionID,
-      allCookies: cookieHeader.split(';').map(c => c.trim())
-    });
-  }
-  
-  next();
-});
+// Verbose session/cookie debug logging - development only. In production
+// this ran on every single request (extra CPU + noisy/leaky logs printing
+// cookie header prefixes), which is both a performance cost and a minor
+// information-disclosure smell for zero benefit once the app is stable.
+if (!isProduction) {
+  // Ensure passport session is properly restored
+  app.use((req, res, next) => {
+    const cookieHeader = req.headers.cookie || '';
+    const hasOfaSid = cookieHeader.includes('ofa.sid');
 
-// Debug middleware to log session state
-app.use((req, res, next) => {
-  // Only log for API routes to avoid spam
-  if (req.path.startsWith('/api/') && req.method === 'POST') {
-    console.log('📊 Request session state:', {
-      path: req.path,
-      hasSession: !!req.session,
-      sessionID: req.sessionID,
-      hasPassport: !!req.session?.passport,
-      passportUser: req.session?.passport?.user,
-      hasReqUser: !!req.user,
-      isAuthenticated: req.isAuthenticated()
-    });
-  }
-  next();
-});
+    if (req.session && !req.session.passport && req.sessionID) {
+      console.warn('⚠️  Session exists but passport data is missing. Session ID:', req.sessionID, {
+        hasCookie: hasOfaSid,
+        cookieHeader: cookieHeader.substring(0, 100)
+      });
+    }
+
+    if (req.session && !hasOfaSid && req.path.startsWith('/api/')) {
+      console.warn('⚠️  Session exists but ofa.sid cookie is missing:', {
+        path: req.path,
+        sessionID: req.sessionID,
+        allCookies: cookieHeader.split(';').map(c => c.trim())
+      });
+    }
+
+    next();
+  });
+
+  // Debug middleware to log session state
+  app.use((req, res, next) => {
+    if (req.path.startsWith('/api/') && req.method === 'POST') {
+      console.log('📊 Request session state:', {
+        path: req.path,
+        hasSession: !!req.session,
+        sessionID: req.sessionID,
+        hasPassport: !!req.session?.passport,
+        passportUser: req.session?.passport?.user,
+        hasReqUser: !!req.user,
+        isAuthenticated: req.isAuthenticated()
+      });
+    }
+    next();
+  });
+}
 
 // Serve uploaded files
 app.use('/uploads', express.static(join(__dirname, '../uploads')));
@@ -553,9 +569,24 @@ app.post('/api/waitlist', async (req, res) => {
 // ============================================
 
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(join(__dirname, '../dist')));
-  
+  // Vite fingerprints built JS/CSS filenames (content hash in the name), so
+  // those can be cached aggressively/immutably - a new deploy gets new
+  // filenames automatically. index.html itself must never be cached, or
+  // browsers could keep serving a stale shell that references assets from
+  // a previous deploy that no longer exist.
+  app.use(express.static(join(__dirname, '../dist'), {
+    index: false,
+    setHeaders: (res, filePath) => {
+      if (filePath.endsWith('index.html')) {
+        res.setHeader('Cache-Control', 'no-cache');
+      } else {
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      }
+    },
+  }));
+
   app.get('*', (req, res) => {
+    res.setHeader('Cache-Control', 'no-cache');
     res.sendFile(join(__dirname, '../dist/index.html'));
   });
 }

@@ -26,37 +26,50 @@ export default function IntentionsPanel({
   setShowRecentIntentions
 }) {
   return (
-    <div 
-      className="rounded-lg p-6 border transition-colors"
-      style={{ 
-        backgroundColor: 'var(--bg-card)',
+    <div
+      className="rounded-2xl p-6 md:p-7 border transition-all duration-200"
+      style={{
+        backgroundColor: 'var(--accent-soft)',
         borderColor: 'var(--border-subtle)'
       }}
     >
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium uppercase tracking-wide transition-colors" style={{ color: 'var(--text-primary)' }}>
-          Today's Intention
-        </h3>
+        <div className="flex items-center gap-2">
+          <div
+            className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
+            style={{ backgroundColor: 'var(--accent)' }}
+          >
+            <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <h3 className="text-sm font-semibold transition-colors" style={{ color: 'var(--text-primary)' }}>
+            Today's one thing
+          </h3>
+        </div>
         <div className="flex items-center gap-2">
           {recentIntentions && recentIntentions.length > 0 && (
             <button
               onClick={() => setShowRecentIntentions(!showRecentIntentions)}
-              className="text-xs px-2 py-1 rounded transition-colors"
-              style={{ 
+              className="text-xs px-2.5 py-1 rounded-lg transition-colors"
+              style={{
                 color: showRecentIntentions ? 'var(--text-primary)' : 'var(--text-muted)',
-                backgroundColor: showRecentIntentions ? 'var(--bg-surface)' : 'transparent'
+                backgroundColor: showRecentIntentions ? 'var(--bg-card)' : 'transparent'
               }}
             >
               Recent
             </button>
           )}
           {intentionSaved && (
-            <svg className="w-4 h-4 transition-colors" style={{ color: 'var(--text-muted)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 transition-colors reward-pop" style={{ color: 'var(--growth)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           )}
         </div>
       </div>
+      <p className="text-xs mb-4 -mt-2 transition-colors" style={{ color: 'var(--text-muted)' }}>
+        One clear focus beats ten vague ones. What matters most today?
+      </p>
 
       {/* Recent Intentions List */}
       {showRecentIntentions && recentIntentions && recentIntentions.length > 0 && (
@@ -152,7 +165,8 @@ export default function IntentionsPanel({
                   </button>
                   <button
                     onClick={() => onDeleteIntention(intention.id)}
-                    className="px-3 py-1 text-xs transition-colors opacity-0 group-hover:opacity-100 text-red-600"
+                    className="px-3 py-1 text-xs transition-colors opacity-0 group-hover:opacity-100"
+                    style={{ color: 'var(--error)' }}
                   >
                     DELETE
                   </button>

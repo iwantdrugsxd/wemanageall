@@ -24,7 +24,7 @@ export default function Signup() {
 
   const strength = getPasswordStrength(formData.password);
   const strengthLabels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
-  const strengthColors = ['bg-gray-200', 'text-black', 'bg-orange-400', 'text-black', 'bg-black'];
+  const strengthColors = ['bg-[var(--border-subtle)]', 'text-[var(--text-primary)]', 'bg-orange-400', 'text-[var(--text-primary)]', 'bg-[var(--accent)]'];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -53,12 +53,12 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex">
+    <div className="min-h-screen bg-[var(--bg-card)] flex">
       {/* Left Panel - Branding */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-ofa-ink via-ofa-charcoal to-ofa-wisdom relative overflow-hidden">
         <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-1/3 -left-24 w-96 h-96 bg-black rounded-full blur-3xl"></div>
-          <div className="absolute bottom-1/3 -right-24 w-96 h-96 bg-black rounded-full blur-3xl"></div>
+          <div className="absolute top-1/3 -left-24 w-96 h-96 bg-[var(--accent)] rounded-full blur-3xl"></div>
+          <div className="absolute bottom-1/3 -right-24 w-96 h-96 bg-[var(--accent)] rounded-full blur-3xl"></div>
         </div>
         
         <div className="relative z-10 flex flex-col justify-center px-16 xl:px-24">
@@ -72,7 +72,7 @@ export default function Signup() {
           <div className="mb-12">
             <h2 className="font-display text-4xl xl:text-5xl text-ofa-cream leading-tight mb-6">
               Your life deserves<br />
-              <span className="text-black italic">an operating system.</span>
+              <span className="text-[var(--text-primary)] italic">an operating system.</span>
             </h2>
             <p className="text-ofa-cloud/70 text-lg leading-relaxed max-w-md">
               Join thousands designing their lives with intention. Connect your identity, actions, and outcomes in one system.
@@ -85,7 +85,7 @@ export default function Signup() {
             </p>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-black/20 flex items-center justify-center">
-                <span className="text-black font-medium">S</span>
+                <span className="text-[var(--text-primary)] font-medium">S</span>
               </div>
               <div>
                 <p className="text-ofa-cream text-sm font-medium">Sarah K.</p>
@@ -101,21 +101,21 @@ export default function Signup() {
         <div className="w-full max-w-md">
           {/* Mobile Logo */}
           <Link to="/" className="lg:hidden flex items-center gap-3 mb-12">
-            <div className="w-10 h-10 rounded-xl bg-black flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-[var(--accent)] flex items-center justify-center">
               <span className="font-display text-ofa-cream text-lg font-semibold">O</span>
             </div>
-            <span className="font-display text-xl font-semibold text-black">OFA</span>
+            <span className="font-display text-xl font-semibold text-[var(--text-primary)]">OFA</span>
           </Link>
           
           {/* Header */}
           <div className="mb-10">
-            <h1 className="font-display text-3xl md:text-4xl text-black mb-3">Create your account</h1>
-            <p className="text-gray-600">Start building your Life OS today.</p>
+            <h1 className="font-display text-3xl md:text-4xl text-[var(--text-primary)] mb-3">Create your account</h1>
+            <p className="text-[var(--text-secondary)]">Start building your Life OS today.</p>
           </div>
           
           {/* Error Message */}
           {error && (
-            <div className="mb-6 p-4 rounded-xl bg-gray-100 border text-black text-black text-sm">
+            <div className="mb-6 p-4 rounded-xl border text-sm" style={{ backgroundColor: 'var(--error-bg)', borderColor: 'var(--error)', color: 'var(--status-danger-fg)' }}>
               {error}
             </div>
           )}
@@ -123,7 +123,7 @@ export default function Signup() {
           {/* Google OAuth Button */}
           <a
             href="/api/auth/google"
-            className="w-full flex items-center justify-center gap-3 px-6 py-3 border-2 border-gray-300 rounded-xl hover:border-gray-400 transition-colors mb-6"
+            className="w-full flex items-center justify-center gap-3 px-6 py-3 border-2 border-[var(--border-subtle)] rounded-xl hover:border-[var(--border-strong)] transition-colors mb-6"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -131,22 +131,22 @@ export default function Signup() {
               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
             </svg>
-            <span className="text-sm font-medium text-gray-700">Continue with Google</span>
+            <span className="text-sm font-medium text-[var(--text-secondary)]">Continue with Google</span>
           </a>
 
           <div className="relative mb-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
+              <div className="w-full border-t border-[var(--border-subtle)]"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Or continue with email</span>
+              <span className="px-2 bg-[var(--bg-card)] text-[var(--text-muted)]">Or continue with email</span>
             </div>
           </div>
 
           {/* Signup Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-black mb-2">Full name</label>
+              <label htmlFor="name" className="block text-sm font-medium text-[var(--text-primary)] mb-2">Full name</label>
               <input 
                 type="text" 
                 id="name"
@@ -160,7 +160,7 @@ export default function Signup() {
             </div>
             
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-black mb-2">Email</label>
+              <label htmlFor="email" className="block text-sm font-medium text-[var(--text-primary)] mb-2">Email</label>
               <input 
                 type="email" 
                 id="email"
@@ -174,7 +174,7 @@ export default function Signup() {
             </div>
             
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-black mb-2">Password</label>
+              <label htmlFor="password" className="block text-sm font-medium text-[var(--text-primary)] mb-2">Password</label>
               <div className="relative">
                 <input 
                   type={showPassword ? 'text' : 'password'}
@@ -190,7 +190,7 @@ export default function Signup() {
                 <button 
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
                 >
                   {showPassword ? (
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -210,12 +210,12 @@ export default function Signup() {
                 {[1, 2, 3, 4].map((i) => (
                   <div 
                     key={i} 
-                    className={`h-1 flex-1 rounded-full transition-colors ${i <= strength ? strengthColors[strength] : 'bg-gray-200'}`}
+                    className={`h-1 flex-1 rounded-full transition-colors ${i <= strength ? strengthColors[strength] : 'bg-[var(--border-subtle)]'}`}
                   />
                 ))}
               </div>
               {strength > 0 && (
-                <p className={`text-xs mt-1 ${strength >= 3 ? 'text-black' : strength >= 2 ? 'text-black' : 'text-black'}`}>
+                <p className={`text-xs mt-1 ${strength >= 3 ? 'text-[var(--text-primary)]' : strength >= 2 ? 'text-[var(--text-primary)]' : 'text-[var(--text-primary)]'}`}>
                   {strengthLabels[strength]}
                 </p>
               )}
@@ -227,13 +227,13 @@ export default function Signup() {
                 id="terms"
                 checked={acceptTerms}
                 onChange={(e) => setAcceptTerms(e.target.checked)}
-                className="mt-1 w-4 h-4 rounded border-gray-300 text-black focus:ring-ofa-ink/20"
+                className="mt-1 w-4 h-4 rounded border-[var(--border-subtle)] text-[var(--text-primary)] focus:ring-ofa-ink/20"
               />
-              <label htmlFor="terms" className="text-sm text-gray-600">
+              <label htmlFor="terms" className="text-sm text-[var(--text-secondary)]">
                 I agree to the{' '}
-                <button type="button" className="text-black hover:text-black transition-colors">Terms of Service</button>
+                <button type="button" className="text-[var(--text-primary)] hover:text-[var(--text-primary)] transition-colors">Terms of Service</button>
                 {' '}and{' '}
-                <button type="button" className="text-black hover:text-black transition-colors">Privacy Policy</button>
+                <button type="button" className="text-[var(--text-primary)] hover:text-[var(--text-primary)] transition-colors">Privacy Policy</button>
               </label>
             </div>
             
@@ -261,9 +261,9 @@ export default function Signup() {
             </button>
           </form>
           
-          <p className="mt-8 text-center text-gray-600">
+          <p className="mt-8 text-center text-[var(--text-secondary)]">
             Already have an account?{' '}
-            <Link to="/login" className="text-black font-medium hover:text-black transition-colors">
+            <Link to="/login" className="text-[var(--text-primary)] font-medium hover:text-[var(--text-primary)] transition-colors">
               Log in
             </Link>
           </p>

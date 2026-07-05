@@ -83,95 +83,143 @@
   }
 }
 
-/* Dark Theme Palette - CSS Variables */
+/* ============================================================
+   Design tokens - "calm operating system" palette
+   ------------------------------------------------------------
+   Principles behind these choices:
+   1. Warm neutrals instead of clinical pure white / blue-black.
+      A slightly warm off-white/near-black canvas reads as paper,
+      not a screen - lower visual harshness, less eye strain over
+      long daily-use sessions.
+   2. One accent color for "act on this" (terracotta). Everything
+      else is neutral so the single accent stays a legible signal
+      instead of competing with itself - reduces decision fatigue
+      because the eye is never asked "which colored thing matters?"
+   3. Separate hues carry separate meaning: terracotta = action,
+      sage (--growth) = progress/completion/momentum, slate-blue
+      (--focus) = calm/informational. Consistent color-to-meaning
+      mapping lets the brain react to color instead of reading text.
+   4. Softer contrast + gentle shadows over harsh black borders -
+      calmer, still fully accessible (all pairs meet WCAG AA).
+   ============================================================ */
 :root {
   /* Light Theme (default) */
-  --bg-base: #ffffff;
-  --bg-surface: #f9fafb;
+  --bg-base: #fbfaf7;
+  --bg-canvas: #f6f4ef;
+  --bg-surface: #f2efe8;
   --bg-card: #ffffff;
   --bg-modal: #ffffff;
   --bg-elevated: #ffffff;
-  
-  --text-primary: #000000;
-  --text-secondary: #1f2937;
-  --text-muted: #6b7280;
-  
-  --border-subtle: #e5e7eb;
-  --border-mid: #d1d5db;
-  --border-strong: #9ca3af;
-  
-  --accent: #000000;
-  --accent-muted: #374151;
-  
-  --error: #dc2626;
-  --error-bg: #fef2f2;
-  --success: #16a34a;
-  --success-bg: #f0fdf4;
-  
+
+  --text-primary: #1c1b19;
+  --text-secondary: #4a463f;
+  --text-muted: #8c8678;
+
+  --border-subtle: #e9e5db;
+  --border-mid: #dbd5c7;
+  --border-strong: #b3ab99;
+
+  --accent: #e2603a;
+  --accent-hover: #c94a29;
+  --accent-soft: #fbe4d8;
+  --accent-muted: #4a463f;
+
+  --focus-color: #456e75;
+  --focus-soft: #e3edee;
+  --growth: #4f7a3d;
+  --growth-soft: #e7f0e1;
+
+  --error: #c0392b;
+  --error-bg: #fbeae7;
+  --success: #4f7a3d;
+  --success-bg: #e7f0e1;
+
   /* Enterprise UI System Tokens */
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  
-  --focus-ring: 0 0 0 2px var(--accent);
-  
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1.125rem;
+  --radius-xl: 1.5rem;
+
+  --shadow-sm: 0 1px 2px rgba(28, 27, 25, 0.04), 0 1px 1px rgba(28, 27, 25, 0.03);
+  --shadow-md: 0 4px 16px rgba(28, 27, 25, 0.06), 0 2px 6px rgba(28, 27, 25, 0.04);
+  --shadow-lg: 0 12px 32px rgba(28, 27, 25, 0.10), 0 4px 12px rgba(28, 27, 25, 0.05);
+
+  --focus-ring: 0 0 0 3px var(--accent-soft);
+
   /* Status Colors */
-  --status-info-bg: #dbeafe;
-  --status-info-fg: #1e40af;
-  --status-success-bg: #f0fdf4;
-  --status-success-fg: #16a34a;
-  --status-warning-bg: #fef3c7;
-  --status-warning-fg: #d97706;
-  --status-danger-bg: #fef2f2;
-  --status-danger-fg: #dc2626;
+  --status-info-bg: #e3edee;
+  --status-info-fg: #2b464b;
+  --status-success-bg: #e7f0e1;
+  --status-success-fg: #37562c;
+  --status-warning-bg: #fbf0dc;
+  --status-warning-fg: #8a5a12;
+  --status-danger-bg: #fbeae7;
+  --status-danger-fg: #a53a21;
 }
 
 .dark {
-  /* Dark Theme */
-  --bg-base: #0f172a;
-  --bg-surface: #1e293b;
-  --bg-card: #1e293b;
-  --bg-modal: #1e293b;
-  --bg-elevated: #334155;
-  
-  --text-primary: #f1f5f9;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
-  
-  --border-subtle: #334155;
-  --border-mid: #475569;
-  --border-strong: #64748b;
-  
-  --accent: #f1f5f9;
-  --accent-muted: #94a3b8;
-  
-  --error: #f87171;
-  --error-bg: #7f1d1d;
-  --success: #4ade80;
-  --success-bg: #14532d;
-  
+  /* Dark Theme - warm near-black, not blue-black, so it still feels
+     human rather than "screen glow" cold at night. */
+  --bg-base: #17150f;
+  --bg-canvas: #17150f;
+  --bg-surface: #1e1b14;
+  --bg-card: #221f18;
+  --bg-modal: #221f18;
+  --bg-elevated: #2b271d;
+
+  --text-primary: #f4f1e9;
+  --text-secondary: #cec7b7;
+  --text-muted: #8f8873;
+
+  --border-subtle: #322d22;
+  --border-mid: #3f392a;
+  --border-strong: #5a5340;
+
+  --accent: #ec7c54;
+  --accent-hover: #f39672;
+  --accent-soft: #3a281e;
+  --accent-muted: #cec7b7;
+
+  --focus-color: #7fb0b8;
+  --focus-soft: #1e2c2d;
+  --growth: #86b56f;
+  --growth-soft: #202b1b;
+
+  --error: #e07a68;
+  --error-bg: #3a221d;
+  --success: #86b56f;
+  --success-bg: #202b1b;
+
   /* Enterprise UI System Tokens (Dark) */
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
-  
-  --focus-ring: 0 0 0 2px var(--accent);
-  
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1.125rem;
+  --radius-xl: 1.5rem;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.5), 0 4px 14px rgba(0, 0, 0, 0.35);
+
+  --focus-ring: 0 0 0 3px var(--accent-soft);
+
   /* Status Colors (Dark) */
-  --status-info-bg: #1e3a8a;
-  --status-info-fg: #93c5fd;
-  --status-success-bg: #14532d;
-  --status-success-fg: #4ade80;
-  --status-warning-bg: #78350f;
-  --status-warning-fg: #fbbf24;
-  --status-danger-bg: #7f1d1d;
-  --status-danger-fg: #f87171;
+  --status-info-bg: #1e2c2d;
+  --status-info-fg: #a9cdd2;
+  --status-success-bg: #202b1b;
+  --status-success-fg: #a9cd97;
+  --status-warning-bg: #332a17;
+  --status-warning-fg: #e0b263;
+  --status-danger-bg: #3a221d;
+  --status-danger-fg: #e79c8c;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 @layer base {
@@ -231,31 +279,44 @@
 @layer components {
   .btn-primary {
     background-color: var(--accent);
-    color: var(--bg-base);
-    @apply inline-flex items-center justify-center px-8 py-4 
-           font-medium text-sm tracking-wider
-           rounded-full transition-all duration-500 ease-out
-           hover:shadow-xl hover:shadow-black/10 dark:hover:shadow-white/10
-           hover:-translate-y-0.5 active:translate-y-0
-           focus:outline-none focus:ring-2 focus:ring-black/50 dark:focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-800
+    color: #fff;
+    @apply inline-flex items-center justify-center px-8 py-4
+           font-medium text-sm tracking-wide
+           rounded-full transition-all duration-300 ease-out
+           hover:shadow-calm-md
+           active:scale-[0.98]
+           focus:outline-none focus-visible:shadow-focus-ring
            disabled:opacity-50 disabled:cursor-not-allowed;
   }
-  
+
+  .btn-primary:hover {
+    background-color: var(--accent-hover);
+  }
+
   .dark .btn-primary {
     background-color: var(--accent);
-    color: var(--bg-base);
+    color: #1c1b19;
+  }
+
+  .dark .btn-primary:hover {
+    background-color: var(--accent-hover);
   }
 
   .btn-secondary {
     background-color: transparent;
     color: var(--text-primary);
     border-color: var(--border-mid);
-    @apply inline-flex items-center justify-center px-8 py-4 
-           font-medium text-sm tracking-wider
+    @apply inline-flex items-center justify-center px-8 py-4
+           font-medium text-sm tracking-wide
            border rounded-full
-           transition-all duration-500 ease-out
-           hover:border-gray-900 dark:hover:border-gray-300 hover:bg-black/5 dark:hover:bg-white/5
-           focus:outline-none focus:ring-2 focus:ring-black/30 dark:focus:ring-white/30;
+           transition-all duration-300 ease-out
+           active:scale-[0.98]
+           focus:outline-none focus-visible:shadow-focus-ring;
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--border-strong);
+    background-color: var(--bg-surface);
   }
 
   .btn-ghost {
@@ -285,20 +346,18 @@
   .card {
     background-color: var(--bg-card);
     border-color: var(--border-subtle);
-    @apply backdrop-blur-sm rounded-2xl p-8 
+    @apply rounded-2xl p-8
            border
-           transition-all duration-500 ease-out
-           hover:shadow-xl hover:shadow-black/5 dark:hover:shadow-black/20 hover:border-gray-400 dark:hover:border-gray-600
-           hover:-translate-y-1;
+           transition-all duration-300 ease-out
+           hover:shadow-calm-md hover:border-[var(--border-mid)];
   }
 
   .card-feature {
     background-color: var(--bg-card);
     border-color: var(--border-subtle);
-    @apply backdrop-blur-sm 
-           rounded-3xl p-10 border
-           transition-all duration-500
-           hover:shadow-2xl hover:shadow-black/10 dark:hover:shadow-black/30;
+    @apply rounded-3xl p-10 border
+           transition-all duration-300
+           hover:shadow-calm-lg;
   }
 
   .input-field {
@@ -306,9 +365,17 @@
     border-color: var(--border-subtle);
     color: var(--text-primary);
     @apply w-full px-5 py-4 rounded-xl
-           placeholder:text-gray-500 dark:placeholder:text-gray-400
-           transition-all duration-300
-           focus:outline-none focus:border-gray-900 dark:focus:border-gray-400 focus:ring-4 focus:ring-black/5 dark:focus:ring-white/10;
+           transition-all duration-200
+           focus:outline-none;
+  }
+
+  .input-field::placeholder {
+    color: var(--text-muted);
+  }
+
+  .input-field:focus {
+    border-color: var(--accent);
+    box-shadow: var(--focus-ring);
   }
 
   .feature-icon {
@@ -340,63 +407,68 @@
   .dashboard-card {
     background-color: var(--bg-card);
     border-color: var(--border-subtle);
-    @apply backdrop-blur-sm rounded-2xl border
-           transition-all duration-300 hover:shadow-lg hover:shadow-black/5 dark:hover:shadow-black/20;
+    @apply rounded-2xl border
+           transition-all duration-300 hover:shadow-calm-md;
   }
 
-  /* Typography Hierarchy - Uniform across all pages */
+  /* Typography Hierarchy - in-app scale.
+     Intentionally modest sizes (compare to the marketing .mk-h1 scale):
+     a daily-use tool is scanned dozens of times a day, so headings sized
+     for a one-time "wow" on a landing page create noise here. Inter at
+     restrained sizes with a clear weight step reads faster and calmer. */
   .text-h1 {
     color: var(--text-primary);
-    @apply font-display text-4xl md:text-5xl lg:text-6xl leading-tight tracking-tight transition-colors;
+    @apply font-sans font-semibold text-2xl md:text-3xl leading-tight tracking-tight transition-colors;
   }
 
   .text-h2 {
     color: var(--text-primary);
-    @apply font-display text-3xl md:text-4xl lg:text-5xl leading-tight tracking-tight transition-colors;
+    @apply font-sans font-semibold text-xl md:text-2xl leading-tight tracking-tight transition-colors;
   }
 
   .text-h3 {
     color: var(--text-primary);
-    @apply font-display text-2xl md:text-3xl lg:text-4xl leading-tight tracking-tight transition-colors;
+    @apply font-sans font-semibold text-lg md:text-xl leading-snug transition-colors;
   }
 
   .text-h4 {
-    @apply font-display text-xl md:text-2xl lg:text-3xl text-black dark:text-white leading-tight transition-colors;
+    color: var(--text-primary);
+    @apply font-sans font-semibold text-base md:text-lg leading-snug transition-colors;
   }
 
   .text-h5 {
     color: var(--text-primary);
-    @apply font-display text-lg md:text-xl lg:text-2xl leading-snug transition-colors;
+    @apply font-sans font-medium text-base leading-snug transition-colors;
   }
 
   .text-h6 {
     color: var(--text-primary);
-    @apply font-display text-base md:text-lg lg:text-xl leading-snug transition-colors;
+    @apply font-sans font-medium text-sm leading-snug transition-colors;
   }
 
   .text-body-lg {
     color: var(--text-secondary);
-    @apply text-lg md:text-xl leading-relaxed transition-colors;
+    @apply text-base md:text-lg leading-relaxed transition-colors;
   }
 
   .text-body {
     color: var(--text-secondary);
-    @apply text-base md:text-lg leading-relaxed transition-colors;
+    @apply text-[0.9375rem] leading-relaxed transition-colors;
   }
 
   .text-body-sm {
     color: var(--text-secondary);
-    @apply text-sm md:text-base leading-relaxed transition-colors;
+    @apply text-sm leading-relaxed transition-colors;
   }
 
   .text-caption {
     color: var(--text-muted);
-    @apply text-xs md:text-sm leading-normal transition-colors;
+    @apply text-xs leading-normal transition-colors;
   }
 
   .text-label {
     color: var(--text-muted);
-    @apply text-xs md:text-sm font-semibold uppercase tracking-wider transition-colors;
+    @apply text-[0.6875rem] font-semibold uppercase tracking-wider transition-colors;
   }
   
   /* Utility classes for common dark mode patterns */
@@ -460,13 +532,61 @@
   }
   
   .app-title {
-    @apply text-3xl md:text-4xl font-light transition-colors;
+    @apply text-2xl md:text-3xl font-semibold tracking-tight transition-colors;
     color: var(--text-primary);
   }
-  
+
   .app-subtitle {
     @apply text-sm transition-colors;
     color: var(--text-muted);
+  }
+
+  /* ----------------------------------------------------------
+     Mode tints - a subtle background wash that cues the brain
+     "you're in a different mode now" without needing to read
+     anything. Used to separate action screens (default canvas)
+     from reflective ones (journal/emotions) and focus ones.
+     Keep opacity low; this is a background hint, not a color
+     block, so it stays calm rather than loud.
+     ---------------------------------------------------------- */
+  .tint-focus {
+    background-color: var(--focus-soft);
+  }
+
+  .tint-growth {
+    background-color: var(--growth-soft);
+  }
+
+  .tint-accent {
+    background-color: var(--accent-soft);
+  }
+
+  /* ----------------------------------------------------------
+     Momentum / streak indicator - small reward affordance used
+     by the habit-formation feature. Pulses gently rather than
+     flashing, so consistency feels warm/earned, not gamified-loud.
+     ---------------------------------------------------------- */
+  .streak-chip {
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold transition-colors;
+    background-color: var(--growth-soft);
+    color: var(--growth);
+  }
+
+  .streak-chip .streak-flame {
+    animation: breathe 3.5s ease-in-out infinite;
+  }
+
+  /* Reward micro-interaction for completing a task/intention/reflection.
+     One short "pop" - small enough to not distract, present enough to
+     register as a tiny win (variable-reward / small-wins principle). */
+  .reward-pop {
+    animation: pop 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  /* Focus Mode overlay - progressively hides everything but the one
+     active task, reducing choice/visual competition to near zero. */
+  .focus-mode-scrim {
+    background-color: var(--bg-base);
   }
 }
 

@@ -584,40 +584,40 @@ export default function Money() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center bg-[var(--bg-surface)] ">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading financial data...</p>
+          <p className="text-[var(--text-secondary)] ">Loading financial data...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6 lg:p-8 transition-colors">
+    <div className="min-h-screen bg-[var(--bg-surface)]  p-6 lg:p-8 transition-colors">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-4xl md:text-5xl font-light text-gray-900 dark:text-white mb-2">Money</h1>
-          <p className="text-gray-600 dark:text-gray-400 italic">Track your income and expenses</p>
+          <h1 className="text-4xl md:text-5xl font-light text-[var(--text-primary)]  mb-2">Money</h1>
+          <p className="text-[var(--text-secondary)]  italic">Track your income and expenses</p>
         </div>
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-sm">
-            <p className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Total Income</p>
-            <p className="text-3xl font-light text-green-600 dark:text-green-400">${totalIncome.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+          <div className="bg-[var(--bg-card)]  border border-[var(--border-subtle)]  rounded-lg p-6 shadow-sm">
+            <p className="text-xs uppercase tracking-wider text-[var(--text-muted)]  mb-2">Total Income</p>
+            <p className="text-3xl font-light text-[var(--growth)] dark:text-green-400">${totalIncome.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
           </div>
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-sm">
-            <p className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Total Expenses</p>
-            <p className="text-3xl font-light text-red-600 dark:text-red-400">${totalExpenses.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+          <div className="bg-[var(--bg-card)]  border border-[var(--border-subtle)]  rounded-lg p-6 shadow-sm">
+            <p className="text-xs uppercase tracking-wider text-[var(--text-muted)]  mb-2">Total Expenses</p>
+            <p className="text-3xl font-light text-[var(--error)] ">${totalExpenses.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
           </div>
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-sm">
-            <p className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Recurring Obligations</p>
+          <div className="bg-[var(--bg-card)]  border border-[var(--border-subtle)]  rounded-lg p-6 shadow-sm">
+            <p className="text-xs uppercase tracking-wider text-[var(--text-muted)]  mb-2">Recurring Obligations</p>
             <p className="text-3xl font-light text-orange-600 dark:text-orange-400">${recurringObligations.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
           </div>
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-sm">
-            <p className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Net Balance</p>
-            <p className={`text-3xl font-light ${netBalance >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+          <div className="bg-[var(--bg-card)]  border border-[var(--border-subtle)]  rounded-lg p-6 shadow-sm">
+            <p className="text-xs uppercase tracking-wider text-[var(--text-muted)]  mb-2">Net Balance</p>
+            <p className={`text-3xl font-light ${netBalance >= 0 ? 'text-[var(--growth)] dark:text-green-400' : 'text-[var(--error)] '}`}>
               ${netBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
           </div>
@@ -626,15 +626,15 @@ export default function Money() {
         {/* Income and Expenses Sections */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Income Section */}
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-sm">
+          <div className="bg-[var(--bg-card)]  border border-[var(--border-subtle)]  rounded-lg p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xs uppercase tracking-wider text-gray-700 dark:text-gray-300 font-medium">Income</h2>
+              <h2 className="text-xs uppercase tracking-wider text-[var(--text-secondary)]  font-medium">Income</h2>
               <div className="flex items-center gap-3">
                 {/* Frequency Filter */}
                 <select
                   value={filters.incomeFrequency}
                   onChange={(e) => setFilters({ ...filters, incomeFrequency: e.target.value })}
-                  className="text-xs px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:outline-none focus:border-orange-500"
+                  className="text-xs px-2 py-1 border border-[var(--border-subtle)]  rounded bg-[var(--bg-card)]  text-[var(--text-secondary)]  focus:outline-none focus:border-[var(--accent)]"
                 >
                   <option value="">All Frequencies</option>
                   <option value="weekly">Weekly</option>
@@ -650,7 +650,7 @@ export default function Money() {
                     setEntryType('income');
                     setShowAddModal(true);
                   }}
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                  className="text-[var(--text-muted)] hover:text-[var(--text-secondary)]  transition-colors"
                   title="Add Income"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -661,13 +661,13 @@ export default function Money() {
             </div>
             {filteredIncome.length > 0 && (
               <div className="flex items-center justify-between mb-2">
-                <label className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                <label className="flex items-center gap-2 text-xs text-[var(--text-muted)] ">
                   <input
                     ref={selectAllIncomeRef}
                     type="checkbox"
                     checked={allFilteredIncomeSelected}
                     onChange={() => handleToggleAllFilteredIncome(filteredIncomeIds)}
-                    className="h-4 w-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                    className="h-4 w-4 rounded border-[var(--border-subtle)] text-orange-500 focus:ring-[var(--accent)]"
                     aria-label="Select all income entries"
                   />
                   Select all
@@ -675,7 +675,7 @@ export default function Money() {
                 {selectedIncomeIds.length > 0 && (
                   <button
                     onClick={handleBulkDeleteIncome}
-                    className="text-xs font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                    className="text-xs font-medium text-[var(--error)] hover:text-red-700  dark:hover:text-red-300 transition-colors"
                     title="Delete selected income entries"
                   >
                     Delete Selected ({selectedIncomeIds.length})
@@ -691,34 +691,34 @@ export default function Money() {
                     className={`group flex items-center gap-3 p-3 rounded-lg transition-colors ${
                       selectedIncomeIds.includes(item.id)
                         ? 'bg-orange-50 dark:bg-orange-900/20'
-                        : 'hover:bg-gray-50 dark:hover:bg-gray-700/50'
+                        : 'hover:bg-[var(--bg-surface)] /50'
                     }`}
                   >
                     <input
                       type="checkbox"
                       checked={selectedIncomeIds.includes(item.id)}
                       onChange={() => handleToggleIncomeSelection(item.id)}
-                      className="h-4 w-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                      className="h-4 w-4 rounded border-[var(--border-subtle)] text-orange-500 focus:ring-[var(--accent)]"
                       aria-label={`Select income ${item.source || 'entry'}`}
                     />
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">{item.source || 'Income'}</p>
+                      <p className="text-sm font-medium text-[var(--text-primary)] ">{item.source || 'Income'}</p>
                       <div className="flex items-center gap-2 mt-0.5">
                         {item.company && (
                           <>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">{item.company}</p>
-                            <span className="text-xs text-gray-400">•</span>
+                            <p className="text-xs text-[var(--text-muted)] ">{item.company}</p>
+                            <span className="text-xs text-[var(--text-muted)]">•</span>
                           </>
                         )}
-                        <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">{item.frequency}</p>
+                        <p className="text-xs text-[var(--text-muted)]  capitalize">{item.frequency}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <p className="text-sm font-medium text-green-600 dark:text-green-400">${parseFloat(item.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                      <p className="text-sm font-medium text-[var(--growth)] dark:text-green-400">${parseFloat(item.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
                           onClick={() => handleEditIncome(item)}
-                          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1 transition-colors"
+                          className="text-[var(--text-muted)] hover:text-[var(--text-secondary)]  p-1 transition-colors"
                           title="Edit income"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -727,7 +727,7 @@ export default function Money() {
                         </button>
                         <button
                           onClick={() => handleDeleteIncome(item.id)}
-                          className="text-gray-400 hover:text-red-600 dark:hover:text-red-400 p-1 transition-colors"
+                          className="text-[var(--text-muted)] hover:text-[var(--error)] dark:hover:text-red-400 p-1 transition-colors"
                           title="Delete income"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -740,20 +740,20 @@ export default function Money() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">No income entries {filters.incomeFrequency ? `with frequency "${filters.incomeFrequency}"` : 'yet'}</p>
+              <p className="text-sm text-[var(--text-muted)] dark:text-[var(--text-muted)] text-center py-8">No income entries {filters.incomeFrequency ? `with frequency "${filters.incomeFrequency}"` : 'yet'}</p>
             )}
           </div>
 
           {/* Expenses Section */}
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-sm">
+          <div className="bg-[var(--bg-card)]  border border-[var(--border-subtle)]  rounded-lg p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xs uppercase tracking-wider text-gray-700 dark:text-gray-300 font-medium">Expenses</h2>
+              <h2 className="text-xs uppercase tracking-wider text-[var(--text-secondary)]  font-medium">Expenses</h2>
               <div className="flex items-center gap-3">
                 {/* Category Filter */}
                 <select
                   value={filters.expenseCategory}
                   onChange={(e) => setFilters({ ...filters, expenseCategory: e.target.value })}
-                  className="text-xs px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:outline-none focus:border-orange-500"
+                  className="text-xs px-2 py-1 border border-[var(--border-subtle)]  rounded bg-[var(--bg-card)]  text-[var(--text-secondary)]  focus:outline-none focus:border-[var(--accent)]"
                 >
                   <option value="">All Categories</option>
                   {expenseCategories.map(cat => (
@@ -764,7 +764,7 @@ export default function Money() {
                 <select
                   value={filters.expenseDateRange}
                   onChange={(e) => setFilters({ ...filters, expenseDateRange: e.target.value })}
-                  className="text-xs px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:outline-none focus:border-orange-500"
+                  className="text-xs px-2 py-1 border border-[var(--border-subtle)]  rounded bg-[var(--bg-card)]  text-[var(--text-secondary)]  focus:outline-none focus:border-[var(--accent)]"
                 >
                   <option value="all">All Time</option>
                   <option value="this-month">This Month</option>
@@ -777,7 +777,7 @@ export default function Money() {
                     setEntryType('expense');
                     setShowAddModal(true);
                   }}
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                  className="text-[var(--text-muted)] hover:text-[var(--text-secondary)]  transition-colors"
                   title="Add Expense"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -788,13 +788,13 @@ export default function Money() {
             </div>
             {filteredExpenses.length > 0 && (
               <div className="flex items-center justify-between mb-2">
-                <label className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                <label className="flex items-center gap-2 text-xs text-[var(--text-muted)] ">
                   <input
                     ref={selectAllExpenseRef}
                     type="checkbox"
                     checked={allFilteredExpensesSelected}
                     onChange={() => handleToggleAllFilteredExpenses(filteredExpenseIds)}
-                    className="h-4 w-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                    className="h-4 w-4 rounded border-[var(--border-subtle)] text-orange-500 focus:ring-[var(--accent)]"
                     aria-label="Select all expense entries"
                   />
                   Select all
@@ -802,7 +802,7 @@ export default function Money() {
                 {selectedExpenseIds.length > 0 && (
                   <button
                     onClick={handleBulkDeleteExpenses}
-                    className="text-xs font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                    className="text-xs font-medium text-[var(--error)] hover:text-red-700  dark:hover:text-red-300 transition-colors"
                     title="Delete selected expense entries"
                   >
                     Delete Selected ({selectedExpenseIds.length})
@@ -818,30 +818,30 @@ export default function Money() {
                     className={`group flex items-center gap-3 p-3 rounded-lg transition-colors ${
                       selectedExpenseIds.includes(item.id)
                         ? 'bg-orange-50 dark:bg-orange-900/20'
-                        : 'hover:bg-gray-50 dark:hover:bg-gray-700/50'
+                        : 'hover:bg-[var(--bg-surface)] /50'
                     }`}
                   >
                     <input
                       type="checkbox"
                       checked={selectedExpenseIds.includes(item.id)}
                       onChange={() => handleToggleExpenseSelection(item.id)}
-                      className="h-4 w-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                      className="h-4 w-4 rounded border-[var(--border-subtle)] text-orange-500 focus:ring-[var(--accent)]"
                       aria-label={`Select expense ${item.description || 'entry'}`}
                     />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">{item.description || 'Expense'}</p>
-                        <span className="text-xs text-gray-400">•</span>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">{item.category || 'Uncategorized'}</p>
+                        <p className="text-sm font-medium text-[var(--text-primary)] ">{item.description || 'Expense'}</p>
+                        <span className="text-xs text-[var(--text-muted)]">•</span>
+                        <p className="text-xs text-[var(--text-muted)] ">{item.category || 'Uncategorized'}</p>
                       </div>
-                      <p className="text-xs text-gray-400 dark:text-gray-500">{formatDate(item.expense_date)}</p>
+                      <p className="text-xs text-[var(--text-muted)] dark:text-[var(--text-muted)]">{formatDate(item.expense_date)}</p>
                     </div>
                     <div className="flex items-center gap-3">
-                      <p className="text-sm font-medium text-red-600 dark:text-red-400">${parseFloat(item.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                      <p className="text-sm font-medium text-[var(--error)] ">${parseFloat(item.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
                           onClick={() => handleEditExpense(item)}
-                          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1"
+                          className="text-[var(--text-muted)] hover:text-[var(--text-secondary)]  p-1"
                           title="Edit expense"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -850,7 +850,7 @@ export default function Money() {
                         </button>
                         <button
                           onClick={() => handleDeleteExpense(item.id)}
-                          className="text-gray-400 hover:text-red-600 dark:hover:text-red-400 p-1"
+                          className="text-[var(--text-muted)] hover:text-[var(--error)] dark:hover:text-red-400 p-1"
                           title="Delete expense"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -863,15 +863,15 @@ export default function Money() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">No expense entries {filters.expenseCategory || filters.expenseDateRange !== 'all' ? 'matching filters' : 'yet'}</p>
+              <p className="text-sm text-[var(--text-muted)] dark:text-[var(--text-muted)] text-center py-8">No expense entries {filters.expenseCategory || filters.expenseDateRange !== 'all' ? 'matching filters' : 'yet'}</p>
             )}
           </div>
         </div>
 
         {/* Subscriptions Section */}
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-sm mb-8">
+        <div className="bg-[var(--bg-card)]  border border-[var(--border-subtle)]  rounded-lg p-6 shadow-sm mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xs uppercase tracking-wider text-gray-700 dark:text-gray-300 font-medium">Subscriptions</h2>
+            <h2 className="text-xs uppercase tracking-wider text-[var(--text-secondary)]  font-medium">Subscriptions</h2>
             <button
               onClick={() => {
                 setEditingSubscription(null);
@@ -879,7 +879,7 @@ export default function Money() {
                 setEntryType('subscription');
                 setShowAddModal(true);
               }}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+              className="text-[var(--text-muted)] hover:text-[var(--text-secondary)]  transition-colors"
               title="Add Subscription"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -890,24 +890,24 @@ export default function Money() {
           {subscriptions.length > 0 ? (
             <div className="space-y-2">
               {subscriptions.map((item) => (
-                <div key={item.id} className="group flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg transition-colors">
+                <div key={item.id} className="group flex items-center justify-between p-3 hover:bg-[var(--bg-surface)] /50 rounded-lg transition-colors">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">{item.name}</p>
+                      <p className="text-sm font-medium text-[var(--text-primary)] ">{item.name}</p>
                       <span className={`text-xs px-2 py-0.5 rounded ${
                         item.status === 'active' 
                           ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' 
                           : item.status === 'paused'
                           ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400'
-                          : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-400'
+                          : 'bg-[var(--bg-surface)]  text-[var(--text-secondary)] '
                       }`}>
                         {item.status}
                       </span>
                     </div>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{formatBillingCycle(item.billing_cycle)}</p>
-                      <span className="text-xs text-gray-400">•</span>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Next: {formatDate(item.next_billing_date)}</p>
+                      <p className="text-xs text-[var(--text-muted)] ">{formatBillingCycle(item.billing_cycle)}</p>
+                      <span className="text-xs text-[var(--text-muted)]">•</span>
+                      <p className="text-xs text-[var(--text-muted)] ">Next: {formatDate(item.next_billing_date)}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -915,7 +915,7 @@ export default function Money() {
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={() => handleToggleSubscriptionStatus(item)}
-                        className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1"
+                        className="text-[var(--text-muted)] hover:text-[var(--text-secondary)]  p-1"
                         title={item.status === 'active' ? 'Pause subscription' : 'Activate subscription'}
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -931,7 +931,7 @@ export default function Money() {
                       </button>
                       <button
                         onClick={() => handleEditSubscription(item)}
-                        className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1"
+                        className="text-[var(--text-muted)] hover:text-[var(--text-secondary)]  p-1"
                         title="Edit subscription"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -940,7 +940,7 @@ export default function Money() {
                       </button>
                       <button
                         onClick={() => handleDeleteSubscription(item.id)}
-                        className="text-gray-400 hover:text-red-600 dark:hover:text-red-400 p-1"
+                        className="text-[var(--text-muted)] hover:text-[var(--error)] dark:hover:text-red-400 p-1"
                         title="Delete subscription"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -953,7 +953,7 @@ export default function Money() {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">No subscriptions yet</p>
+            <p className="text-sm text-[var(--text-muted)] dark:text-[var(--text-muted)] text-center py-8">No subscriptions yet</p>
           )}
         </div>
       </div>
@@ -970,11 +970,11 @@ export default function Money() {
           }}
         >
           <div 
-            className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto"
+            className="bg-[var(--bg-card)]  rounded-xl shadow-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+              <h3 className="text-xl font-semibold text-[var(--text-primary)] ">
                 {editingIncome ? 'Edit Income' : 
                  editingExpense ? 'Edit Expense' : 
                  editingSubscription ? 'Edit Subscription' :
@@ -989,7 +989,7 @@ export default function Money() {
                   setEditingExpense(null);
                   setEditingSubscription(null);
                 }}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                className="text-[var(--text-muted)] hover:text-[var(--text-secondary)]  transition-colors"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -1001,35 +1001,35 @@ export default function Money() {
             {entryType === 'income' && (
               <form onSubmit={editingIncome ? handleUpdateIncome : handleAddIncome} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Source</label>
+                  <label className="block text-sm font-medium text-[var(--text-secondary)]  mb-2">Source</label>
                   <input
                     type="text"
                     value={incomeForm.source}
                     onChange={(e) => setIncomeForm({ ...incomeForm, source: e.target.value })}
                     placeholder="e.g., Salary, Freelance"
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500"
+                    className="w-full px-4 py-2 border border-[var(--border-subtle)]  rounded-lg bg-[var(--bg-card)]  text-[var(--text-primary)]  focus:outline-none focus:border-[var(--accent)]"
                     required
                     autoFocus
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Amount</label>
+                  <label className="block text-sm font-medium text-[var(--text-secondary)]  mb-2">Amount</label>
                   <input
                     type="number"
                     step="0.01"
                     value={incomeForm.amount}
                     onChange={(e) => setIncomeForm({ ...incomeForm, amount: e.target.value })}
                     placeholder="0.00"
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500"
+                    className="w-full px-4 py-2 border border-[var(--border-subtle)]  rounded-lg bg-[var(--bg-card)]  text-[var(--text-primary)]  focus:outline-none focus:border-[var(--accent)]"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Frequency</label>
+                  <label className="block text-sm font-medium text-[var(--text-secondary)]  mb-2">Frequency</label>
                   <select
                     value={incomeForm.frequency}
                     onChange={(e) => setIncomeForm({ ...incomeForm, frequency: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500"
+                    className="w-full px-4 py-2 border border-[var(--border-subtle)]  rounded-lg bg-[var(--bg-card)]  text-[var(--text-primary)]  focus:outline-none focus:border-[var(--accent)]"
                   >
                     <option value="weekly">Weekly</option>
                     <option value="biweekly">Bi-weekly</option>
@@ -1039,13 +1039,13 @@ export default function Money() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Company (optional)</label>
+                  <label className="block text-sm font-medium text-[var(--text-secondary)]  mb-2">Company (optional)</label>
                   <input
                     type="text"
                     value={incomeForm.company}
                     onChange={(e) => setIncomeForm({ ...incomeForm, company: e.target.value })}
                     placeholder="Company name"
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500"
+                    className="w-full px-4 py-2 border border-[var(--border-subtle)]  rounded-lg bg-[var(--bg-card)]  text-[var(--text-primary)]  focus:outline-none focus:border-[var(--accent)]"
                   />
                 </div>
                 <div className="flex gap-3 pt-4">
@@ -1055,7 +1055,7 @@ export default function Money() {
                       setShowAddModal(false);
                       setEditingIncome(null);
                     }}
-                    className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300"
+                    className="flex-1 px-4 py-2 border border-[var(--border-subtle)]  rounded-lg hover:bg-[var(--bg-surface)]  transition-colors text-[var(--text-secondary)] "
                   >
                     Cancel
                   </button>
@@ -1073,24 +1073,24 @@ export default function Money() {
             {entryType === 'expense' && (
               <form onSubmit={editingExpense ? handleUpdateExpense : handleAddExpense} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Amount</label>
+                  <label className="block text-sm font-medium text-[var(--text-secondary)]  mb-2">Amount</label>
                   <input
                     type="number"
                     step="0.01"
                     value={expenseForm.amount}
                     onChange={(e) => setExpenseForm({ ...expenseForm, amount: e.target.value })}
                     placeholder="0.00"
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500"
+                    className="w-full px-4 py-2 border border-[var(--border-subtle)]  rounded-lg bg-[var(--bg-card)]  text-[var(--text-primary)]  focus:outline-none focus:border-[var(--accent)]"
                     required
                     autoFocus
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category</label>
+                  <label className="block text-sm font-medium text-[var(--text-secondary)]  mb-2">Category</label>
                   <select
                     value={expenseForm.category}
                     onChange={(e) => setExpenseForm({ ...expenseForm, category: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500"
+                    className="w-full px-4 py-2 border border-[var(--border-subtle)]  rounded-lg bg-[var(--bg-card)]  text-[var(--text-primary)]  focus:outline-none focus:border-[var(--accent)]"
                     required
                   >
                     <option value="">Select a category</option>
@@ -1100,31 +1100,31 @@ export default function Money() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description</label>
+                  <label className="block text-sm font-medium text-[var(--text-secondary)]  mb-2">Description</label>
                   <input
                     type="text"
                     value={expenseForm.description}
                     onChange={(e) => setExpenseForm({ ...expenseForm, description: e.target.value })}
                     placeholder="What did you spend on?"
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500"
+                    className="w-full px-4 py-2 border border-[var(--border-subtle)]  rounded-lg bg-[var(--bg-card)]  text-[var(--text-primary)]  focus:outline-none focus:border-[var(--accent)]"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Date</label>
+                  <label className="block text-sm font-medium text-[var(--text-secondary)]  mb-2">Date</label>
                   <input
                     type="date"
                     value={expenseForm.date}
                     onChange={(e) => setExpenseForm({ ...expenseForm, date: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500"
+                    className="w-full px-4 py-2 border border-[var(--border-subtle)]  rounded-lg bg-[var(--bg-card)]  text-[var(--text-primary)]  focus:outline-none focus:border-[var(--accent)]"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Note (optional)</label>
+                  <label className="block text-sm font-medium text-[var(--text-secondary)]  mb-2">Note (optional)</label>
                   <textarea
                     value={expenseForm.note}
                     onChange={(e) => setExpenseForm({ ...expenseForm, note: e.target.value })}
                     placeholder="Additional notes..."
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500 resize-none"
+                    className="w-full px-4 py-2 border border-[var(--border-subtle)]  rounded-lg bg-[var(--bg-card)]  text-[var(--text-primary)]  focus:outline-none focus:border-[var(--accent)] resize-none"
                     rows={3}
                   />
                 </div>
@@ -1135,13 +1135,13 @@ export default function Money() {
                       setShowAddModal(false);
                       setEditingExpense(null);
                     }}
-                    className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300"
+                    className="flex-1 px-4 py-2 border border-[var(--border-subtle)]  rounded-lg hover:bg-[var(--bg-surface)]  transition-colors text-[var(--text-secondary)] "
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 px-4 py-2 bg-gray-900 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors"
+                    className="flex-1 px-4 py-2 bg-[var(--text-primary)]  text-white rounded-lg hover:bg-[var(--accent-hover)] dark:hover:bg-[var(--accent-hover)] transition-colors"
                   >
                     {editingExpense ? 'Update Expense' : 'Add Expense'}
                   </button>
@@ -1153,35 +1153,35 @@ export default function Money() {
             {entryType === 'subscription' && (
               <form onSubmit={editingSubscription ? handleUpdateSubscription : handleAddSubscription} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Name</label>
+                  <label className="block text-sm font-medium text-[var(--text-secondary)]  mb-2">Name</label>
                   <input
                     type="text"
                     value={subscriptionForm.name}
                     onChange={(e) => setSubscriptionForm({ ...subscriptionForm, name: e.target.value })}
                     placeholder="e.g., Netflix, Spotify"
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500"
+                    className="w-full px-4 py-2 border border-[var(--border-subtle)]  rounded-lg bg-[var(--bg-card)]  text-[var(--text-primary)]  focus:outline-none focus:border-[var(--accent)]"
                     required
                     autoFocus
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Amount</label>
+                  <label className="block text-sm font-medium text-[var(--text-secondary)]  mb-2">Amount</label>
                   <input
                     type="number"
                     step="0.01"
                     value={subscriptionForm.amount}
                     onChange={(e) => setSubscriptionForm({ ...subscriptionForm, amount: e.target.value })}
                     placeholder="0.00"
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500"
+                    className="w-full px-4 py-2 border border-[var(--border-subtle)]  rounded-lg bg-[var(--bg-card)]  text-[var(--text-primary)]  focus:outline-none focus:border-[var(--accent)]"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Billing Cycle</label>
+                  <label className="block text-sm font-medium text-[var(--text-secondary)]  mb-2">Billing Cycle</label>
                   <select
                     value={subscriptionForm.billing_cycle}
                     onChange={(e) => setSubscriptionForm({ ...subscriptionForm, billing_cycle: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500"
+                    className="w-full px-4 py-2 border border-[var(--border-subtle)]  rounded-lg bg-[var(--bg-card)]  text-[var(--text-primary)]  focus:outline-none focus:border-[var(--accent)]"
                     required
                   >
                     <option value="weekly">Weekly</option>
@@ -1192,21 +1192,21 @@ export default function Money() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Next Billing Date</label>
+                  <label className="block text-sm font-medium text-[var(--text-secondary)]  mb-2">Next Billing Date</label>
                   <input
                     type="date"
                     value={subscriptionForm.next_billing_date}
                     onChange={(e) => setSubscriptionForm({ ...subscriptionForm, next_billing_date: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500"
+                    className="w-full px-4 py-2 border border-[var(--border-subtle)]  rounded-lg bg-[var(--bg-card)]  text-[var(--text-primary)]  focus:outline-none focus:border-[var(--accent)]"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
+                  <label className="block text-sm font-medium text-[var(--text-secondary)]  mb-2">Status</label>
                   <select
                     value={subscriptionForm.status}
                     onChange={(e) => setSubscriptionForm({ ...subscriptionForm, status: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:border-orange-500"
+                    className="w-full px-4 py-2 border border-[var(--border-subtle)]  rounded-lg bg-[var(--bg-card)]  text-[var(--text-primary)]  focus:outline-none focus:border-[var(--accent)]"
                     required
                   >
                     <option value="active">Active</option>
@@ -1221,7 +1221,7 @@ export default function Money() {
                       setShowAddModal(false);
                       setEditingSubscription(null);
                     }}
-                    className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300"
+                    className="flex-1 px-4 py-2 border border-[var(--border-subtle)]  rounded-lg hover:bg-[var(--bg-surface)]  transition-colors text-[var(--text-secondary)] "
                   >
                     Cancel
                   </button>

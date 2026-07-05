@@ -1,20 +1,22 @@
 import { useState } from 'react';
 import PageHeader from '../layout/PageHeader';
 import Button from '../ui/Button';
+import MomentumChip from './MomentumChip';
 import { cn } from '../../lib/cn';
 
 /**
  * Today Header Component
  * Enterprise header with greeting, date, time pill, and Quick Add menu
  */
-export default function TodayHeader({ 
-  greeting, 
-  currentDate, 
+export default function TodayHeader({
+  greeting,
+  currentDate,
   currentTime,
   onQuickAddIntention,
   onQuickAddTask,
   onQuickAddEvent,
-  onQuickAddThought
+  onQuickAddThought,
+  onEnterFocusMode
 }) {
   const [showQuickAddMenu, setShowQuickAddMenu] = useState(false);
 
@@ -43,6 +45,16 @@ export default function TodayHeader({
         </div>
       }
       actions={
+        <div className="flex items-center gap-3">
+          <MomentumChip />
+          {onEnterFocusMode && (
+            <Button variant="ghost" size="sm" onClick={onEnterFocusMode} title="Enter focus mode - hide everything but your next task">
+              <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V6a2 2 0 012-2h2M4 16v2a2 2 0 002 2h2m8-16h2a2 2 0 012 2v2m-4 12h2a2 2 0 002-2v-2" />
+              </svg>
+              Focus
+            </Button>
+          )}
         <div className="relative">
           <Button
             variant="secondary"
@@ -62,7 +74,7 @@ export default function TodayHeader({
                 onClick={() => setShowQuickAddMenu(false)}
               />
               <div
-                className="absolute right-0 mt-2 w-56 rounded-lg shadow-lg py-2 z-20 border"
+                className="absolute right-0 mt-2 w-56 rounded-2xl shadow-calm-lg py-2 z-20 border"
                 style={{
                   backgroundColor: 'var(--bg-modal)',
                   borderColor: 'var(--border-subtle)'
@@ -111,6 +123,7 @@ export default function TodayHeader({
               </div>
             </>
           )}
+        </div>
         </div>
       }
     />

@@ -440,24 +440,24 @@ export default function Emotions() {
         <div className="max-w-6xl mx-auto px-6 lg:px-8 py-16">
           {/* Hero Section */}
           <div className="text-center mb-12">
-            <h1 className="text-h2 text-gray-900 mb-4">
+            <h1 className="text-h2 text-[var(--text-primary)] mb-4">
               You don't need to be <span className="italic text-[#3B6E5C]">okay</span> here.
             </h1>
-            <p className="text-body text-gray-600 max-w-xl mx-auto">
+            <p className="text-body text-[var(--text-secondary)] max-w-xl mx-auto">
               This is your private space to let things out. No judgment, no audience.
             </p>
           </div>
 
           {/* Message Dialog Box */}
           <div className="max-w-3xl mx-auto mb-12">
-            <div className="bg-white rounded-2xl border border-[#ECEFF1] shadow-[0_4px_16px_rgba(0,0,0,0.06)] overflow-hidden">
+            <div className="bg-[var(--bg-card)] rounded-2xl border border-[#ECEFF1] shadow-[0_4px_16px_rgba(0,0,0,0.06)] overflow-hidden">
               {/* Text Area or Recording Preview */}
               <div className="relative">
                 {audioUrl && !isRecording ? (
                   // Show audio preview after recording
                   <div className="px-6 py-5">
                     <div className="mb-4">
-                      <p className="text-sm text-gray-600 mb-3">Recording preview</p>
+                      <p className="text-sm text-[var(--text-secondary)] mb-3">Recording preview</p>
                       <audio controls src={audioUrl} className="w-full h-10 mb-3" />
                       
                       <div className="flex items-center gap-3">
@@ -474,7 +474,7 @@ export default function Emotions() {
                             setAudioBlob(null);
                             setRecordingTime(0);
                           }}
-                          className="px-5 py-2.5 bg-white border border-[#ECEFF1] text-[#1F2933] rounded-lg hover:bg-[#FAFAFA] transition-all text-sm font-medium"
+                          className="px-5 py-2.5 bg-[var(--bg-card)] border border-[#ECEFF1] text-[#1F2933] rounded-lg hover:bg-[#FAFAFA] transition-all text-sm font-medium"
                         >
                           Record Again
                         </button>
@@ -487,7 +487,7 @@ export default function Emotions() {
                       value={content}
                       onChange={(e) => setContent(e.target.value)}
                       placeholder="What's on your mind? Let it out here..."
-                      className="w-full px-6 py-5 pr-16 min-h-[200px] max-h-[400px] resize-none border-0 focus:outline-none focus:ring-0 text-gray-900 placeholder:text-gray-400 text-lg leading-relaxed font-sans"
+                      className="w-full px-6 py-5 pr-16 min-h-[200px] max-h-[400px] resize-none border-0 focus:outline-none focus:ring-0 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] text-lg leading-relaxed font-sans"
                       style={{
                         fontFamily: 'inherit'
                       }}
@@ -497,15 +497,15 @@ export default function Emotions() {
                     <div className="absolute bottom-4 right-4 flex items-center gap-3">
                       {isRecording ? (
                         <div className="flex items-center gap-3">
-                          <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full border text-black">
-                            <div className="w-2 h-2 bg-gray-1000 rounded-full animate-pulse"></div>
-                            <span className="text-black text-sm font-medium">
+                          <div className="flex items-center gap-2 px-4 py-2 bg-[var(--bg-surface)] rounded-full border text-[var(--text-primary)]">
+                            <div className="w-2 h-2 bg-[var(--error)] rounded-full animate-pulse"></div>
+                            <span className="text-[var(--text-primary)] text-sm font-medium">
                               {Math.floor(recordingTime / 60)}:{(recordingTime % 60).toString().padStart(2, '0')}
                             </span>
                           </div>
                           <button
                             onClick={handleStopRecording}
-                            className="w-10 h-10 bg-gray-1000 text-white rounded-full flex items-center justify-center hover:text-black transition-colors shadow-lg"
+                            className="w-10 h-10 bg-[var(--error)] text-white rounded-full flex items-center justify-center hover:text-[var(--text-primary)] transition-colors shadow-lg"
                             title="Stop recording"
                           >
                             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -519,7 +519,7 @@ export default function Emotions() {
                             <button
                               onClick={handleSaveText}
                               disabled={saving || !content.trim()}
-                              className="px-6 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all text-sm font-semibold shadow-md"
+                              className="px-6 py-2.5 bg-[var(--text-primary)] text-white rounded-lg hover:bg-[var(--accent-hover)] disabled:opacity-50 disabled:cursor-not-allowed transition-all text-sm font-semibold shadow-md"
                             >
                               {saving ? 'Saving...' : 'Save'}
                             </button>
@@ -545,13 +545,13 @@ export default function Emotions() {
               
               {/* Footer with Privacy */}
               <div className="px-6 py-4 bg-[#FAFAFA] flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sm text-gray-600">
+                <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
                   </svg>
                   <span className="font-medium">Private by design</span>
                 </div>
-                <div className="text-xs text-gray-600">
+                <div className="text-xs text-[var(--text-secondary)]">
                   Nothing here is shared or analyzed
                 </div>
               </div>
@@ -567,13 +567,13 @@ export default function Emotions() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search entries..."
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-gray-900"
+                  className="flex-1 px-4 py-2 border border-[var(--border-subtle)] rounded-lg focus:outline-none focus:border-[var(--accent)]"
                 />
                 <div className="flex items-center gap-2">
                   <button
                     onClick={handleExportEntries}
                     disabled={exporting}
-                    className="px-4 py-2 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 transition-colors text-sm font-semibold disabled:opacity-50"
+                    className="px-4 py-2 bg-[var(--bg-surface)] text-[var(--text-primary)] rounded-lg hover:bg-[var(--border-subtle)] transition-colors text-sm font-semibold disabled:opacity-50"
                   >
                     {exporting ? 'Exporting...' : 'Export'}
                   </button>
@@ -593,8 +593,8 @@ export default function Emotions() {
                     onClick={() => setFilter(f)}
                     className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                       filter === f
-                        ? 'bg-gray-900 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        ? 'bg-[var(--text-primary)] text-white'
+                        : 'bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:bg-[var(--border-subtle)]'
                     }`}
                   >
                     {f.charAt(0).toUpperCase() + f.slice(1)}
@@ -608,7 +608,7 @@ export default function Emotions() {
           {filteredEntries.length > 0 && (
             <div className="mt-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-h3 text-gray-900">
+                <h2 className="text-h3 text-[var(--text-primary)]">
                   {searchQuery ? `Search Results (${filteredEntries.length})` : 'Recent Unloads'}
                 </h2>
                 <button
@@ -616,7 +616,7 @@ export default function Emotions() {
                     setShowHistory(true);
                     setView('home');
                   }}
-                  className="px-4 py-2 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 transition-colors text-sm font-semibold flex items-center gap-2"
+                  className="px-4 py-2 bg-[var(--bg-surface)] text-[var(--text-primary)] rounded-lg hover:bg-[var(--border-subtle)] transition-colors text-sm font-semibold flex items-center gap-2"
                 >
                   View all
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -632,7 +632,7 @@ export default function Emotions() {
                   return (
                     <div 
                       key={entry.id} 
-                      className="bg-white rounded-xl p-6 border-2 border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all relative group"
+                      className="bg-[var(--bg-card)] rounded-xl p-6 border-2 border-[var(--border-subtle)] hover:border-[var(--border-subtle)] hover:shadow-lg transition-all relative group"
                     >
                       {/* Left indicator */}
                       <div 
@@ -657,7 +657,7 @@ export default function Emotions() {
                         <div className="flex-1 min-w-0">
                           {isPlaying && entry.type === 'voice' ? (
                             <div>
-                              <p className="text-gray-900 font-semibold mb-3 text-lg">Listening to: {entry.transcript || entry.content || 'Voice Entry'}</p>
+                              <p className="text-[var(--text-primary)] font-semibold mb-3 text-lg">Listening to: {entry.transcript || entry.content || 'Voice Entry'}</p>
                               {entry.audio_url && (
                                 <div className="mb-2">
                                   <audio 
@@ -687,23 +687,23 @@ export default function Emotions() {
                           ) : (
                             <div>
                               <div className="flex items-center gap-2 mb-3">
-                                <p className="text-h6 text-gray-900">
+                                <p className="text-h6 text-[var(--text-primary)]">
                                   {entry.type === 'text' 
                                     ? `Written Entry (~${getWordCount(entry.content)} words)`
                                     : `Voice Entry (${Math.floor((entry.duration || 0) / 60)}:${((entry.duration || 0) % 60).toString().padStart(2, '0')})`
                                   }
                                 </p>
                                 {entry.locked && (
-                                  <span className="text-gray-500 text-sm">🔒</span>
+                                  <span className="text-[var(--text-muted)] text-sm">🔒</span>
                                 )}
                               </div>
                               {/* Voice entries are audio-only now; no transcript snippet shown */}
                               {entry.type === 'text' && entry.content && (
-                                <p className="text-body-sm text-gray-800 mb-3 line-clamp-3">
+                                <p className="text-body-sm text-[var(--text-primary)] mb-3 line-clamp-3">
                                   {entry.content}
                                 </p>
                               )}
-                              <p className="text-caption text-gray-600">{getHumanTime(entry.created_at)}</p>
+                              <p className="text-caption text-[var(--text-secondary)]">{getHumanTime(entry.created_at)}</p>
                             </div>
                           )}
                         </div>
@@ -728,7 +728,7 @@ export default function Emotions() {
                                   }
                                 }, 100);
                               }}
-                              className="px-5 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 hover:shadow-md transition-all text-body-sm font-semibold"
+                              className="px-5 py-2.5 bg-[var(--text-primary)] text-white rounded-lg hover:bg-[var(--accent-hover)] hover:shadow-md transition-all text-body-sm font-semibold"
                             >
                               ▶ Play
                             </button>
@@ -738,14 +738,14 @@ export default function Emotions() {
                                 setSelectedEntry(entry);
                                 setView('read');
                               }}
-                              className="px-5 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 hover:shadow-md transition-all text-body-sm font-semibold"
+                              className="px-5 py-2.5 bg-[var(--text-primary)] text-white rounded-lg hover:bg-[var(--accent-hover)] hover:shadow-md transition-all text-body-sm font-semibold"
                             >
                               Read
                             </button>
                           ) : null}
                           <button
                             onClick={() => handleEditEntry(entry)}
-                            className="p-2.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                            className="p-2.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)] rounded-lg transition-colors"
                             title="Edit"
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -758,7 +758,7 @@ export default function Emotions() {
                                 handleDeleteEntry(entry.id);
                               }
                             }}
-                            className="p-2.5 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            className="p-2.5 text-[var(--text-secondary)] hover:text-[var(--error)] hover:bg-red-50 rounded-lg transition-colors"
                             title="Delete"
                           >
                             🗑️
@@ -777,7 +777,7 @@ export default function Emotions() {
                       setShowHistory(true);
                       setView('home');
                     }}
-                    className="px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm font-semibold shadow-md"
+                    className="px-6 py-3 bg-[var(--text-primary)] text-white rounded-lg hover:bg-[var(--accent-hover)] transition-colors text-sm font-semibold shadow-md"
                   >
                     View all {filteredEntries.length} entries →
                   </button>
@@ -789,12 +789,12 @@ export default function Emotions() {
           {/* Empty State */}
           {filteredEntries.length === 0 && (
             <div className="mt-16 text-center max-w-2xl mx-auto">
-              <div className="bg-white rounded-2xl p-12 border border-gray-200 shadow-sm">
+              <div className="bg-[var(--bg-card)] rounded-2xl p-12 border border-[var(--border-subtle)] shadow-sm">
                 <div className="text-6xl mb-6">📝</div>
-                <h3 className="text-2xl font-medium text-gray-900 mb-3">
+                <h3 className="text-2xl font-medium text-[var(--text-primary)] mb-3">
                   {searchQuery ? 'No entries found' : entries.length === 0 ? 'No entries yet' : 'No entries match your filters'}
                 </h3>
-                <p className="text-gray-600 text-lg mb-6">
+                <p className="text-[var(--text-secondary)] text-lg mb-6">
                   {searchQuery 
                     ? 'Try adjusting your search query or filters.'
                     : 'Start by writing or recording your thoughts.'
@@ -806,7 +806,7 @@ export default function Emotions() {
                       setSearchQuery('');
                       setFilter('all');
                     }}
-                    className="px-4 py-2 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 transition-colors text-sm"
+                    className="px-4 py-2 bg-[var(--bg-surface)] text-[var(--text-primary)] rounded-lg hover:bg-[var(--border-subtle)] transition-colors text-sm"
                   >
                     Clear filters
                   </button>
@@ -817,7 +817,7 @@ export default function Emotions() {
 
           {/* Emotional Success Message */}
           {showSaveMessage && (
-            <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-white rounded-full px-6 py-3 shadow-lg border border-gray-300 z-50 animate-fade-in-up">
+            <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-[var(--bg-card)] rounded-full px-6 py-3 shadow-lg border border-[var(--border-subtle)] z-50 animate-fade-in-up">
               <p className="text-[#1F2933] text-sm font-medium">
                 You don't have to carry this alone here.
               </p>
@@ -825,21 +825,21 @@ export default function Emotions() {
           )}
 
           {/* Footer */}
-          <div className="mt-20 pt-8 border-t border-gray-300 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-gray-600 italic text-sm">
+          <div className="mt-20 pt-8 border-t border-[var(--border-subtle)] flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-[var(--text-secondary)] italic text-sm">
               "The weight of words decreases once they are outside."
             </p>
             <div className="flex items-center gap-6 text-sm">
-              <a href="#" className="text-gray-600 hover:text-black transition-colors">SUPPORT</a>
-              <a href="#" className="text-gray-600 hover:text-black transition-colors">DATA PRIVACY</a>
-              <a href="#" className="text-gray-600 hover:text-black transition-colors">TERMS</a>
+              <a href="#" className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">SUPPORT</a>
+              <a href="#" className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">DATA PRIVACY</a>
+              <a href="#" className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">TERMS</a>
             </div>
           </div>
         </div>
 
         {/* Floating Action Button - Gentler */}
         <button
-          className="fixed bottom-8 right-8 w-12 h-12 bg-white text-black rounded-full border border-gray-300 hover:shadow-md transition-all flex items-center justify-center text-xl z-50 opacity-80 hover:opacity-100"
+          className="fixed bottom-8 right-8 w-12 h-12 bg-[var(--bg-card)] text-[var(--text-primary)] rounded-full border border-[var(--border-subtle)] hover:shadow-md transition-all flex items-center justify-center text-xl z-50 opacity-80 hover:opacity-100"
           title="Settings"
           style={{
             boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
@@ -858,19 +858,19 @@ export default function Emotions() {
         <div className="max-w-5xl mx-auto px-6 lg:px-8">
           {/* Top Microcopy */}
           <div className="mb-8 text-center">
-            <p className="text-lg text-gray-600 italic">
+            <p className="text-lg text-[var(--text-secondary)] italic">
               You can write nonsense here.<br />
               You don't need to sound strong.
             </p>
           </div>
 
           {/* Writing Area */}
-          <div className="bg-white rounded-3xl p-12 border border-gray-300 mb-8 min-h-[500px]">
+          <div className="bg-[var(--bg-card)] rounded-3xl p-12 border border-[var(--border-subtle)] mb-8 min-h-[500px]">
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder=""
-              className="w-full h-full min-h-[400px] bg-transparent border-none resize-none focus:outline-none text-black text-xl leading-relaxed placeholder:text-gray-500"
+              className="w-full h-full min-h-[400px] bg-transparent border-none resize-none focus:outline-none text-[var(--text-primary)] text-xl leading-relaxed placeholder:text-[var(--text-muted)]"
               autoFocus
             />
           </div>
@@ -880,7 +880,7 @@ export default function Emotions() {
             <button
               onClick={handleSaveText}
               disabled={!content.trim() || saving}
-              className="px-8 py-3 bg-black text-ofa-cream rounded-xl hover:bg-black disabled:opacity-50 transition-colors"
+              className="px-8 py-3 bg-[var(--accent)] text-ofa-cream rounded-xl hover:bg-[var(--accent-hover)] disabled:opacity-50 transition-colors"
             >
               {saving ? 'Saving...' : 'Save'}
             </button>
@@ -893,7 +893,7 @@ export default function Emotions() {
                   });
                 }
               }}
-              className="px-8 py-3 bg-white border border-gray-300 text-gray-600 rounded-xl hover:bg-gray-100 transition-colors"
+              className="px-8 py-3 bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-secondary)] rounded-xl hover:bg-[var(--bg-surface)] transition-colors"
             >
               Lock this
             </button>
@@ -902,7 +902,7 @@ export default function Emotions() {
                 setView('home');
                 setContent('');
               }}
-              className="px-8 py-3 bg-white border border-gray-300 text-gray-600 rounded-xl hover:bg-gray-100 transition-colors"
+              className="px-8 py-3 bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-secondary)] rounded-xl hover:bg-[var(--bg-surface)] transition-colors"
             >
               Discard
             </button>
@@ -911,7 +911,7 @@ export default function Emotions() {
           {/* After Save Feedback */}
           {saved && !showLockPrompt && (
             <div className="mt-12 text-center">
-              <p className="text-xl text-black mb-6 leading-relaxed">
+              <p className="text-xl text-[var(--text-primary)] mb-6 leading-relaxed">
                 Thanks for letting that out.<br />
                 You don't have to carry it alone here.
               </p>
@@ -920,7 +920,7 @@ export default function Emotions() {
                   setView('home');
                   setSaved(false);
                 }}
-                className="px-8 py-3 bg-black text-white rounded-xl hover:bg-black/90 transition-colors"
+                className="px-8 py-3 bg-[var(--accent)] text-white rounded-xl hover:opacity-90 transition-colors"
               >
                 Back to Unload
               </button>
@@ -930,11 +930,11 @@ export default function Emotions() {
           {/* Lock Prompt */}
           {showLockPrompt && newEntryId && (
             <div className="mt-12 text-center">
-              <p className="text-lg text-gray-600 mb-6">Want to lock this entry?</p>
+              <p className="text-lg text-[var(--text-secondary)] mb-6">Want to lock this entry?</p>
               <div className="flex items-center justify-center gap-4">
                 <button
                   onClick={() => handleLockEntry(newEntryId, true)}
-                  className="px-8 py-3 bg-black text-ofa-cream rounded-xl hover:bg-black transition-colors"
+                  className="px-8 py-3 bg-[var(--accent)] text-ofa-cream rounded-xl hover:bg-[var(--accent-hover)] transition-colors"
                 >
                   Lock it
                 </button>
@@ -943,7 +943,7 @@ export default function Emotions() {
                     setShowLockPrompt(false);
                     setShowRelief(true);
                   }}
-                  className="px-8 py-3 bg-white border border-gray-300 text-gray-600 rounded-xl hover:bg-gray-100 transition-colors"
+                  className="px-8 py-3 bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-secondary)] rounded-xl hover:bg-[var(--bg-surface)] transition-colors"
                 >
                   Leave it unlocked
                 </button>
@@ -954,14 +954,14 @@ export default function Emotions() {
           {/* Relief Tools */}
           {showRelief && (
             <div className="mt-12 text-center">
-              <p className="text-lg text-gray-600 mb-6">Want a small moment before you move on?</p>
+              <p className="text-lg text-[var(--text-secondary)] mb-6">Want a small moment before you move on?</p>
               <div className="flex items-center justify-center gap-4 flex-wrap">
                 <button
                   onClick={() => {
                     setShowRelief(false);
                     setView('home');
                   }}
-                  className="px-6 py-2 bg-black/10 text-black rounded-xl hover:bg-black/20 transition-colors"
+                  className="px-6 py-2 bg-black/10 text-[var(--text-primary)] rounded-xl hover:bg-black/20 transition-colors"
                 >
                   Take 30 seconds
                 </button>
@@ -970,7 +970,7 @@ export default function Emotions() {
                     setView('write');
                     setShowRelief(false);
                   }}
-                  className="px-6 py-2 bg-black/10 text-black rounded-xl hover:bg-black/20 transition-colors"
+                  className="px-6 py-2 bg-black/10 text-[var(--text-primary)] rounded-xl hover:bg-black/20 transition-colors"
                 >
                   Write one more line
                 </button>
@@ -979,7 +979,7 @@ export default function Emotions() {
                     setShowRelief(false);
                     setView('home');
                   }}
-                  className="px-6 py-2 bg-white border border-gray-300 text-gray-600 rounded-xl hover:bg-gray-100 transition-colors"
+                  className="px-6 py-2 bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-secondary)] rounded-xl hover:bg-[var(--bg-surface)] transition-colors"
                 >
                   I'm good
                 </button>
@@ -1005,7 +1005,7 @@ export default function Emotions() {
           <div className="flex items-center justify-center gap-4">
             <button
               onClick={handleStartRecording}
-              className="px-12 py-4 bg-black text-ofa-cream rounded-xl hover:bg-black transition-colors text-lg"
+              className="px-12 py-4 bg-[var(--accent)] text-ofa-cream rounded-xl hover:bg-[var(--accent-hover)] transition-colors text-lg"
             >
               Start recording
             </button>
@@ -1045,12 +1045,12 @@ export default function Emotions() {
           {/* Microphone with LIVE badge */}
           <div className="relative mb-12">
             <div className="relative w-48 h-48 mx-auto">
-              <div className="absolute inset-0 rounded-full bg-gray-1000/20 animate-ping"></div>
-              <div className="absolute inset-0 rounded-full bg-gray-1000/30 animate-pulse"></div>
-              <div className="relative w-48 h-48 rounded-full bg-gray-1000/40 flex items-center justify-center">
+              <div className="absolute inset-0 rounded-full bg-[var(--error)]/20 animate-ping"></div>
+              <div className="absolute inset-0 rounded-full bg-[var(--error)]/30 animate-pulse"></div>
+              <div className="relative w-48 h-48 rounded-full bg-[var(--error)]/40 flex items-center justify-center">
                 <div className="text-6xl">🎙️</div>
               </div>
-              <div className="absolute -top-2 -right-2 bg-gray-1000 text-white px-3 py-1 rounded-full text-sm font-bold">
+              <div className="absolute -top-2 -right-2 bg-[var(--error)] text-white px-3 py-1 rounded-full text-sm font-bold">
                 LIVE
               </div>
             </div>
@@ -1063,7 +1063,7 @@ export default function Emotions() {
                 <div className="text-4xl font-mono text-white">{minutes.toString().padStart(2, '0')}</div>
                 <div className="text-sm text-white/70 mt-1">MINUTES</div>
               </div>
-              <div className="text-black text-4xl font-bold">:</div>
+              <div className="text-[var(--text-primary)] text-4xl font-bold">:</div>
               <div className="text-black/50 rounded-xl px-6 py-4 border text-black/50">
                 <div className="text-4xl font-mono text-white">{seconds.toString().padStart(2, '0')}</div>
                 <div className="text-sm text-white/70 mt-1">SECONDS</div>
@@ -1075,10 +1075,10 @@ export default function Emotions() {
           <div className="flex items-center justify-center gap-4">
             <button
               onClick={handleStopRecording}
-              className="px-12 py-4 bg-gray-1000 text-white rounded-xl hover:text-black transition-colors text-lg flex items-center gap-3"
+              className="px-12 py-4 bg-[var(--error)] text-white rounded-xl hover:text-[var(--text-primary)] transition-colors text-lg flex items-center gap-3"
             >
-              <div className="w-6 h-6 bg-white rounded flex items-center justify-center">
-                <div className="w-3 h-3 bg-gray-1000 rounded-sm"></div>
+              <div className="w-6 h-6 bg-[var(--bg-card)] rounded flex items-center justify-center">
+                <div className="w-3 h-3 bg-[var(--error)] rounded-sm"></div>
               </div>
               <span>Stop Recording</span>
             </button>
@@ -1115,9 +1115,9 @@ export default function Emotions() {
     return (
       <div className="min-h-screen bg-black/10 py-12">
         <div className="max-w-4xl mx-auto px-6 lg:px-8">
-          <div className="bg-white rounded-3xl p-8 border border-gray-300 mb-8">
+          <div className="bg-[var(--bg-card)] rounded-3xl p-8 border border-[var(--border-subtle)] mb-8">
             <div className="text-center mb-6">
-              <p className="text-sm text-gray-500 mb-2">
+              <p className="text-sm text-[var(--text-muted)] mb-2">
                 Recorded — {formatDate(new Date().toISOString())} {formatTimeOnly(new Date().toISOString())}
               </p>
               <audio controls src={audioUrl} className="w-full max-w-md mx-auto" />
@@ -1128,7 +1128,7 @@ export default function Emotions() {
             <button
               onClick={handleSaveVoice}
               disabled={saving}
-              className="px-8 py-3 bg-black text-ofa-cream rounded-xl hover:bg-black disabled:opacity-50 transition-colors"
+              className="px-8 py-3 bg-[var(--accent)] text-ofa-cream rounded-xl hover:bg-[var(--accent-hover)] disabled:opacity-50 transition-colors"
             >
               {saving ? 'Saving...' : 'Save recording'}
             </button>
@@ -1138,7 +1138,7 @@ export default function Emotions() {
                 setAudioBlob(null);
                 setRecordingTime(0);
               }}
-              className="px-8 py-3 bg-white border border-gray-300 text-gray-600 rounded-xl hover:bg-gray-100 transition-colors"
+              className="px-8 py-3 bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-secondary)] rounded-xl hover:bg-[var(--bg-surface)] transition-colors"
             >
               Record again
             </button>
@@ -1148,7 +1148,7 @@ export default function Emotions() {
                 setAudioUrl(null);
                 setAudioBlob(null);
               }}
-              className="px-8 py-3 bg-white border border-gray-300 text-gray-600 rounded-xl hover:bg-gray-100 transition-colors"
+              className="px-8 py-3 bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-secondary)] rounded-xl hover:bg-[var(--bg-surface)] transition-colors"
             >
               Discard
             </button>
@@ -1157,7 +1157,7 @@ export default function Emotions() {
           {/* After Save Feedback */}
           {saved && (
             <div className="mt-12 text-center">
-              <p className="text-xl text-black mb-6 leading-relaxed">
+              <p className="text-xl text-[var(--text-primary)] mb-6 leading-relaxed">
                 You don't have to solve this today.<br />
                 You already did something brave — you let it out.
               </p>
@@ -1166,7 +1166,7 @@ export default function Emotions() {
                   setView('home');
                   setSaved(false);
                 }}
-                className="px-8 py-3 bg-black text-white rounded-xl hover:bg-black/90 transition-colors"
+                className="px-8 py-3 bg-[var(--accent)] text-white rounded-xl hover:opacity-90 transition-colors"
               >
                 Back to Unload
               </button>
@@ -1189,28 +1189,28 @@ export default function Emotions() {
                 setSelectedEntry(null);
                 setView('home');
               }}
-              className="text-body-sm text-gray-600 hover:text-gray-900 transition-colors mb-6 flex items-center gap-2 font-medium"
+              className="text-body-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors mb-6 flex items-center gap-2 font-medium"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
               Back to Unload
             </button>
-            <div className="flex items-start justify-between mb-8 pb-6 border-b border-gray-200">
+            <div className="flex items-start justify-between mb-8 pb-6 border-b border-[var(--border-subtle)]">
               <div className="flex-1">
-                <h1 className="text-h3 text-gray-900 mb-3">Written Entry</h1>
+                <h1 className="text-h3 text-[var(--text-primary)] mb-3">Written Entry</h1>
                 <div className="flex items-center gap-4 flex-wrap">
-                  <p className="text-caption text-gray-600">
+                  <p className="text-caption text-[var(--text-secondary)]">
                     {formatDate(selectedEntry.created_at)}
                   </p>
-                  <span className="text-gray-300">•</span>
-                  <p className="text-caption text-gray-600">
+                  <span className="text-[var(--text-muted)]">•</span>
+                  <p className="text-caption text-[var(--text-secondary)]">
                     {getWordCount(selectedEntry.content)} words
                   </p>
                   {selectedEntry.locked && (
                     <>
-                      <span className="text-gray-300">•</span>
-                      <div className="flex items-center gap-2 text-caption text-gray-600">
+                      <span className="text-[var(--text-muted)]">•</span>
+                      <div className="flex items-center gap-2 text-caption text-[var(--text-secondary)]">
                         <span>🔒</span>
                         <span>Locked</span>
                       </div>
@@ -1222,20 +1222,20 @@ export default function Emotions() {
           </div>
 
           {/* Content Card */}
-          <div className="bg-white rounded-2xl p-8 md:p-12 border-2 border-gray-200 shadow-lg mb-8">
+          <div className="bg-[var(--bg-card)] rounded-2xl p-8 md:p-12 border-2 border-[var(--border-subtle)] shadow-lg mb-8">
             <div className="prose prose-lg max-w-none">
-              <div className="text-body whitespace-pre-wrap text-gray-900 leading-relaxed">
+              <div className="text-body whitespace-pre-wrap text-[var(--text-primary)] leading-relaxed">
                 {selectedEntry.content}
               </div>
             </div>
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-between flex-wrap gap-4 pt-6 border-t border-gray-200">
+          <div className="flex items-center justify-between flex-wrap gap-4 pt-6 border-t border-[var(--border-subtle)]">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => handleEditEntry(selectedEntry)}
-                className="px-6 py-3 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 transition-colors text-body-sm font-semibold flex items-center gap-2 border-2 border-gray-300"
+                className="px-6 py-3 bg-[var(--bg-surface)] text-[var(--text-primary)] rounded-lg hover:bg-[var(--border-subtle)] transition-colors text-body-sm font-semibold flex items-center gap-2 border-2 border-[var(--border-subtle)]"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -1245,7 +1245,7 @@ export default function Emotions() {
               {!selectedEntry.locked ? (
                 <button
                   onClick={() => handleLockEntry(selectedEntry.id, true)}
-                  className="px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-body-sm font-semibold flex items-center gap-2 shadow-md"
+                  className="px-6 py-3 bg-[var(--text-primary)] text-white rounded-lg hover:bg-[var(--accent-hover)] transition-colors text-body-sm font-semibold flex items-center gap-2 shadow-md"
                 >
                   <span>🔒</span>
                   <span>Lock Entry</span>
@@ -1253,7 +1253,7 @@ export default function Emotions() {
               ) : (
                 <button
                   onClick={() => handleLockEntry(selectedEntry.id, false)}
-                  className="px-6 py-3 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 transition-colors text-body-sm font-semibold flex items-center gap-2 border-2 border-gray-300"
+                  className="px-6 py-3 bg-[var(--bg-surface)] text-[var(--text-primary)] rounded-lg hover:bg-[var(--border-subtle)] transition-colors text-body-sm font-semibold flex items-center gap-2 border-2 border-[var(--border-subtle)]"
                 >
                   <span>🔓</span>
                   <span>Unlock Entry</span>
@@ -1315,7 +1315,7 @@ export default function Emotions() {
                     onClick={() => setFilter(f)}
                     className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                       filter === f
-                        ? 'bg-white text-black'
+                        ? 'bg-[var(--bg-card)] text-[var(--text-primary)]'
                         : 'bg-black/30 text-white/80 hover:bg-black/50'
                     }`}
                   >
@@ -1341,7 +1341,7 @@ export default function Emotions() {
             <div className="mt-4">
               <button
                 onClick={() => setView('home')}
-                className="px-6 py-2 bg-black text-white rounded-xl hover:bg-black/90 transition-colors text-sm"
+                className="px-6 py-2 bg-[var(--accent)] text-white rounded-xl hover:opacity-90 transition-colors text-sm"
               >
                 + New Unload
               </button>
@@ -1361,7 +1361,7 @@ export default function Emotions() {
                 onClick={() => setFilter(f.id)}
                 className={`px-4 py-2 rounded-xl transition-colors text-sm flex items-center gap-2 ${
                   filter === f.id
-                    ? 'bg-black text-white'
+                    ? 'bg-[var(--accent)] text-white'
                     : 'bg-white/10 text-white/80 hover:bg-white/20'
                 }`}
               >
@@ -1454,7 +1454,7 @@ export default function Emotions() {
                                 setView(entry.type === 'text' ? 'read' : 'home');
                               }
                             }}
-                            className="px-4 py-2 bg-black text-white rounded-xl hover:bg-black/90 transition-colors text-sm"
+                            className="px-4 py-2 bg-[var(--accent)] text-white rounded-xl hover:opacity-90 transition-colors text-sm"
                           >
                             Unlock & View
                           </button>
@@ -1465,7 +1465,7 @@ export default function Emotions() {
                               setSelectedEntry(entry);
                               setView(entry.type === 'text' ? 'read' : 'home');
                             }}
-                            className="px-4 py-2 bg-black text-white rounded-xl hover:bg-black/90 transition-colors text-sm"
+                            className="px-4 py-2 bg-[var(--accent)] text-white rounded-xl hover:opacity-90 transition-colors text-sm"
                           >
                             {entry.type === 'text' ? 'Read Entry' : 'Open Entry'}
                           </button>
@@ -1569,14 +1569,14 @@ export default function Emotions() {
 
     return (
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="bg-[var(--bg-card)] rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
           <div className="p-8">
             <div className="flex items-start justify-between mb-6">
               <div>
-                <h2 className="font-display text-2xl text-black mb-2">
+                <h2 className="font-display text-2xl text-[var(--text-primary)] mb-2">
                   {entry.type === 'text' ? 'Edit Entry' : 'Edit Transcript'}
                 </h2>
-                <p className="text-gray-600 text-sm">
+                <p className="text-[var(--text-secondary)] text-sm">
                   {entry.type === 'text' 
                     ? 'Update the content of your text entry'
                     : 'Add or update the transcript for this voice entry'
@@ -1589,7 +1589,7 @@ export default function Emotions() {
                   setEditingContent('');
                   setEditingTranscript('');
                 }}
-                className="text-gray-600 hover:text-black transition-colors text-2xl"
+                className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors text-2xl"
               >
                 ×
               </button>
@@ -1598,15 +1598,15 @@ export default function Emotions() {
             {entry.type === 'text' ? (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-black mb-2">Content</label>
+                  <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Content</label>
                   <textarea
                     value={editingContent}
                     onChange={(e) => setEditingContent(e.target.value)}
                     rows={12}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-gray-900 resize-none"
+                    className="w-full px-4 py-3 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-[var(--accent)] resize-none"
                     placeholder="Enter your thoughts..."
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-[var(--text-muted)] mt-1">
                     {getWordCount(editingContent)} words
                   </p>
                 </div>
@@ -1614,42 +1614,42 @@ export default function Emotions() {
             ) : (
               <div className="space-y-4">
                 {entry.audio_url && (
-                  <div className="bg-gray-50 rounded-xl p-4">
-                    <p className="text-sm text-gray-600 mb-2">Audio Recording</p>
+                  <div className="bg-[var(--bg-surface)] rounded-xl p-4">
+                    <p className="text-sm text-[var(--text-secondary)] mb-2">Audio Recording</p>
                     <audio controls src={entry.audio_url} className="w-full" />
                   </div>
                 )}
                 <div>
-                  <label className="block text-sm font-medium text-black mb-2">Transcript</label>
+                  <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Transcript</label>
                   <textarea
                     value={editingTranscript}
                     onChange={(e) => setEditingTranscript(e.target.value)}
                     rows={8}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-gray-900 resize-none"
+                    className="w-full px-4 py-3 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-[var(--accent)] resize-none"
                     placeholder="Add or edit the transcript for this voice entry..."
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-[var(--text-muted)] mt-1">
                     {getWordCount(editingTranscript)} words
                   </p>
                 </div>
               </div>
             )}
 
-            <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-300">
+            <div className="flex items-center justify-between mt-8 pt-6 border-t border-[var(--border-subtle)]">
               <button
                 onClick={() => {
                   setEditingEntryId(null);
                   setEditingContent('');
                   setEditingTranscript('');
                 }}
-                className="text-gray-600 hover:text-black transition-colors"
+                className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleUpdateEntry}
                 disabled={savingEdit || (entry.type === 'text' && !editingContent.trim())}
-                className="px-6 py-3 bg-black text-white rounded-xl hover:bg-black/90 disabled:opacity-50 transition-colors"
+                className="px-6 py-3 bg-[var(--accent)] text-white rounded-xl hover:opacity-90 disabled:opacity-50 transition-colors"
               >
                 {savingEdit ? 'Saving...' : 'Save Changes'}
               </button>

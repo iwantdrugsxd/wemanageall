@@ -301,7 +301,7 @@ export default function Library({ embedded = false }) {
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12 text-center">
-        <p className="text-gray-600">Loading resources...</p>
+        <p className="text-[var(--text-secondary)]">Loading resources...</p>
       </div>
     );
   }
@@ -312,12 +312,12 @@ export default function Library({ embedded = false }) {
       {!embedded && (
         <div className="flex items-start justify-between mb-8">
           <div>
-            <h1 className="font-display text-4xl md:text-5xl text-black mb-2">Resources</h1>
-            <p className="text-gray-600 text-lg">Curated intellectual assets and reading logs.</p>
+            <h1 className="font-display text-4xl md:text-5xl text-[var(--text-primary)] mb-2">Resources</h1>
+            <p className="text-[var(--text-secondary)] text-lg">Curated intellectual assets and reading logs.</p>
           </div>
           <button
             onClick={() => setShowAddModal(true)}
-            className="px-6 py-3 bg-black text-white rounded-xl hover:bg-gray-900 transition-colors flex items-center gap-2 font-medium"
+            className="px-6 py-3 bg-[var(--accent)] text-white rounded-xl hover:bg-[var(--accent-hover)] transition-colors flex items-center gap-2 font-medium"
           >
             <span className="text-xl">+</span>
             <span>Add Resource</span>
@@ -334,12 +334,12 @@ export default function Library({ embedded = false }) {
             value={searchQuery}
             onChange={(e) => handleSearchChange(e.target.value)}
             placeholder="Search by title, author, or notes..."
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-ofa-ink"
+            className="flex-1 px-4 py-2 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-ofa-ink"
           />
           <select
             value={selectedFolder}
             onChange={(e) => setSelectedFolder(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-ofa-ink"
+            className="px-4 py-2 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-ofa-ink"
           >
             <option value="all">All Folders</option>
             {folders.map(folder => (
@@ -349,7 +349,7 @@ export default function Library({ embedded = false }) {
           <select
             value={selectedPriority}
             onChange={(e) => setSelectedPriority(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-ofa-ink"
+            className="px-4 py-2 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-ofa-ink"
           >
             <option value="all">All Priorities</option>
             <option value="low">Low</option>
@@ -362,7 +362,7 @@ export default function Library({ embedded = false }) {
 
       {/* Category Navigation - only show if no error */}
       {!error && (
-      <div className="flex items-center gap-6 mb-8 border-b border-gray-300 pb-4">
+      <div className="flex items-center gap-6 mb-8 border-b border-[var(--border-subtle)] pb-4">
         {allCategories.map((cat) => {
           const isActive = (cat === 'All Resources' && selectedCategory === 'all') || 
                           (cat !== 'All Resources' && selectedCategory === cat);
@@ -372,8 +372,8 @@ export default function Library({ embedded = false }) {
               onClick={() => setSelectedCategory(cat === 'All Resources' ? 'all' : cat)}
               className={`text-sm font-medium transition-colors pb-2 ${
                 isActive
-                  ? 'text-black border-b-2 border-ofa-ink'
-                  : 'text-gray-600 hover:text-black'
+                  ? 'text-[var(--text-primary)] border-b-2 border-ofa-ink'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
               {cat}
@@ -386,7 +386,7 @@ export default function Library({ embedded = false }) {
       {/* Continue Reading Section - only show if no error */}
       {!error && continueReading.length > 0 && (
         <div className="mb-12">
-          <h2 className="font-display text-2xl text-black mb-4">Continue Reading</h2>
+          <h2 className="font-display text-2xl text-[var(--text-primary)] mb-4">Continue Reading</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {continueReading.map((resource) => (
               <ResourceCard
@@ -406,7 +406,7 @@ export default function Library({ embedded = false }) {
       selectedCategory === 'all' ? (
         Object.keys(groupedResources).map((category) => (
           <div key={category} className="mb-12">
-            <h2 className="font-display text-3xl text-black mb-6">{category}</h2>
+            <h2 className="font-display text-3xl text-[var(--text-primary)] mb-6">{category}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {groupedResources[category].filter(r => !continueReading.find(cr => cr.id === r.id)).map((resource) => (
                 <ResourceCard
@@ -422,7 +422,7 @@ export default function Library({ embedded = false }) {
         ))
       ) : (
         <div className="mb-12">
-          <h2 className="font-display text-3xl text-black mb-6">{selectedCategory}</h2>
+          <h2 className="font-display text-3xl text-[var(--text-primary)] mb-6">{selectedCategory}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {resources.filter(r => !continueReading.find(cr => cr.id === r.id)).map((resource) => (
                 <ResourceCard
@@ -441,10 +441,10 @@ export default function Library({ embedded = false }) {
       {/* Empty State - only show if no error */}
       {!error && resources.length === 0 && (
         <div className="text-center py-16">
-          <p className="text-gray-600 text-lg mb-4">No resources yet.</p>
+          <p className="text-[var(--text-secondary)] text-lg mb-4">No resources yet.</p>
           <button
             onClick={() => setShowAddModal(true)}
-            className="px-6 py-3 bg-black text-white rounded-xl hover:bg-gray-900 transition-colors"
+            className="px-6 py-3 bg-[var(--accent)] text-white rounded-xl hover:bg-[var(--accent-hover)] transition-colors"
           >
             Add Your First Resource
           </button>
@@ -461,22 +461,22 @@ export default function Library({ embedded = false }) {
           }}
         >
           <div
-            className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+            className="bg-[var(--bg-card)] rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-8">
               {/* Header */}
               <div className="flex items-start justify-between mb-6">
                 <div>
-                  <h2 className="font-display text-3xl text-black mb-2">Add New Resource</h2>
-                  <p className="text-gray-600 text-sm">Peaceful Professionalism — Organize your digital resources</p>
+                  <h2 className="font-display text-3xl text-[var(--text-primary)] mb-2">Add New Resource</h2>
+                  <p className="text-[var(--text-secondary)] text-sm">Peaceful Professionalism — Organize your digital resources</p>
                 </div>
                 <button
                   onClick={() => {
                     setShowAddModal(false);
                     resetForm();
                   }}
-                  className="text-gray-600 hover:text-black transition-colors text-2xl"
+                  className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors text-2xl"
                 >
                   ×
                 </button>
@@ -487,7 +487,7 @@ export default function Library({ embedded = false }) {
                 className={`border-2 border-dashed rounded-xl p-12 text-center mb-6 transition-colors ${
                   dragActive
                     ? 'border-ofa-calm bg-black/10'
-                    : 'border-gray-300 hover:border-ofa-calm'
+                    : 'border-[var(--border-subtle)] hover:border-ofa-calm'
                 }`}
                 onDragEnter={handleDrag}
                 onDragLeave={handleDrag}
@@ -496,29 +496,29 @@ export default function Library({ embedded = false }) {
               >
                 {uploadFile ? (
                   <div>
-                    <div className="text-black text-4xl mb-4">✓</div>
-                    <p className="text-black font-medium mb-2">{uploadFile.name}</p>
-                    <p className="text-gray-600 text-sm mb-4">
+                    <div className="text-[var(--text-primary)] text-4xl mb-4">✓</div>
+                    <p className="text-[var(--text-primary)] font-medium mb-2">{uploadFile.name}</p>
+                    <p className="text-[var(--text-secondary)] text-sm mb-4">
                       {(uploadFile.size / 1024 / 1024).toFixed(2)} MB
                     </p>
                     <button
                       onClick={() => setUploadFile(null)}
-                      className="text-gray-600 hover:text-black text-sm"
+                      className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-sm"
                     >
                       Remove file
                     </button>
                   </div>
                 ) : (
                   <div>
-                    <div className="text-black text-4xl mb-4">📄</div>
-                    <p className="text-black font-medium mb-2">Upload PDF</p>
-                    <p className="text-gray-600 text-sm mb-2">
+                    <div className="text-[var(--text-primary)] text-4xl mb-4">📄</div>
+                    <p className="text-[var(--text-primary)] font-medium mb-2">Upload PDF</p>
+                    <p className="text-[var(--text-secondary)] text-sm mb-2">
                       Drag and drop your PDF here
                     </p>
-                    <p className="text-gray-500 text-xs mb-4">
+                    <p className="text-[var(--text-muted)] text-xs mb-4">
                       or click to browse files (PDF only, max 50MB)
                     </p>
-                    <label className="inline-block px-6 py-2 bg-black/10 text-black rounded-xl hover:bg-black/20 transition-colors cursor-pointer">
+                    <label className="inline-block px-6 py-2 bg-black/10 text-[var(--text-primary)] rounded-xl hover:bg-black/20 transition-colors cursor-pointer">
                       Select File
                       <input
                         type="file"
@@ -534,29 +534,29 @@ export default function Library({ embedded = false }) {
               {/* Form Fields */}
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-black mb-2">Resource Title</label>
+                  <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Resource Title</label>
                   <input
                     type="text"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="e.g. Quarterly Investment Outlook"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-ofa-ink"
+                    className="w-full px-4 py-2 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-ofa-ink"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-black mb-2">Author</label>
+                  <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Author</label>
                   <input
                     type="text"
                     value={author}
                     onChange={(e) => setAuthor(e.target.value)}
                     placeholder="e.g. Robert C. Martin"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-ofa-ink"
+                    className="w-full px-4 py-2 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-ofa-ink"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-black mb-2">Category</label>
+                  <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Category</label>
                   <div className="relative">
                     <input
                       type="text"
@@ -564,7 +564,7 @@ export default function Library({ embedded = false }) {
                       onChange={(e) => setCategory(e.target.value)}
                       list="category-list"
                       placeholder="Type or select a category"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-ofa-ink"
+                      className="w-full px-4 py-2 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-ofa-ink"
                     />
                     <datalist id="category-list">
                       <option value="Uncategorized">Uncategorized</option>
@@ -579,11 +579,11 @@ export default function Library({ embedded = false }) {
                         ))}
                     </datalist>
                   </div>
-                  <p className="text-xs text-gray-600 mt-1">Type a new category name or select from existing ones</p>
+                  <p className="text-xs text-[var(--text-secondary)] mt-1">Type a new category name or select from existing ones</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-black mb-2">Folder (Optional)</label>
+                  <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Folder (Optional)</label>
                   <div className="relative">
                     <input
                       type="text"
@@ -591,7 +591,7 @@ export default function Library({ embedded = false }) {
                       onChange={(e) => setFolder(e.target.value)}
                       list="folder-list"
                       placeholder="Type or select a folder"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-ofa-ink"
+                      className="w-full px-4 py-2 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-ofa-ink"
                     />
                     <datalist id="folder-list">
                       {folders.map(f => (
@@ -602,7 +602,7 @@ export default function Library({ embedded = false }) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-black mb-2">Priority Level</label>
+                  <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Priority Level</label>
                   <div className="flex gap-2">
                     {['low', 'normal', 'high'].map((p) => (
                       <button
@@ -611,8 +611,8 @@ export default function Library({ embedded = false }) {
                         onClick={() => setPriority(p)}
                         className={`flex-1 px-4 py-2 rounded-xl transition-colors ${
                           priority === p
-                            ? 'bg-black text-white'
-                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            ? 'bg-[var(--accent)] text-white'
+                            : 'bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:bg-[var(--border-subtle)]'
                         }`}
                       >
                         {p.charAt(0).toUpperCase() + p.slice(1)}
@@ -622,13 +622,13 @@ export default function Library({ embedded = false }) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-black mb-2">Initial Notes</label>
+                  <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Initial Notes</label>
                   <textarea
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder="Add key takeaways or reason for saving..."
                     rows={4}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-ofa-ink resize-none"
+                    className="w-full px-4 py-2 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-ofa-ink resize-none"
                   />
                 </div>
               </div>
@@ -636,25 +636,25 @@ export default function Library({ embedded = false }) {
               {/* Error Message */}
               {uploadError && (
                 <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl">
-                  <p className="text-sm text-red-600">{uploadError}</p>
+                  <p className="text-sm text-[var(--error)]">{uploadError}</p>
                 </div>
               )}
 
               {/* Actions */}
-              <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-300">
+              <div className="flex items-center justify-between mt-8 pt-6 border-t border-[var(--border-subtle)]">
                 <button
                   onClick={() => {
                     setShowAddModal(false);
                     resetForm();
                   }}
-                  className="text-gray-600 hover:text-black transition-colors"
+                  className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleUpload}
                   disabled={!uploadFile || uploading}
-                  className="px-6 py-3 bg-black text-white rounded-xl hover:bg-black/90 disabled:opacity-50 transition-colors flex items-center gap-2"
+                  className="px-6 py-3 bg-[var(--accent)] text-white rounded-xl hover:opacity-90 disabled:opacity-50 transition-colors flex items-center gap-2"
                 >
                   <span>📁</span>
                   <span>{uploading ? 'Uploading...' : 'Save Resource'}</span>
@@ -682,14 +682,14 @@ export default function Library({ embedded = false }) {
           }}
         >
           <div
-            className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+            className="bg-[var(--bg-card)] rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-8">
               <div className="flex items-start justify-between mb-6">
                 <div>
-                  <h2 className="font-display text-2xl text-black mb-2">Edit Resource</h2>
-                  <p className="text-gray-600 text-sm">Update resource metadata</p>
+                  <h2 className="font-display text-2xl text-[var(--text-primary)] mb-2">Edit Resource</h2>
+                  <p className="text-[var(--text-secondary)] text-sm">Update resource metadata</p>
                 </div>
                 <button
                   onClick={() => {
@@ -703,7 +703,7 @@ export default function Library({ embedded = false }) {
                       priority: 'normal'
                     });
                   }}
-                  className="text-gray-600 hover:text-black transition-colors text-2xl"
+                  className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors text-2xl"
                 >
                   ×
                 </button>
@@ -711,34 +711,34 @@ export default function Library({ embedded = false }) {
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-black mb-2">Title</label>
+                  <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Title</label>
                   <input
                     type="text"
                     value={editForm.title}
                     onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-ofa-ink"
+                    className="w-full px-4 py-2 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-ofa-ink"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-black mb-2">Author</label>
+                  <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Author</label>
                   <input
                     type="text"
                     value={editForm.author}
                     onChange={(e) => setEditForm({ ...editForm, author: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-ofa-ink"
+                    className="w-full px-4 py-2 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-ofa-ink"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-black mb-2">Category</label>
+                  <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Category</label>
                   <div className="relative">
                     <input
                       type="text"
                       value={editForm.category}
                       onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
                       list="edit-category-list"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-ofa-ink"
+                      className="w-full px-4 py-2 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-ofa-ink"
                     />
                     <datalist id="edit-category-list">
                       <option value="Uncategorized">Uncategorized</option>
@@ -750,7 +750,7 @@ export default function Library({ embedded = false }) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-black mb-2">Folder</label>
+                  <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Folder</label>
                   <div className="relative">
                     <input
                       type="text"
@@ -758,7 +758,7 @@ export default function Library({ embedded = false }) {
                       onChange={(e) => setEditForm({ ...editForm, folder: e.target.value })}
                       list="edit-folder-list"
                       placeholder="Optional folder name"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-ofa-ink"
+                      className="w-full px-4 py-2 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-ofa-ink"
                     />
                     <datalist id="edit-folder-list">
                       {folders.map(f => (
@@ -769,7 +769,7 @@ export default function Library({ embedded = false }) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-black mb-2">Priority</label>
+                  <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Priority</label>
                   <div className="flex gap-2">
                     {['low', 'normal', 'high'].map((p) => (
                       <button
@@ -778,8 +778,8 @@ export default function Library({ embedded = false }) {
                         onClick={() => setEditForm({ ...editForm, priority: p })}
                         className={`flex-1 px-4 py-2 rounded-xl transition-colors ${
                           editForm.priority === p
-                            ? 'bg-black text-white'
-                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            ? 'bg-[var(--accent)] text-white'
+                            : 'bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:bg-[var(--border-subtle)]'
                         }`}
                       >
                         {p.charAt(0).toUpperCase() + p.slice(1)}
@@ -789,17 +789,17 @@ export default function Library({ embedded = false }) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-black mb-2">Notes</label>
+                  <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">Notes</label>
                   <textarea
                     value={editForm.notes}
                     onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
                     rows={4}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:border-ofa-ink resize-none"
+                    className="w-full px-4 py-2 border border-[var(--border-subtle)] rounded-xl focus:outline-none focus:border-ofa-ink resize-none"
                   />
                 </div>
               </div>
 
-              <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-300">
+              <div className="flex items-center justify-between mt-8 pt-6 border-t border-[var(--border-subtle)]">
                 <button
                   onClick={() => {
                     setEditingResource(null);
@@ -812,13 +812,13 @@ export default function Library({ embedded = false }) {
                       priority: 'normal'
                     });
                   }}
-                  className="text-gray-600 hover:text-black transition-colors"
+                  className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleUpdateResource}
-                  className="px-6 py-3 bg-black text-white rounded-xl hover:bg-black/90 transition-colors"
+                  className="px-6 py-3 bg-[var(--accent)] text-white rounded-xl hover:opacity-90 transition-colors"
                 >
                   Save Changes
                 </button>
@@ -835,7 +835,7 @@ export default function Library({ embedded = false }) {
 function ResourceCard({ resource, onOpen, onDelete, onEdit }) {
   return (
     <div
-      className="bg-white rounded-xl border border-gray-300 overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
+      className="bg-[var(--bg-card)] rounded-xl border border-[var(--border-subtle)] overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
       onClick={() => onOpen(resource.id)}
     >
       {/* Cover Image Placeholder */}
@@ -845,20 +845,20 @@ function ResourceCard({ resource, onOpen, onDelete, onEdit }) {
 
       {/* Content */}
       <div className="p-4">
-        <h3 className="font-medium text-black mb-1 line-clamp-2">{resource.title}</h3>
+        <h3 className="font-medium text-[var(--text-primary)] mb-1 line-clamp-2">{resource.title}</h3>
         {resource.author && (
-          <p className="text-sm text-gray-600 mb-3">{resource.author}</p>
+          <p className="text-sm text-[var(--text-secondary)] mb-3">{resource.author}</p>
         )}
 
         {/* Progress Bar */}
         <div className="mb-3">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-xs text-gray-600">Progress</span>
-            <span className="text-xs font-medium text-black">{Math.round(resource.progress || 0)}%</span>
+            <span className="text-xs text-[var(--text-secondary)]">Progress</span>
+            <span className="text-xs font-medium text-[var(--text-primary)]">{Math.round(resource.progress || 0)}%</span>
           </div>
-          <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div className="w-full h-2 bg-[var(--border-subtle)] rounded-full overflow-hidden">
             <div
-              className="h-full bg-black transition-all"
+              className="h-full bg-[var(--accent)] transition-all"
               style={{ width: `${resource.progress || 0}%` }}
             />
           </div>
@@ -871,7 +871,7 @@ function ResourceCard({ resource, onOpen, onDelete, onEdit }) {
               e.stopPropagation();
               onOpen(resource.id);
             }}
-            className="px-4 py-2 bg-black/10 text-black rounded-xl hover:bg-black/20 transition-colors flex items-center gap-2 text-sm font-medium"
+            className="px-4 py-2 bg-black/10 text-[var(--text-primary)] rounded-xl hover:bg-black/20 transition-colors flex items-center gap-2 text-sm font-medium"
           >
             <span>▶</span>
             <span>{resource.progress > 0 ? 'Resume Reading' : 'Start Reading'}</span>
@@ -882,7 +882,7 @@ function ResourceCard({ resource, onOpen, onDelete, onEdit }) {
                 e.stopPropagation();
                 onEdit(resource);
               }}
-              className="opacity-0 group-hover:opacity-100 p-2 text-gray-600 hover:text-black transition-all"
+              className="opacity-0 group-hover:opacity-100 p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all"
               title="Edit"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -891,7 +891,7 @@ function ResourceCard({ resource, onOpen, onDelete, onEdit }) {
             </button>
             <button
               onClick={(e) => onDelete(resource.id, e)}
-              className="opacity-0 group-hover:opacity-100 p-2 text-gray-600 hover:text-red-600 transition-all"
+              className="opacity-0 group-hover:opacity-100 p-2 text-[var(--text-secondary)] hover:text-[var(--error)] transition-all"
               title="Delete"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

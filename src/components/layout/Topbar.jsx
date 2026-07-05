@@ -106,7 +106,7 @@ export default function Topbar({ onQuickAction }) {
           {/* Search */}
           <div className="flex-1 max-w-xl hidden sm:block">
             <div 
-              className="relative flex items-center gap-2 px-4 py-2 rounded-lg transition-colors border"
+              className="relative flex items-center gap-2 px-4 py-2 rounded-xl transition-colors border"
               style={{ 
                 backgroundColor: 'var(--bg-surface)',
                 borderColor: 'var(--border-subtle)'
@@ -146,7 +146,7 @@ export default function Topbar({ onQuickAction }) {
             <div className="relative">
               <button
                 onClick={() => setShowCreateMenu(!showCreateMenu)}
-                className="px-4 py-2 rounded-lg text-sm transition-colors flex items-center gap-2 border"
+                className="px-4 py-2 rounded-xl text-sm transition-colors flex items-center gap-2 border"
                 style={{
                   backgroundColor: 'var(--bg-card)',
                   borderColor: 'var(--border-subtle)',
